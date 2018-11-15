@@ -116,10 +116,9 @@ void main(void)
 	
 	cam_out();//制御用へ出力
 	
-	ImageCapture(LineStart,LineStop);			//イメージキャプチャー
 	
 	//明るさの最大値が目標値に近づくまでループ && ラインを発見するまでループ
-	while(!((-25 < (Line_Max - Max)) && ((Line_Max - Max) < 25)) && (!((Wide != 0) && (Wide < (LineStop - LineStart))))){
+	do{
 	
 		mode = (MODE_HIGH_BIT & 0x01) + ((MODE_LOW_BIT & 0x01) << 1);//モード判定に使用
 		
@@ -131,10 +130,10 @@ void main(void)
 		
 		WhiteLineWide(LineStart,LineStop);		//白ラインの測定	
 		
-		cam_out();//制御用へ出力
+		//cam_out();//制御用へ出力
 		Center_lasttime = Center;//過去の値を保存
 		
-	}
+	}while(!((-50 < (Line_Max - Max)) && ((Line_Max - Max) < 50)) && (!((Wide != 0) && (Wide < 30))));
 	
 	
 	while( 1 ) {
@@ -156,7 +155,7 @@ void main(void)
 				break;
 				
 			case 1://坂モード
-				expose2();				//露光時間（全白、全黒でも時間変更)
+				expose();				//露光時間
 				
 				ImageCapture(LineStartSaka,LineStopSaka);			//イメージキャプチャー
 		
@@ -318,22 +317,21 @@ void expose( void )
 	int sa = Line_Max - Max;
 	
 	//if( Wide != 0 && White <= 60){//黒でなく白でもない
-	if( Wide == 0 || White >= 50){//黒or白
+	if( Wide == 0 || White >= 70){//黒or白
 		EXPOSURE_cnt++;
 	}else{
 		EXPOSURE_cnt = 0;
 	}
 	
 	if(EXPOSURE_cnt < 2){
-		if(-20 < sa && sa < 20)EXPOSURE_timer += (long)(sa*5);
-		else EXPOSURE_timer += (long)(sa*10);
-		
+		//if(-20 < sa && sa < 20)EXPOSURE_timer += (long)(sa*5);
+		//else 
 		EXPOSURE_timer += (long)(sa*10);
 	}	
 		
 	
-	if( EXPOSURE_timer > 100000000) EXPOSURE_timer = 100000000;
-	else if( EXPOSURE_timer < 0 ) EXPOSURE_timer = 0;
+	if( EXPOSURE_timer > 1000000000) EXPOSURE_timer = 1000000000;
+	else if( EXPOSURE_timer <= 0 ) EXPOSURE_timer = 0;
 
 	for(i=0;i<EXPOSURE_timer;i++);
 
@@ -348,10 +346,15 @@ void expose2( void )
 {
 	unsigned long i;
 	
-	EXPOSURE_timer += (long)((Line_Max - Max)*10);
+	//EXPOSURE_timer += (long)((Line_Max - Max)*10);
 	
-	if( EXPOSURE_timer > 100000000) EXPOSURE_timer = 100000000;
-	else if( EXPOSURE_timer < 0 ) EXPOSURE_timer = 0;
+	if(Line_Max - Max < 0){
+		EXPOSURE_timer -= 100;
+	}else{
+		EXPOSURE_timer += 100;
+	}
+	if( EXPOSURE_timer > 1000000000) EXPOSURE_timer = 1000000000;
+	else if( EXPOSURE_timer <= 0 ) EXPOSURE_timer = 0;
 	
 	for(i=0;i<EXPOSURE_timer;i++);
 
@@ -444,7 +447,7 @@ void binarization(int linestart, int linestop)
 	/* 黒は０　白は１にする */
 	White = 0;					/* 白の数を０にする */
 	
-	if( Max > Line_Max - 250 ){//320 -150
+	if( Max > Line_Max - 400 ){//320 -150  250
 		/* 白が一直線のとき */
 		//if(Min > Line_Max - 80 ){//260
 		if(Max - Min < 130){
