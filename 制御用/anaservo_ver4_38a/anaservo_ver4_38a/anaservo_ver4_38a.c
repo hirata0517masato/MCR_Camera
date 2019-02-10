@@ -37,8 +37,10 @@
 
 #define 	SERVO_MAX 			127	  	/* ハンドル最大位置 115           */
 
-#define 	MAXTIME 			1000	  	/* 最大走行時間 (0.01秒)  1200 = 12s          */
+#define 	MAXTIME 			1300	  	/* 最大走行時間 (0.01秒)  1200 = 12s          */
 
+//#define		BATTERY
+//ステアリングは無効中
 
 /*======================================*/
 /* プロトタイプ宣言                     */
@@ -49,6 +51,8 @@ unsigned char dipsw_get2( void );
 unsigned char pushsw_get( void );
 unsigned char cn6_get( void );
 void led_out( unsigned char led );
+void motor_r( int accele_l, int accele_r );
+void motor_f( int accele_l, int accele_r );
 void motor2_r( int accele_l, int accele_r );
 void motor2_f( int accele_l, int accele_r );
 void motor3_r( int accele_l, int accele_r );
@@ -73,6 +77,7 @@ void get_angle_y(void);
 void get_angle_x(void);
 int angle_check(void);
 int date_f_make(int, int , int,int);
+void getV(void);
 
 
 /*======================================*/
@@ -161,6 +166,10 @@ int 			pre_angle_x[2] = {0};		/* ジャイロセンサーのX軸の過去の値	*/
 int 			Center_IR = 0;
 int 			IR_flag = 0;
 
+int				BatteryV = 0;
+int 			pre_BatteryV[2] = {0};		/* バッテリー電圧の過去の値	*/
+
+
 /* TRCレジスタのバッファ */
 unsigned int    trcgrb_buff;            /* TRCGRBのバッファ             */
 unsigned int    trcgrd_buff;            /* TRCGRDのバッファ             */
@@ -171,22 +180,25 @@ unsigned char   types_dipsw;            /* ディップスイッチ値保存       */
 
 /*	パラメータ	*/
 //オフセット
-int  		Center_offset_MAX = 3;		/*カーブ時カメラセンターを移動＝寄せる 最大値	5			*/
-int  		Center_offset_Angle = 25;	/*この値につき１ＩＮ側に寄せる			*/
+int  		Center_offset_MAX = 2;		/*カーブ時カメラセンターを移動＝寄せる 最大値	5			*/
+int  		Center_offset_Angle = 30;	/*この値につき１ＩＮ側に寄せる			*/
 
 int  		Center_offset_MAX_saka = 1;		/*坂　カーブ時カメラセンターを移動＝寄せる 最大値	5			*/
 int  		Center_offset_Angle_saka = -20;	/*坂　この値につき１ＩＮ側に寄せる			*/
 int			KASOKU = 15;	
 
+
+int			BatteryVBase 		=	 1000;//バッテリー電圧の基準値(12.5V -> 1250) 0.5Vくらい低く測定されていそう
+
 //通常
 
-int			MOTOR_out_base	=		 95;		//カーブ前半用　外側モーター用パラメーター 
+int			MOTOR_out_base	=		 90;		//カーブ前半用　外側モーター用パラメーター 
 
 //////////////////////////////////////////// 0:禁止 1と-1は同じ
 //前半
 int		    TOPSPEED	=		50;		//直線 44
 int			SPEED_DOWN	=		6;		//角度によりTOPSPEEDを減速 カーブ前半
-int			MOTOR_out_R	=		 1;		//外側モーター用パラメーター -2
+int			MOTOR_out_R	=		 -3;		//外側モーター用パラメーター -2
 int			MOTOR_in_F	=		 -2;		//内側モーター用パラメーター 2
 int			MOTOR_in_R	=		-3;		//内側モーター用パラメーター -2
 	
@@ -197,18 +209,18 @@ int			MOTOR_in_F_N=		2;		//内側モーター用パラメーター　後半
 int			MOTOR_in_R_N=		1;		//内側モーター用パラメーター　後半
 
 
-int			S_para		=		2;		//S字きりかえし用パラメータ
+int			S_para		=		1;		//S字きりかえし用パラメータ
 int			OUT_M_DOWN	=		2;		//カーブ外寄りブレーキ用倍率
 
-int			date_f_brake	=	500;	//再生走行時のブレーキ使用可能距離(mm)
+int			date_f_brake	=	300;	//再生走行時のブレーキ使用可能距離(mm)
 
 int			Cu_FREE_time = 		5;		//カーブ終了時の後輪フリーの時間(msec）
 
 int			Cu_BRAKE_time = 	10;		//カーブ進入時のブレーキ時間 (msec)
-int			Cu_BRAKE_SP =		30;		//カーブ進入時にこの速度以上ならブレーキ
+int			Cu_BRAKE_SP =		43;		//カーブ進入時にこの速度以上ならブレーキ
 int			Cu_BRAKE	=		-60;	//カーブ進入時のブレーキ
 
-int			Cu_N_time	=		200;	//Cu_N_time ms カーブを走行すると後半になる 	
+int			Cu_N_time	=		100;	//Cu_N_time ms カーブを走行すると後半になる 	
 
 //坂
 int			saka_max	  =		  1;	//認識可能な坂の数
@@ -217,7 +229,7 @@ int 		KASA_Encoder2 = 	800;	//上り終わり
 int 		KASA_Encoder3 = 	2800;	//坂上終わり  1450
 int 		KASA_Encoder4 = 	4000;	//下り終わり 通常にもどる
 //斜面(下り)
-int		    TOPSPEED4	=		50;		//直線(坂）30 33
+int		    TOPSPEED4	=		45;		//直線(坂）30 33
 int			SPEED_DOWN4	=		10;		//角度によりTOPSPEEDを減速(坂）カーブ前半
 int			SPEED_DOWN4_N=		10;		//角度によりTOPSPEEDを減速  カーブ後半
 int			MOTOR_out4_R=		100;	//外側モーター用パラメーター(坂）
@@ -249,14 +261,16 @@ int			OUT_M_DOWN2	=		4;		//カーブ外寄りブレーキ用倍率(坂上）
 
 
 //クランク
-int		    C_TOPSPEED	=		32;		//クランク(入)  25 33
+int		    C_TOPSPEED	=		33;		//クランク(入)  25 33
+int		    C_TOPSPEED2	=		50;		//クランク(出)	40
+
 int 		C_TOPSPEED4 = 		48;		//再生走行時のブレーキ前
 int		    C_TOPSPEED3	=		40;		//クランク(入)  25 33 再生走行用
-int		    C_TOPSPEED2	=		50;		//クランク(出)	40
+
 int			date_f_brake_c	=	500;	//再生走行時のブレーキ使用可能距離(mm) クランク用
 int			date_f_shortcat_c=	200;	//再生走行時のショートカット距離(mm) クランク用
 
-int			c_cut 			 =	  1;	//個別設定になったので注意！　再生走行時であっても 0= 再生しない 1= 再生する
+int			c_cut 			 =	  1;	//個別設定も可能　再生走行時であっても 0= 再生しない 1= 再生する
 
 int c_cnt = 0;
 
@@ -268,12 +282,12 @@ int			date_f_brake_h	=	500;	//再生走行時のブレーキ使用可能距離(mm)　ハーフ用
 int			date_f_shortcat_h=	250;		//再生走行時のショートカット距離(mm)　ハーフ用 
 int			h_cut 			 =	  1;	//再生走行時であっても 0= 再生しない 1= 再生する 
 
-int			BRAKE_MAX	=		-70;	//ブレーキの最大パワー 
+int			BRAKE_MAX	=		-50;	//ブレーキの最大パワー 
 
 int			S_flag = 2;				//坂道　遇数回を　1 = 無視しない  2 = 無視する
 
 
-int				kp = -17;//- 8  3 -16 -19 -23  -13
+int				kp = -18;//- 8  3 -16 -19 -23  -13
 int				kd = -110;//-80 20 -130 -190	-110
 int 			ki = 0;//-2
 
@@ -323,7 +337,7 @@ void main( void )
     // 書き込みしたい時間[ms] : x = 10[ms] : 64バイト
     // 60000msなら、x = 60000 * 64 / 10 = 384000
     // 結果は512の倍数になるように繰り上げする。
-    msdEndAddress  = 384000;
+    msdEndAddress  = 768000;//384000;
     msdEndAddress += msdStartAddress;   /* スタート分足す               */                  
 
 	 /* microSD初期化 */
@@ -380,6 +394,9 @@ void main( void )
 	//加速度センサー値の初期化
 	angle_y = ad0;
 	angle_x = ad1;
+	
+	//バッテリー電圧
+	BatteryV = ad4;
 	
 	/* スタート時、マイコンディップスイッチ 1 = ON   再生モード　IN */
 	if( (dipsw_get() & 0x01) == 0x01 ) {
@@ -441,7 +458,11 @@ void main( void )
 	}
  
  
- 	//
+ /*	while(1){
+		
+		printf("%d\n",BatteryV);	
+	}
+ 	*/
  /*	while(1){
 		double v = ad4;
 		v *= 3 * 5;
@@ -450,7 +471,7 @@ void main( void )
 		printf("%lf\n",v);	
 	}*/
  
- /*	while(1){
+ 	/*while(1){
 		//printf("%4d  %4d\n",ad7, ad6);		
 		printf("%d\n",ad6 - ad7);		
 	}*/
@@ -758,8 +779,8 @@ void main( void )
             motor2_r( x, x );
 	
 		}else{
-			motor2_f(100 , 100 );
-         	motor2_r(100 , 100 );
+			motor_f(100 , 100 );
+         	motor_r(100 , 100 );
 		}
 		
 		
@@ -819,7 +840,7 @@ void main( void )
 			}
 		}
 		
-		if(-50 < i && i < 50){
+		if(-23 < i && i < 23){
 			if(mode == 0){//坂中でなければ
 			//	if(lEncoderTotal > 200 && (lEncoderTotal-sp2) >= 500 && (lEncoderTotal-sp) >= 100){//ゲートに反応しないように && 坂終了から少しの間は無視
 				if(lEncoderTotal > 200 ){//ゲートに反応しないように 
@@ -1031,8 +1052,8 @@ void main( void )
 				
 				//if(x < BRAKE_MAX) x = BRAKE_MAX;
 				if(x < 0) x = 0;
-				if(r < -5) r = -5;
-				if(f < 0) f = 0;
+				if(r < -10) r = -10;
+				if(f < -5) f = -5;
 				
 				motor2_f( x, r );
             	motor2_r( f, r );			
@@ -1065,10 +1086,10 @@ void main( void )
 				
 				if(or < 0) or = 0;
 				
-				motor2_f(f,MOTOR_out_base);
+				motor3_f(f,MOTOR_out_base);
 				//motor2_r(x,99);
 				
-				motor2_r(or,r);
+				motor3_r(or,r);
 					
 			}else if((Center  + Center_offset > 10) || (i >= 60 && cnt8 <= Cu_N_time)) {//外寄り
 				
@@ -1085,8 +1106,8 @@ void main( void )
 				
 				if(or < 0) or = 0;
 					
-				motor2_f( MOTOR_out_base, f);
-				motor2_r( or, r);
+				motor3_f( MOTOR_out_base, f);
+				motor3_r( or, r);
 					
         	}else{
 				
@@ -1182,8 +1203,8 @@ void main( void )
 				f = x;		
 				//if(x < BRAKE_MAX) x = BRAKE_MAX;
 				if(x < 0) x = 0;
-				if(r < -5) r = -5;
-				if(f < 0) f = 0;
+				if(r < -10) r = -10;
+				if(f < -5) f = -5;
 				
 				motor2_f( r, x );
             	motor2_r( r, f );
@@ -1215,8 +1236,8 @@ void main( void )
 				else or = (MOTOR_out_base - (-i * -MOTOR_out_R));
 				if(or < 0) or = 0;
 				
-				motor2_f(f, MOTOR_out_base);
-				motor2_r(r, or);
+				motor3_f(f, MOTOR_out_base);
+				motor3_r(r, or);
 					
 			}else if(Center  + Center_offset > 10) {//きりかえし
 			
@@ -1232,10 +1253,10 @@ void main( void )
 				else or = (MOTOR_out_base - (-i * -MOTOR_out_R));
 				if(or < 0) or = 0;
 				
-				motor2_f(MOTOR_out_base, f);
+				motor3_f(MOTOR_out_base, f);
 			//	motor2_r(99, x);
 			
-				motor2_r(r,or);
+				motor3_r(r,or);
 					
         	}else{
 				
@@ -1343,8 +1364,13 @@ void main( void )
 				
 				motor2_f(100 , 90 );
 				motor2_r(100 , 100 );
+				
+			}else if(mode == 0 && date_f_mode != 0 && date_f_buff_int[date_f_num] - date_f_brake > SEncoderTotal){//ブースト
+				
+				motor_f(100 , 100 );
+				motor_r(100 , 100 );
+				
 			}else{
-			
 				motor2_f(100 , 100 );
            		motor2_r(100 , 100 );
 				
@@ -1363,13 +1389,18 @@ void main( void )
 			servoPwmOut( iServoPwm  );
 		}
 		
-		if((date_f_mode != 0 && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_c )> SEncoderTotal)&& iEncoder10 >= TOPSPEED)){
+		//再生走行時　　ブレーキ
+		if((date_f_mode != 0 && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_c )> SEncoderTotal)&& iEncoder10 >= C_TOPSPEED4)){
+			
+			motor2_mode_f( FREE, FREE );
+			motor2_mode_r( FREE, FREE );
 			
 			x=(TOPSPEED-iEncoder10)*1;
 			if(x < BRAKE_MAX) x = BRAKE_MAX;
 			motor2_f( x, x );
             motor2_r( x, x );
 			
+		//クランク　ブレーキ
         }else if( (date_f_mode == 0 && iEncoder10 >= C_TOPSPEED) || (date_f_mode != 0 && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_c )< SEncoderTotal)&& iEncoder10 >= C_TOPSPEED)   ) {          // エンコーダによりスピード制御 
             int x;
 			x=(C_TOPSPEED-iEncoder10)*30;
@@ -1378,14 +1409,17 @@ void main( void )
 		//	if(r < BRAKE_MAX+50) r = BRAKE_MAX+50;
 		//	if(r > 0) r = 0;
 			
-			motor2_f( x, x );
-            motor2_r( x, x );
 			
 			motor2_mode_f( BRAKE, BRAKE );
 			motor2_mode_r( BRAKE, BRAKE );
 			
+			motor2_f( x, x );
+            motor2_r( x, x );
+			
+			
 		//	motor2_f( 40, 40 );
          //   motor2_r( 40, 40 );
+		 
         }else{
 			motor2_mode_f( FREE, FREE );
 			motor2_mode_r( FREE, FREE );
@@ -1445,13 +1479,17 @@ void main( void )
 			
 				Center_offset = 0;
 				
+				motor2_mode_f( BRAKE, BRAKE );
+				motor2_mode_r( BRAKE, BRAKE );
+			
 				motor2_f( -60, -60 );
             	motor2_r( -60, -60 );
 				
 				//if(date_f_mode == 0 || c_cut == 0)wait(4);
 				wait(4);
 				
-				motor2_mode_r( BRAKE, BRAKE );
+				motor2_mode_f( FREE, FREE );
+				motor2_mode_r( FREE, FREE );
 				break;
 				
         	}
@@ -1467,13 +1505,17 @@ void main( void )
 			
 				Center_offset = 0;
 				
+				motor2_mode_f( BRAKE, BRAKE );
+				motor2_mode_r( BRAKE, BRAKE );
+			
 				motor2_f( -60, -60 );
             	motor2_r( -60, -60 );
 				
 				//if(date_f_mode == 0 || c_cut == 0)wait(4);
 				wait(4);
 				
-				motor2_mode_r( BRAKE, BRAKE );
+				motor2_mode_f( FREE, FREE );
+				motor2_mode_r( FREE, FREE );
 				break;	
         	}
 		}
@@ -1484,6 +1526,7 @@ void main( void )
 		
 		i = (i +old_i) >> 1;
 		
+		//再生走行時 　ブレーキ
 		if((c_cut == 1 && date_f_mode != 0) && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_c )> SEncoderTotal)&& iEncoder10 >= C_TOPSPEED4){
 			
 			x=(C_TOPSPEED4-iEncoder10)*2;
@@ -1491,6 +1534,10 @@ void main( void )
 			if(r < BRAKE_MAX) r = BRAKE_MAX;
 			
 			if(x < BRAKE_MAX) x = BRAKE_MAX;
+			
+			motor2_mode_f( FREE, FREE );
+			motor2_mode_r( FREE, FREE );
+				
 			motor2_f( x, x );
             motor2_r( r, r );
 			
@@ -1500,25 +1547,33 @@ void main( void )
 				//motor2_f( 0, 0 );
             	//motor2_r( 0, 0 );
 				
-				if(c_cut == 0 || date_f_mode == 0)x=(C_TOPSPEED -iEncoder10)*30;
-				else x=(C_TOPSPEED3 -iEncoder10)*30;
+				if(c_cut == 0 || date_f_mode == 0)x=(C_TOPSPEED -iEncoder10)*20;
+				else x=(C_TOPSPEED3 -iEncoder10)*20;
 			
 				r = x;
 				if(r < -10) r = -10;
 				
 				if(x < BRAKE_MAX+20) x = BRAKE_MAX+20;
+				
+				motor2_mode_f( BRAKE, BRAKE );
+				motor2_mode_r( BRAKE, BRAKE );
+				
 				motor2_f( x, x );
             	motor2_r( r, r );
 			
 			}else{
-				if(c_cut == 0 || date_f_mode == 0)x=(C_TOPSPEED -iEncoder10)*30;
-				else x=(C_TOPSPEED3 -iEncoder10)*30;
+				if(c_cut == 0 || date_f_mode == 0)x=(C_TOPSPEED -iEncoder10)*20;
+				else x=(C_TOPSPEED3 -iEncoder10)*20;
 			
 				r = x;
 				if(r < -50 && (c_cut == 0 || date_f_mode == 0)) r = -50;
 				else if(r < BRAKE_MAX) r = BRAKE_MAX;
 				
 				if(x < BRAKE_MAX) x = BRAKE_MAX;
+				
+				motor2_mode_f( BRAKE, BRAKE );
+				motor2_mode_r( BRAKE, BRAKE );
+				
 				motor2_f( x, x );
             	motor2_r( r, r );
 			}
@@ -1587,40 +1642,40 @@ void main( void )
 				
 			if(0 < Center  && (lEncoderTotal-sp) >= 150  || (Wide != 0 && -6 < Center  && (lEncoderTotal-sp) >= 250)){
 				iSetAngle = -45;
-				motor2_f( 0,   95 );         
-        		motor2_r( 0,   0 ); 
+				motor3_f( 0,   95 );         
+        		motor3_r( 0,   0 ); 
 		
 			}else if((lEncoderTotal-sp) >= 350){
 				iSetAngle = 100;
-				motor2_f( 95,   30 );         
-        		motor2_r( 50,   0 );  
+				motor3_f( 95,   30 );         
+        		motor3_r( 50,   0 );  
 				
 				
 			}else if((lEncoderTotal-sp) >= 250){
 				iSetAngle = 110;
-				motor2_f( 95,   0 );         
-        		motor2_r( 0,   0 );  
+				motor3_f( 95,   0 );         
+        		motor3_r( 0,   0 );  
 			
 				
 			}else if((lEncoderTotal-sp) >= 150){
 				iSetAngle = 104;
-				motor2_f( 95,   0 );         
-        		motor2_r( 40,   0 );
+				motor3_f( 95,   0 );         
+        		motor3_r( 40,   0 );
 				
 			}else if((lEncoderTotal-sp) >= 100){
 				iSetAngle = 95;
-				motor2_f( 95,   30 );         
-        		motor2_r( 70,   25 );
+				motor3_f( 95,   30 );         
+        		motor3_r( 70,   25 );
 			
 			}else if((lEncoderTotal-sp) >= 50){
 				iSetAngle = 60;
-				motor2_f( 100,   35 );         
-        		motor2_r( 80,  30 );
+				motor3_f( 100,   35 );         
+        		motor3_r( 80,  30 );
 					
 			}else{
 				iSetAngle = 40;
-				motor2_f( 100,   45 );         
-        		motor2_r( 90,   40 );
+				motor3_f( 100,   45 );         
+        		motor3_r( 90,   40 );
 			} 
 			
        	}
@@ -1738,39 +1793,39 @@ void main( void )
   
 			if((Center < 0 && (lEncoderTotal-sp) >= 100) || (Wide != 0 && Center < 6 && (lEncoderTotal-sp) >= 250)){
 				iSetAngle = 45;
-				motor2_f( 95,   0 );         
-        		motor2_r( 0,   0 ); 
+				motor3_f( 95,   0 );         
+        		motor3_r( 0,   0 ); 
 		
 			}else if((lEncoderTotal-sp) >= 350){
 				iSetAngle = -100;
-				motor2_f( 30,   95 );         
-        		motor2_r( 0,   50 );  
+				motor3_f( 30,   95 );         
+        		motor3_r( 0,   50 );  
 				
 			}else if((lEncoderTotal-sp) >= 250){
 				iSetAngle = -110;
-				motor2_f( 0,   95 );         
-        		motor2_r( 0,   0 );  
+				motor3_f( 0,   95 );         
+        		motor3_r( 0,   0 );  
 			
 				
 			}else if((lEncoderTotal-sp) >= 150){
 				iSetAngle = -100;
-				motor2_f( 0,   95 );         
-        		motor2_r( 0,   40 );
+				motor3_f( 0,   95 );         
+        		motor3_r( 0,   40 );
 				
 			}else if((lEncoderTotal-sp) >= 100){
 				iSetAngle = -95;
-				motor2_f( 35,   95 );         
-        		motor2_r( 25,   70 );
+				motor3_f( 35,   95 );         
+        		motor3_r( 25,   70 );
 			
 			}else if((lEncoderTotal-sp) >= 50){
 				iSetAngle = -60;
-				motor2_f( 40,   100 );         
-        		motor2_r( 35,  80 );
+				motor3_f( 40,   100 );         
+        		motor3_r( 35,  80 );
 					
 			}else{
 				iSetAngle = -40;
-				motor2_f( 45,   100 );         
-        		motor2_r( 40,   90 );
+				motor3_f( 45,   100 );         
+        		motor3_r( 40,   90 );
 			}  
        	}
 		
@@ -1806,6 +1861,7 @@ void main( void )
         break;
 
     case 42:
+		/* 安定するまで (ショーカットは42には来ないよ)*/
 		
 		if((lEncoderTotal-sp) >= 120)iSetAngle = -90;
 		else iSetAngle = -100;
@@ -2419,7 +2475,7 @@ void main( void )
         printf( "\n" );
         printf( "CarName Data Out\n" ); /* 自分のカーネームを入れてください */
         printf( "Pattern, Center, Wide ,角度, サーボPWM, " );
-        printf( "左前PWM, 右前PWM, 左後PWM, 右後PWM, エンコーダ,モード,坂道回数,ジャイロY/10,ジャイロX/10,赤外線\n" );
+        printf( "左前PWM, 右前PWM, 左後PWM, 右後PWM, エンコーダ,電圧,坂道回数,ジャイロY/10,ジャイロX/10,赤外線\n" );
 		
 		msdWorkAddress = msdStartAddress;   /* 読み込み開始アドレス     */
         pattern = 106;
@@ -3077,6 +3133,9 @@ void intTRB( void )
 	get_angle_y();
 	get_angle_x();
 
+	//バッテリー電圧
+	getV();
+	
     /* サーボモータ制御 */
     servoControl();
 	servoControl2();
@@ -3177,7 +3236,8 @@ void intTRB( void )
 			*p++ = RleftMotorBuff;       /* 後左モータPWM値                */
             *p++ = RrightMotorBuff;      /* 後右モータPWM値                */
 			*p++ = iEncoder5;    /* エンコーダ                   */
-            *p++ = mode;/*モード*/
+            //*p++ = mode;/*モード*/
+			*p++ = (char)(BatteryV/10);
             *p++ = flag2;/*坂道回数*/
             *p++ = (char)(angle_y/10);
             *p++ = (char)(angle_x/10);
@@ -3328,6 +3388,148 @@ void led_out( unsigned char led )
 
 
 /************************************************************************/
+/* 後輪の速度制御 ディップスイッチには関係しないmotor関数              */
+/* 引数　 左モータ:-100～100 , 右モータ:-100～100                       */
+/*        0で停止、100で正転100%、-100で逆転100%                        */
+/* 戻り値 なし                                                          */
+/************************************************************************/
+void motor_r( int accele_l, int accele_r )
+{
+	if(accele_l > 100){
+		accele_l = 100;
+	}else if(accele_l < -100){
+		accele_l = -100;
+	}
+	
+	
+	if(accele_r > 100){
+		accele_r = 100;
+	}else if(accele_r < -100){
+		accele_r = -100;
+	}
+	
+	
+	#ifndef BATTERY
+	RleftMotorBuff  = accele_l;          /* バッファに保存               */
+    RrightMotorBuff = accele_r;         /* バッファに保存               */
+	#endif
+	
+	
+	#ifdef BATTERY
+	RleftMotorBuff  = (int)(((long)accele_l * BatteryV) / BatteryVBase);          /* バッファに保存               */
+    RrightMotorBuff = (int)(((long)accele_r * BatteryV) / BatteryVBase);         /* バッファに保存               */
+	#endif
+	 
+	
+    /* 左後モータ */
+    if( accele_l >= 0 ) {
+        p2_1 = 0;
+	/*	if(accele_l == 100){
+			p2_2 = 1;
+			//trdpsr0 = 0x08;                     // TRDIOB0,C0,D0端子設定        
+    		//trdpsr1 = 0x05;                     // TRDIOA1,B1,C1,D1端子設定     
+		}else{
+			trdpsr0 = 0x08;                     // TRDIOB0,C0,D0端子設定        
+    		trdpsr1 = 0x05;                     // TRDIOA1,B1,C1,D1端子設定     
+		}*/
+		
+		if(accele_l == 100)trdgrd0 = (long)( TRD_MOTOR_CYCLE);
+        else trdgrd0 = (long)( TRD_MOTOR_CYCLE - 2 ) * accele_l / 100;
+		
+		//trdgrd0 = (long)( TRD_MOTOR_CYCLE - 2 ) * accele_l / 100;
+    } else {
+        p2_1 = 1;
+		if(accele_l == -100)trdgrd0 = (long)( TRD_MOTOR_CYCLE);
+        else trdgrd0 = (long)( TRD_MOTOR_CYCLE - 2 ) * ( -accele_l ) / 100;
+		
+		//trdgrd0 = (long)( TRD_MOTOR_CYCLE - 2 ) * ( -accele_l ) / 100;
+    }
+
+    /* 右後モータ */
+    if( accele_r >= 0 ) {
+        p2_3 = 0;
+		if(accele_r == 100)trdgrc1 = (long)( TRD_MOTOR_CYCLE);
+        else trdgrc1 = (long)( TRD_MOTOR_CYCLE - 2 ) * accele_r / 100;
+		
+		//trdgrc1 = (long)( TRD_MOTOR_CYCLE - 2 ) * accele_r / 100;
+    } else {
+        p2_3 = 1;
+		if(accele_r == -100)trdgrc1 = (long)( TRD_MOTOR_CYCLE);
+        else trdgrc1 = (long)( TRD_MOTOR_CYCLE - 2 ) * ( -accele_r ) / 100;
+		
+		//trdgrc1 = (long)( TRD_MOTOR_CYCLE - 2 ) * ( -accele_r ) / 100;
+    }
+}
+
+
+/************************************************************************/
+/* 前輪の速度制御 ディップスイッチには関係しないmotor関数              */
+/* 引数　 左モータ:-100～100 , 右モータ:-100～100                       */
+/*        0で停止、100で正転100%、-100で逆転100%                        */
+/* 戻り値 なし                                                          */
+/************************************************************************/
+void motor_f( int accele_l, int accele_r )
+{
+	if(accele_l > 100){
+		accele_l = 100;
+	}else if(accele_l < -100){
+		accele_l = -100;
+	}
+	
+
+	if(accele_r > 100){
+		accele_r = 100;
+	}else if(accele_r < -100){
+		accele_r = -100;
+	}
+	
+	
+	#ifndef BATTERY
+	FleftMotorBuff  = accele_l;          /* バッファに保存               */
+    FrightMotorBuff = accele_r;         /* バッファに保存               */
+	#endif
+	
+	
+	#ifdef BATTERY
+	FleftMotorBuff  = (int)(((long)accele_l * BatteryV) / BatteryVBase);          /* バッファに保存               */
+    FrightMotorBuff = (int)(((long)accele_r * BatteryV) / BatteryVBase);         /* バッファに保存               */
+	#endif
+	
+	
+    /* 左前モータ */
+    if( accele_l >= 0 ) {
+        p2_0 = 0;
+    } else {
+        p2_0 = 1;
+        accele_l = -accele_l;
+    }
+    if( accele_l <= -1 ) {//5
+        trcgrb = trcgrb_buff = trcgra;
+    } else {
+		if(accele_l == 100)trcgrb_buff = (unsigned long)(TRC_MOTOR_CYCLE);
+        else trcgrb_buff = (unsigned long)(TRC_MOTOR_CYCLE-2) * accele_l / 100;
+		
+		//trcgrb_buff = (unsigned long)(TRC_MOTOR_CYCLE-2) * accele_l / 100;
+    }
+
+    /* 右前モータ */
+    if( accele_r >= 0 ) {
+        p2_7 = 0;
+    } else {
+        p2_7 = 1;
+        accele_r = -accele_r;
+    }
+    if( accele_r <= -1 ) {//5
+        trcgrd = trcgrd_buff = trcgra;
+    } else {
+		if(accele_r == 100)trcgrd_buff = (unsigned long)(TRC_MOTOR_CYCLE);
+        else trcgrd_buff = (unsigned long)(TRC_MOTOR_CYCLE-2) * accele_r / 100;
+		
+		//trcgrd_buff = (unsigned long)(TRC_MOTOR_CYCLE-2) * accele_r / 100;
+    }
+}
+
+/************************************************************************/
 /* 後輪の速度制御2 ディップスイッチには関係しないmotor関数              */
 /* 引数　 左モータ:-100～100 , 右モータ:-100～100                       */
 /*        0で停止、100で正転100%、-100で逆転100%                        */
@@ -3341,11 +3543,6 @@ void motor2_r( int accele_l, int accele_r )
 		accele_l = -100;
 	}
 	
-	/*
-	if(accele_l == 0 || (RleftMotorBuff > 0 && accele_l < 0) || (RleftMotorBuff < 0 && accele_l > 0))accele_l = 0;
-	else if(accele_l - RleftMotorBuff  > KASOKU)accele_l = RleftMotorBuff + KASOKU;
-	else if(accele_l - RleftMotorBuff < -KASOKU)accele_l = RleftMotorBuff - KASOKU;
-	*/
 	
 	if(accele_r > 100){
 		accele_r = 100;
@@ -3353,11 +3550,23 @@ void motor2_r( int accele_l, int accele_r )
 		accele_r = -100;
 	}
 	
-	/*
-	if(accele_r == 0 || (RrightMotorBuff > 0 && accele_r < 0) || (RrightMotorBuff < 0 && accele_r > 0))accele_r = 0;
-	else if(accele_r - RrightMotorBuff > KASOKU)accele_r = RrightMotorBuff + KASOKU;
-	else if(accele_r - RrightMotorBuff < -KASOKU)accele_r = RrightMotorBuff- KASOKU;
-	*/
+	
+//	RleftMotorBuff  = accele_l;          /* バッファに保存               */
+//    RrightMotorBuff = accele_r;          /* バッファに保存               */
+	 
+	////////////////////////////////////////////////
+	#ifdef BATTERY
+	accele_l = (int)(((long)accele_l * BatteryVBase) / BatteryV);
+	accele_r = (int)(((long)accele_r * BatteryVBase) / BatteryV);
+	
+	if(accele_l > 100)accele_l = 100;
+	else if(accele_l < -100)accele_l = -100;
+	
+	
+	if(accele_r > 100)accele_r = 100;
+	else if(accele_r < -100)accele_r = -100;
+	#endif
+	///////////////////////////////////////////////
 	
 	RleftMotorBuff  = accele_l;          /* バッファに保存               */
     RrightMotorBuff = accele_r;          /* バッファに保存               */
@@ -3418,11 +3627,6 @@ void motor2_f( int accele_l, int accele_r )
 		accele_l = -100;
 	}
 	
-	/*
-	if(accele_l == 0  || (FleftMotorBuff > 0 && accele_l < 0) || (FleftMotorBuff < 0 && accele_l > 0))accele_l = 0;
-	else if(accele_l - FleftMotorBuff  > KASOKU)accele_l = FleftMotorBuff + KASOKU;
-	else if(accele_l - FleftMotorBuff < -KASOKU)accele_l = FleftMotorBuff - KASOKU;
-	*/
 
 	if(accele_r > 100){
 		accele_r = 100;
@@ -3430,15 +3634,27 @@ void motor2_f( int accele_l, int accele_r )
 		accele_r = -100;
 	}
 	
-	/*
-	if(accele_r == 0 || (FrightMotorBuff > 0 && accele_r < 0) || (FrightMotorBuff < 0 && accele_r > 0))accele_r = 0;
-	else if(accele_r - FrightMotorBuff > KASOKU)accele_r = FrightMotorBuff + KASOKU;
-	else if(accele_r - FrightMotorBuff < -KASOKU)accele_r = FrightMotorBuff- KASOKU;
-	*/
 	
+//	FleftMotorBuff  = accele_l;          /* バッファに保存               */
+//    FrightMotorBuff = accele_r;          /* バッファに保存               */
+
+	////////////////////////////////////////////////
+	#ifdef BATTERY
+	accele_l = (int)(((long)accele_l * BatteryVBase) / BatteryV);
+	accele_r = (int)(((long)accele_r * BatteryVBase) / BatteryV);
+	
+	if(accele_l > 100)accele_l = 100;
+	else if(accele_l < -100)accele_l = -100;
+	
+	
+	if(accele_r > 100)accele_r = 100;
+	else if(accele_r < -100)accele_r = -100;
+	#endif
+	///////////////////////////////////////////////
+
 	FleftMotorBuff  = accele_l;          /* バッファに保存               */
     FrightMotorBuff = accele_r;          /* バッファに保存               */
-
+	
 	
     /* 左前モータ */
     if( accele_l >= 0 ) {
@@ -3473,7 +3689,6 @@ void motor2_f( int accele_l, int accele_r )
     }
 }
 
-
 /************************************************************************/
 /* 後輪の速度制御3 ディップスイッチには関係しないmotor関数              */
 /* 引数　 左モータ:-100～100 , 右モータ:-100～100                       */
@@ -3482,11 +3697,8 @@ void motor2_f( int accele_l, int accele_r )
 /************************************************************************/
 void motor3_r( int accele_l, int accele_r )
 {
-	if(accele_l > 100){
-		accele_l = 100;
-	}else if(accele_l < -100){
-		accele_l = -100;
-	}
+	if(accele_l > 100)accele_l = 100;
+	else if(accele_l < -100)accele_l = -100;
 	
 	
 	if(accele_l == 0 || (RleftMotorBuff > 0 && accele_l < 0) || (RleftMotorBuff < 0 && accele_l > 0))accele_l = 0;
@@ -3494,11 +3706,8 @@ void motor3_r( int accele_l, int accele_r )
 	else if(accele_l - RleftMotorBuff < -KASOKU)accele_l = RleftMotorBuff - KASOKU;
 	
 	
-	if(accele_r > 100){
-		accele_r = 100;
-	}else if(accele_r < -100){
-		accele_r = -100;
-	}
+	if(accele_r > 100)accele_r = 100;
+	else if(accele_r < -100)accele_r = -100;
 	
 	
 	if(accele_r == 0 || (RrightMotorBuff > 0 && accele_r < 0) || (RrightMotorBuff < 0 && accele_r > 0))accele_r = 0;
@@ -3506,10 +3715,26 @@ void motor3_r( int accele_l, int accele_r )
 	else if(accele_r - RrightMotorBuff < -KASOKU)accele_r = RrightMotorBuff- KASOKU;
 	
 	
+//	RleftMotorBuff  = accele_l;          /* バッファに保存               */
+//    RrightMotorBuff = accele_r;          /* バッファに保存               */
+	
+	////////////////////////////////////////////////
+	#ifdef BATTERY
+	accele_l = (int)(((long)accele_l * BatteryVBase) / BatteryV);
+	accele_r = (int)(((long)accele_r * BatteryVBase) / BatteryV);
+	
+	if(accele_l > 100)accele_l = 100;
+	else if(accele_l < -100)accele_l = -100;
+	
+	
+	if(accele_r > 100)accele_r = 100;
+	else if(accele_r < -100)accele_r = -100;
+	#endif
+	///////////////////////////////////////////////
+	
 	RleftMotorBuff  = accele_l;          /* バッファに保存               */
     RrightMotorBuff = accele_r;          /* バッファに保存               */
-	
-	
+
     /* 左後モータ */
     if( accele_l >= 0 ) {
         p2_1 = 0;
@@ -3549,11 +3774,8 @@ void motor3_r( int accele_l, int accele_r )
 /************************************************************************/
 void motor3_f( int accele_l, int accele_r )
 {
-	if(accele_l > 100){
-		accele_l = 100;
-	}else if(accele_l < -100){
-		accele_l = -100;
-	}
+	if(accele_l > 100)accele_l = 100;
+	else if(accele_l < -100)accele_l = -100;
 	
 	
 	if(accele_l == 0  || (FleftMotorBuff > 0 && accele_l < 0) || (FleftMotorBuff < 0 && accele_l > 0))accele_l = 0;
@@ -3561,11 +3783,8 @@ void motor3_f( int accele_l, int accele_r )
 	else if(accele_l - FleftMotorBuff < -KASOKU)accele_l = FleftMotorBuff - KASOKU;
 	
 
-	if(accele_r > 100){
-		accele_r = 100;
-	}else if(accele_r < -100){
-		accele_r = -100;
-	}
+	if(accele_r > 100)accele_r = 100;
+	else if(accele_r < -100)accele_r = -100;
 	
 	
 	if(accele_r == 0 || (FrightMotorBuff > 0 && accele_r < 0) || (FrightMotorBuff < 0 && accele_r > 0))accele_r = 0;
@@ -3573,10 +3792,26 @@ void motor3_f( int accele_l, int accele_r )
 	else if(accele_r - FrightMotorBuff < -KASOKU)accele_r = FrightMotorBuff- KASOKU;
 	
 	
+//	FleftMotorBuff  = accele_l;          /* バッファに保存               */
+//    FrightMotorBuff = accele_r;          /* バッファに保存               */
+
+	////////////////////////////////////////////////
+	#ifdef BATTERY
+	accele_l = (int)(((long)accele_l * BatteryVBase) / BatteryV);
+	accele_r = (int)(((long)accele_r * BatteryVBase) / BatteryV);
+	
+	if(accele_l > 100)accele_l = 100;
+	else if(accele_l < -100)accele_l = -100;
+	
+	
+	if(accele_r > 100)accele_r = 100;
+	else if(accele_r < -100)accele_r = -100;
+	#endif
+	///////////////////////////////////////////////
+
 	FleftMotorBuff  = accele_l;          /* バッファに保存               */
     FrightMotorBuff = accele_r;          /* バッファに保存               */
-
-	
+		
     /* 左前モータ */
     if( accele_l >= 0 ) {
         p2_0 = 0;
@@ -3665,6 +3900,14 @@ void servoPwmOut( int pwm )
     
 	handleBuff = pwm;                 /* バッファに保存               */
 
+	/////////////////////////////////////////////////////
+/*	#ifdef BATTERY
+	pwm = (int)(((long)pwm * BatteryVBase) / BatteryV);
+	
+	if( pwm >  100 ) pwm =  100;
+	else if( pwm < -100 ) pwm = -100;
+	#endif
+*/	////////////////////////////////////////////////////
 	
     if( pwm >= 0 ) {
         p2_6 = 0;
@@ -3777,7 +4020,7 @@ unsigned char check_wideline( void )
 	//cam_in();//値の取得
 	
 	ret = 0;
-	if(Wide >= 35){
+	if(Wide >= 37){
 	
 		ret = 1;			/* wideライン発見 */
 	}
@@ -3969,6 +4212,27 @@ int angle_check(){
 		if(angle_x > 440)return 0;//下
 	}
 	return 1;//変化無し
+}
+
+/**************************************************************************/
+/*	バッテリー電圧の取得 (12.5V -> 1250)												  */
+/**************************************************************************/
+void getV(){
+
+	long long v = ad4;
+	v *= 1500;//3 * 15 * 100
+	v >>= 10;// /1023
+	
+	pre_BatteryV[0] = pre_BatteryV[1];
+	pre_BatteryV[1] = BatteryV;
+	
+	BatteryV = (int)(((long)BatteryV * 85/100) + (v * 15/100));
+	
+	if(((pre_BatteryV[0] < pre_BatteryV[1]) && (pre_BatteryV[1] < BatteryV))  || ((BatteryV < pre_BatteryV[1]) && (pre_BatteryV[1] < pre_BatteryV[0])))
+		BatteryV = pre_BatteryV[1];
+		
+	else if(((pre_BatteryV[1] < pre_BatteryV[0]) && (pre_BatteryV[0] < BatteryV))  || ((BatteryV < pre_BatteryV[0]) && (pre_BatteryV[0] < pre_BatteryV[1])))
+		BatteryV = pre_BatteryV[0];
 }
 
 
