@@ -71,8 +71,8 @@ unsigned long   cnt1000 =  0;
 
 /* カメラ関連 */
 unsigned long	EXPOSURE_timer = 3000;	/* 露光時間	20000				*/
-int		ImageData[130];			/* カメラの値				*/
-int 		BinarizationData[130];	/* ２値化					*/
+int		ImageData[128];			/* カメラの値				*/
+int 		BinarizationData[128];	/* ２値化					*/
 
 int		Max = 0,Min,Ave;	/*カメラ読み取り最大値、最小値、平均値*/
 
@@ -109,7 +109,7 @@ void main(void)
 	
 	
 	/* Data Initialization */
-	for(i=0;i<130;i++){
+	for(i=0;i<128;i++){
 		ImageData[i] = 0;			/* カメラの値				*/
 		BinarizationData[i] = 0;	/* ２値化					*/
 	}
@@ -333,7 +333,9 @@ void expose( void )
 	if( EXPOSURE_timer > 1000000000) EXPOSURE_timer = 1000000000;
 	else if( EXPOSURE_timer <= 0 ) EXPOSURE_timer = 0;
 
-	for(i=0;i<EXPOSURE_timer;i++);
+	i = EXPOSURE_timer;
+	while(i > 0)i--;
+	//for(i=0;i<EXPOSURE_timer;i++);
 
 }
 
@@ -356,7 +358,9 @@ void expose2( void )
 	if( EXPOSURE_timer > 1000000000) EXPOSURE_timer = 1000000000;
 	else if( EXPOSURE_timer <= 0 ) EXPOSURE_timer = 0;
 	
-	for(i=0;i<EXPOSURE_timer;i++);
+	i = EXPOSURE_timer;
+	while(i > 0)i--;
+	//for(i=0;i<EXPOSURE_timer;i++);
 
 }
  
@@ -372,9 +376,9 @@ void ImageCapture(int linestart, int linestop){
 	TAOS_SI_HIGH;
 	TAOS_CLK_HIGH;
 	TAOS_SI_LOW;
-	ImageData[0] = 0;
 	TAOS_CLK_LOW;
-	for(i = 1; i < LineStart; i++) {		
+	
+	for(i = 0; i < LineStart; i++) {		
 		TAOS_CLK_HIGH;		
 		TAOS_CLK_LOW;
 	}
@@ -406,9 +410,6 @@ void ImageCapture(int linestart, int linestop){
 		TAOS_CLK_HIGH;		
 		TAOS_CLK_LOW;
 	}
-	
-	TAOS_CLK_HIGH;
-	TAOS_CLK_LOW;
 }
 /************************************************************************/
 /* A/D値読み込み(AN0)                                                 */
