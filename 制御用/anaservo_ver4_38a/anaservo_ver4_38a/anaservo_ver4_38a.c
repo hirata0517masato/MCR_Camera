@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			127	  	/* ハンドル最大位置 115           */
 
-#define 	MAXTIME 			1300	  	/* 最大走行時間 (0.01秒)  1200 = 12s          */
+#define 	MAXTIME 			900	  	/* 最大走行時間 (0.01秒)  1200 = 12s          */
 
 
 /*======================================*/
@@ -73,6 +73,11 @@ void get_angle_y(void);
 void get_angle_x(void);
 int angle_check(void);
 int date_f_make(int, int , int,int);
+int IR_L(void);
+int IR_R(void);
+void Get_Center_IR(void);
+void IRcalibration( void );
+
 
 
 /*======================================*/
@@ -140,6 +145,7 @@ long            SEncoderTotal = 0;          /* 直線積算値保存用                 
 
 /*  サーボ関連 */
 int             iSensorBefore = 0;          /* 前回のセンサ値保存           */
+int             iSensorBeforeIR = 0;          /* 前回のセンサ値保存           */
 int             iAngleBefore2 = 0;
 int             iServoPwm = 0;              /* サーボＰＷＭ値               */
 int             iServoPwm2 = 0;
@@ -160,6 +166,10 @@ int 			pre_angle_y[2] = {0};		/* ジャイロセンサーのY軸の過去の値	*/
 int 			pre_angle_x[2] = {0};		/* ジャイロセンサーのX軸の過去の値	*/
 int 			Center_IR = 0;
 int 			IR_flag = 0;
+int 			IR_max[2] = {};
+int				IR_min[2] = {1024,1024};
+int 			IR_cnt = 0;
+int 			IR_old = 0;
 
 
 /* TRCレジスタのバッファ */
@@ -172,11 +182,10 @@ unsigned char   types_dipsw;            /* ディップスイッチ値保存       */
 
 /*	パラメータ	*/
 //オフセット
-int  		Center_offset_MAX = 2;		/*カーブ時カメラセンターを移動＝寄せる 最大値	5			*/
-int  		Center_offset_Angle = 30;	/*この値につき１ＩＮ側に寄せる			*/
+int  		Center_offset_MAX = 4;		/*カーブ時カメラセンターを移動＝寄せる 最小値 0 最大値	5			*/
+int  		Center_offset_Angle = -15;	/*この値につき１ＩＮ側に寄せる	正：IN　負：OUT		*/
 
-int  		Center_offset_MAX_saka = 1;		/*坂　カーブ時カメラセンターを移動＝寄せる 最大値	5			*/
-int  		Center_offset_Angle_saka = -20;	/*坂　この値につき１ＩＮ側に寄せる			*/
+
 int			KASOKU = 15;	
 
 //通常
@@ -184,15 +193,29 @@ int			KASOKU = 15;
 int			MOTOR_out_base	=		 90;		//カーブ前半用　外側モーター用パラメーター 
 
 //////////////////////////////////////////// 0:禁止 1と-1は同じ
-//前半
+/*//前半
 int		    TOPSPEED	=		50;		//直線 44
-int			SPEED_DOWN	=		6;		//角度によりTOPSPEEDを減速 カーブ前半
-int			MOTOR_out_R	=		 -3;		//外側モーター用パラメーター -2
-int			MOTOR_in_F	=		 -2;		//内側モーター用パラメーター 2
-int			MOTOR_in_R	=		-3;		//内側モーター用パラメーター -2
+int			SPEED_DOWN	=		9;		//角度によりTOPSPEEDを減速 カーブ前半
+int			MOTOR_out_R	=		 3;		//外側モーター用パラメーター -2
+int			MOTOR_in_F	=		 2;		//内側モーター用パラメーター 2
+int			MOTOR_in_R	=		1;		//内側モーター用パラメーター -2
 	
 //後半
-int			SPEED_DOWN_N=		8;		//角度によりTOPSPEEDを減速  カーブ後半
+int			SPEED_DOWN_N=		10;		//角度によりTOPSPEEDを減速  カーブ後半
+int			MOTOR_out_R_N=		4;		//外側モーター用パラメーター 後半
+int			MOTOR_in_F_N=		3;		//内側モーター用パラメーター　後半
+int			MOTOR_in_R_N=		2;		//内側モーター用パラメーター　後半
+*/
+
+//前半
+int		    TOPSPEED	=		50;		//直線 44
+int			SPEED_DOWN	=		9;		//角度によりTOPSPEEDを減速 カーブ前半
+int			MOTOR_out_R	=		 1;		//外側モーター用パラメーター -2
+int			MOTOR_in_F	=		 1;		//内側モーター用パラメーター 2
+int			MOTOR_in_R	=		-2;		//内側モーター用パラメーター -2
+	
+//後半
+int			SPEED_DOWN_N=		10;		//角度によりTOPSPEEDを減速  カーブ後半
 int			MOTOR_out_R_N=		2;		//外側モーター用パラメーター 後半
 int			MOTOR_in_F_N=		2;		//内側モーター用パラメーター　後半
 int			MOTOR_in_R_N=		1;		//内側モーター用パラメーター　後半
@@ -201,24 +224,24 @@ int			MOTOR_in_R_N=		1;		//内側モーター用パラメーター　後半
 int			S_para		=		1;		//S字きりかえし用パラメータ
 int			OUT_M_DOWN	=		2;		//カーブ外寄りブレーキ用倍率
 
-int			date_f_brake	=	300;	//再生走行時のブレーキ使用可能距離(mm)
+int			date_f_brake	=	400;	//再生走行時のブレーキ使用可能距離(mm)
 
-int			Cu_FREE_time = 		5;		//カーブ終了時の後輪フリーの時間(msec）
+int			Cu_FREE_time = 		10;		//カーブ終了時の後輪フリーの時間(msec）
 
 int			Cu_BRAKE_time = 	10;		//カーブ進入時のブレーキ時間 (msec)
 int			Cu_BRAKE_SP =		43;		//カーブ進入時にこの速度以上ならブレーキ
 int			Cu_BRAKE	=		-60;	//カーブ進入時のブレーキ
 
-int			Cu_N_time	=		100;	//Cu_N_time ms カーブを走行すると後半になる 	
+int			Cu_N_time	=		200;	//Cu_N_time ms カーブを走行すると後半になる 	
 
 //坂
 int			saka_max	  =		  1;	//認識可能な坂の数
-int 		KASA_Encoder1 = 	350;	//坂開始
-int 		KASA_Encoder2 = 	800;	//上り終わり 
+int 		KASA_Encoder1 = 	400;	//坂開始
+int 		KASA_Encoder2 = 	700;	//上り終わり 
 int 		KASA_Encoder3 = 	2800;	//坂上終わり  1450
 int 		KASA_Encoder4 = 	4000;	//下り終わり 通常にもどる
 //斜面(下り)
-int		    TOPSPEED4	=		45;		//直線(坂）30 33
+int		    TOPSPEED4	=		48;		//直線(坂）30 33
 int			SPEED_DOWN4	=		10;		//角度によりTOPSPEEDを減速(坂）カーブ前半
 int			SPEED_DOWN4_N=		10;		//角度によりTOPSPEEDを減速  カーブ後半
 int			MOTOR_out4_R=		100;	//外側モーター用パラメーター(坂）
@@ -238,7 +261,7 @@ int			MOTOR_in3_R	=		10;		//内側モーター用パラメーター(坂）
 int			S_para3		=		2;		//S字きりかえし用パラメータ(坂）
 int			OUT_M_DOWN3	=		2;		//カーブ外寄りブレーキ用倍率(坂）
 //上
-int		    TOPSPEED2	=		40;		//直線(坂上）30 33
+int		    TOPSPEED2	=		36;		//直線(坂上）30 33
 int			SPEED_DOWN2	=		6;		//角度によりTOPSPEEDを減速(坂上）カーブ前半
 int			SPEED_DOWN2_N=		6;		//角度によりTOPSPEEDを減速  カーブ後半
 int			MOTOR_out2_R=		-1;		//外側モーター用パラメーター(坂上)
@@ -253,11 +276,11 @@ int			OUT_M_DOWN2	=		4;		//カーブ外寄りブレーキ用倍率(坂上）
 int		    C_TOPSPEED	=		33;		//クランク(入)  25 33
 int		    C_TOPSPEED2	=		50;		//クランク(出)	40
 
-int 		C_TOPSPEED4 = 		48;		//再生走行時のブレーキ前
+int 		C_TOPSPEED4 = 		45;		//再生走行時のブレーキ前
 int		    C_TOPSPEED3	=		40;		//クランク(入)  25 33 再生走行用
 
 int			date_f_brake_c	=	500;	//再生走行時のブレーキ使用可能距離(mm) クランク用
-int			date_f_shortcat_c=	200;	//再生走行時のショートカット距離(mm) クランク用
+int			date_f_shortcat_c=	210;	//再生走行時のショートカット距離(mm) クランク用
 
 int			c_cut 			 =	  1;	//個別設定も可能　再生走行時であっても 0= 再生しない 1= 再生する
 
@@ -268,10 +291,11 @@ int		    H_TOPSPEED	=		48;		//ハーフ（侵入）37 壁なし 47 46
 int		    H_TOPSPEED2	=		44;		//ハーフ(斜め)  31 壁なし 45
 int		    H_TOPSPEED2_S=		50;		//ハーフ(斜め)  ショートカット用
 int			date_f_brake_h	=	500;	//再生走行時のブレーキ使用可能距離(mm)　ハーフ用 
-int			date_f_shortcat_h=	250;		//再生走行時のショートカット距離(mm)　ハーフ用 
+int			date_f_shortcat_h=	250;		//再生走行時のショートカット距離(mm)　ハーフ用
+int			date_f_plus_h	=	300;		//再生走行時の直後のストレート距離補正(mm)　ハーフ用  
 int			h_cut 			 =	  1;	//再生走行時であっても 0= 再生しない 1= 再生する 
 
-int			BRAKE_MAX	=		-50;	//ブレーキの最大パワー 
+int			BRAKE_MAX	=		-100;	//ブレーキの最大パワー 
 
 int			S_flag = 2;				//坂道　遇数回を　1 = 無視しない  2 = 無視する
 
@@ -280,8 +304,8 @@ int				kp = -18;//- 8  3 -16 -19 -23  -13
 int				kd = -110;//-80 20 -130 -190	-110
 int 			ki = 0;//-2
 
-int				kp_ir = -70;
-int				kd_ir = -115;
+int				kp_ir = -20;
+int				kd_ir = -110;
 int 			ki_ir = 0;
 
 
@@ -445,10 +469,6 @@ void main( void )
 	}
  
 
- 
- 	while(1){
-		printf("%4d  %4d  %4d\n",ad7, ad6,ad6 - ad7);				
-	}
     while( 1 ) {
 		
 //	I2CEepromProcess();                 /* I2C EEP-ROM保存処理          */
@@ -459,7 +479,7 @@ void main( void )
 	Center_old = Center;
 	Wide_old = Wide;
 	
-	Center_IR = (ad6 - ad7);//赤外線センサー
+	Get_Center_IR();//赤外線センサー
 	cam_in();//値の取得
 
 	
@@ -483,7 +503,7 @@ void main( void )
 	
 	//脱線チェック
 	if(pattern < 100){
-		if(((check_wideline()) || (iEncoder10 < 3) || (Wide == 0 && Center == 0  && pattern != 53 && pattern != 63 && pattern != 31 && pattern != 41 && pattern != 32 && pattern != 42)) && (pattern > 3) && (pattern != 70)){
+		if(((check_wideline()) || (iEncoder10 < 3) || (mode != 1 && Wide == 0 && Center == 0  && pattern != 53 && pattern != 63 && pattern != 31 && pattern != 41 && pattern != 32 && pattern != 42)) && (pattern >= 10) && (pattern != 70)){
 			out_cnt ++;		
 		}else{
 			out_cnt = 0;
@@ -494,14 +514,40 @@ void main( void )
 		}
 	}
 	
-    switch( pattern ) {
+    switch( pattern ) {	
     case 0:
-        /* プッシュスイッチ押下待ち */
+        
+		/* プッシュスイッチ押下待ち */
         servoPwmOut( 0 );
         if( pushsw_get() ) {
 			setBeepPatternS( 0x8000 );
 			iAngle0 = 0;
 			iAngle0 = getServoAngle();  /* 0度の位置記憶                */
+			
+			IRcalibration( );
+			
+			
+ 			/*while(1){
+				printf("%4d  %4d  %4d\n",IR_L(), IR_R(),IR_R() - IR_L());				
+			}*/
+			
+            setBeepPatternS( 0xcc00 );
+            cnt1 = 0;
+            pattern = 5;
+            break;
+        }
+		
+        led_out(camera(Center,Wide));
+		
+        break;
+	case 5:
+		/* プッシュスイッチ押下待ち */
+        servoPwmOut( 0 );
+        if( pushsw_get() ) {
+			setBeepPatternS( 0x8000 );
+			iAngle0 = 0;
+			iAngle0 = getServoAngle();  /* 0度の位置記憶                */
+			
 			
 			ret = eraseMicroSD( msdStartAddress, msdEndAddress-1 );
             if( ret != 0x00 ) {
@@ -630,7 +676,7 @@ void main( void )
         }else{
 			led_out(camera(Center,Wide));
 		}
-        break;
+		break;
     case 1:
         /* スタートバー開待ち */
 		servoPwmOut( 0 );
@@ -768,6 +814,12 @@ void main( void )
     case 11:
         /* 通常トレース */
 		 
+		 old_i = i;//前回の角度を記憶
+		
+        i = getServoAngle();//ハンドル角度取得
+		
+		i = (i +old_i) >> 1;
+		
 		if(mode != 1 && Wide == 0){//黒だったら
 			Center = Center_old;
 			Wide = Wide_old;
@@ -784,13 +836,50 @@ void main( void )
 			Wide = Wide_old;	
 		}
 		
-		if(mode == 1 && Wide == 0){//坂中 && ライン見えない
-			Center = (ad6 - ad7);//赤外線センサー
+	
+		if(mode == 1){
+			if(IR_flag == 0){
+				if((-10 < i && i < 10) && (-5 < Center && Center < 5 && Wide != 0) && (	-5 < Center_IR  && 	Center_IR < 5)){
+					if(KASA_Encoder1 <= (lEncoderTotal-sp2) && (lEncoderTotal-sp2) < KASA_Encoder2){
+						IR_cnt++;
+						if(IR_cnt > 20){
+							IR_flag = 1;
+							IR_cnt = 0;
+						}	
+					}
+				}
+			}else{
+				if((-10 < i && i < 10) && (-5 < Center && Center < 5 && Wide != 0) && (	-5 < Center_IR  && 	Center_IR < 5)){
+					if(KASA_Encoder3 <= (lEncoderTotal-sp2)){
+						IR_cnt++;
+						if(IR_cnt > 20){
+							IR_flag = 0;
+							IR_cnt = 0;
+						}	
+					}
+				}
+			}
+		}else{
+			if(IR_flag == 1){
+				if((-10 < i && i < 10) && (-5 < Center && Center < 5 && Wide != 0) && (	-5 < Center_IR  && 	Center_IR < 5)){
+					
+					IR_cnt++;
+					if(IR_cnt > 20){
+						IR_flag = 0;
+						IR_cnt = 0;
+					}	
+				}
+			}
+		}	
+		
+	
+	/*	if(mode == 1 && (-10 < i && i < 10) && KASA_Encoder2 <= (lEncoderTotal-sp2) && (lEncoderTotal-sp2) < KASA_Encoder3){
+		//if(mode == 1 && Wide == 0){//坂中 && ライン見えない
 			IR_flag = 1;
 		}else{
 			IR_flag = 0;
 		}
-		
+	*/	
 		if(cnt2 >=  MAXTIME * 10){//走行時間終了
 			pattern = 200;
 			motor_mode_f( BRAKE, BRAKE );
@@ -798,11 +887,7 @@ void main( void )
 			break;
 		}
 		
-		old_i = i;//前回の角度を記憶
 		
-        i = getServoAngle();//ハンドル角度取得
-		
-		i = (i +old_i) >> 1;
 		
 		if(-10 < i && i < 10){
 			//if(cn6_get() == 7 && ((lEncoderTotal-sp2) >= 1000) && ((lEncoderTotal-sp) >= 1000)){//坂センサーチェック
@@ -814,7 +899,7 @@ void main( void )
 			}
 		}
 		
-		if(-23 < i && i < 23){
+		if(-30 < i && i < 30){
 			if(mode == 0){//坂中でなければ
 			//	if(lEncoderTotal > 200 && (lEncoderTotal-sp2) >= 500 && (lEncoderTotal-sp) >= 100){//ゲートに反応しないように && 坂終了から少しの間は無視
 				if(lEncoderTotal > 200 ){//ゲートに反応しないように 
@@ -894,6 +979,7 @@ void main( void )
 		}
 		
 		if(mode == 0){//通常
+		
 			if(cnt5 >= 1){//坂
 				if(flag2 % S_flag == 0 && saka_max > 0){
 
@@ -987,16 +1073,14 @@ void main( void )
 		}else{
 			servoPwmOut( iServoPwm );	
 		}
-        if( i > 9 ){//ハンドル右
+        if( i > 12 ){//ハンドル右
 			
 			if(mode != 1){
 				Center_offset = i / Center_offset_Angle ;//カーブで寄せる
 				if(Center_offset > Center_offset_MAX )Center_offset = Center_offset_MAX;
 				if(Center_offset < -Center_offset_MAX )Center_offset = -Center_offset_MAX;
 			}else{
-				Center_offset = i / Center_offset_Angle_saka ;//カーブで寄せる
-				if(Center_offset > Center_offset_MAX_saka )Center_offset = Center_offset_MAX_saka;
-				if(Center_offset < -Center_offset_MAX_saka )Center_offset = -Center_offset_MAX_saka;
+				Center_offset = 0;
 			}
 			
 			
@@ -1139,16 +1223,14 @@ void main( void )
 							
 			}
 			 		 	 
-		}else if( i < -9 ){//ハンドル左
+		}else if( i < -12 ){//ハンドル左
 			
 			if(mode != 1){
 				Center_offset = i / Center_offset_Angle ;//カーブで寄せる
 				if(Center_offset > Center_offset_MAX )Center_offset = Center_offset_MAX;
 				if(Center_offset < -Center_offset_MAX )Center_offset = -Center_offset_MAX;
 			}else{
-				Center_offset = i / Center_offset_Angle_saka ;//カーブで寄せる
-				if(Center_offset > Center_offset_MAX_saka )Center_offset = Center_offset_MAX_saka;
-				if(Center_offset < -Center_offset_MAX_saka )Center_offset = -Center_offset_MAX_saka;
+				Center_offset = 0;
 			}
 			
 			
@@ -1321,7 +1403,7 @@ void main( void )
 						 (mode == 0 && date_f_mode != 0 && (date_f_buff_int[date_f_num] - date_f_brake )< SEncoderTotal) && (iEncoder10 >= (TOPSPEED -(i / SPEED_DOWN)))) {// エンコーダによりスピード制御 
 						 
 				if(date_f_mode == 0 || mode == 1)x=((TOPSPEED -(i / SPEED_DOWN))-iEncoder10)/2;
-				else x=((TOPSPEED -(i / SPEED_DOWN))-iEncoder10)*5;//再生走行時のブレーキ
+				else x=((TOPSPEED -(i / SPEED_DOWN))-iEncoder10)*10;//再生走行時のブレーキ
 					
 				if(x < BRAKE_MAX) x = BRAKE_MAX;
 				if(mode != 0 && date_f_mode == 0 && x < -5)x = -5;
@@ -1369,7 +1451,7 @@ void main( void )
 			motor_mode_f( FREE, FREE );
 			motor_mode_r( FREE, FREE );
 			
-			x=(TOPSPEED-iEncoder10)*1;
+			x=(C_TOPSPEED4-iEncoder10)*1;
 			if(x < BRAKE_MAX) x = BRAKE_MAX;
 			motor_f( x, x );
             motor_r( x, x );
@@ -1379,9 +1461,8 @@ void main( void )
             int x;
 			x=(C_TOPSPEED-iEncoder10)*30;
 			r = x;
-			if(x < -50) x = -50;
-		//	if(r < BRAKE_MAX+50) r = BRAKE_MAX+50;
-		//	if(r > 0) r = 0;
+			
+			if(r < BRAKE_MAX) r = BRAKE_MAX;
 			
 			
 			motor_mode_f( BRAKE, BRAKE );
@@ -1416,30 +1497,31 @@ void main( void )
         /* クロスライン後のトレース、直角検出処理 */
 		
 		//if(c_cut == 1 && date_f_mode != 0){
-		if(date_f_mode != 0){
+		/*if(date_f_mode != 0){
 			if(date_f_buff_ch_int[date_f_num_ch-1] == 31){
 				
-				if(Center < -16){//寄りすぎ
-					Center_offset = 13;//右に寄る
+				if(Center < -14){//寄りすぎ
+					Center_offset = 9;//右に寄る
 					servoPwmOut( iServoPwm );
 				
 				}else{
-					Center_offset = 14;//右に寄る
+					Center_offset = 12;//右に寄る
 					servoPwmOut( iServoPwm );
 				}
 			}else{
-				if(Center > 16){//寄りすぎ
-					Center_offset = -13;//左に寄る
+				if(Center > 14){//寄りすぎ
+					Center_offset = -9;//左に寄る
 					servoPwmOut( iServoPwm );
 				}else{
-					Center_offset = -14;//左に寄る
+					Center_offset = -12;//左に寄る
 					servoPwmOut( iServoPwm  );
 				}
 			}
 			
 		}else{
 			servoPwmOut( iServoPwm * 1.5  );
-		}
+		}*/
+		servoPwmOut( iServoPwm * 1.5  );
 		
 		if( (lEncoderTotal-sp) >= 250 ) {
 			//if((( c_cut == 0 || date_f_mode == 0) && check_halfline() == 2) || ((c_cut == 1 && date_f_mode != 0) && date_f_buff_ch_int[date_f_num_ch-1] == 31  && (check_wideline() == 1 || ((date_f_buff_ch_int[date_f_num_ch] - date_f_shortcat_c )< SEncoderTotal)))){//右クランク
@@ -1456,8 +1538,8 @@ void main( void )
 				motor_mode_f( BRAKE, BRAKE );
 				motor_mode_r( BRAKE, BRAKE );
 			
-				motor_f( -60, -60 );
-            	motor_r( -60, -60 );
+				motor_f( -80, -80 );
+            	motor_r( -80, -80 );
 				
 				//if(date_f_mode == 0 || c_cut == 0)wait(4);
 				wait(4);
@@ -1482,8 +1564,8 @@ void main( void )
 				motor_mode_f( BRAKE, BRAKE );
 				motor_mode_r( BRAKE, BRAKE );
 			
-				motor_f( -60, -60 );
-            	motor_r( -60, -60 );
+				motor_f( -80, -80 );
+            	motor_r( -80, -80 );
 				
 				//if(date_f_mode == 0 || c_cut == 0)wait(4);
 				wait(4);
@@ -1501,7 +1583,8 @@ void main( void )
 		i = (i +old_i) >> 1;
 		
 		//再生走行時 　ブレーキ
-		if((c_cut == 1 && date_f_mode != 0) && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_c )> SEncoderTotal)&& iEncoder10 >= C_TOPSPEED4){
+		//if((c_cut == 1 && date_f_mode != 0) && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_c )> SEncoderTotal)&& iEncoder10 >= C_TOPSPEED4){
+		if((date_f_mode != 0) && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_c )> SEncoderTotal)&& iEncoder10 >= C_TOPSPEED4){
 			
 			x=(C_TOPSPEED4-iEncoder10)*2;
 			r = x;
@@ -1515,9 +1598,13 @@ void main( void )
 			motor_f( x, x );
             motor_r( r, r );
 			
- 		}else if( ((c_cut == 0 || date_f_mode == 0) && iEncoder10 >= C_TOPSPEED) || ((c_cut == 1 && date_f_mode != 0) && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_c )< SEncoderTotal)&& iEncoder10 >= C_TOPSPEED3)   ) {          // エンコーダによりスピード制御 
+ 		}else if( ((date_f_mode == 0) && iEncoder10 >= C_TOPSPEED) 
+				|| ((c_cut == 1 && date_f_mode != 0) && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_c )< SEncoderTotal)&& iEncoder10 >= C_TOPSPEED3) 
+				|| ((c_cut == 0 && date_f_mode != 0) && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_c )< SEncoderTotal)&& iEncoder10 >= C_TOPSPEED)   ) {          // エンコーダによりスピード制御 
              
-			if(i < -10 || 10 < i){//abs
+			if((i < -10 || 10 < i) && 
+				((date_f_mode != 0 && ( date_f_buff_ch_int[date_f_num_ch-1] == 31 || date_f_buff_ch_int[date_f_num_ch-1] == 41) && (lEncoderTotal-sp) >= 300) 
+				|| (date_f_mode == 0))){//abs
 				//motor_f( 0, 0 );
             	//motor_r( 0, 0 );
 				
@@ -1549,16 +1636,9 @@ void main( void )
 				motor_mode_r( BRAKE, BRAKE );
 				
 				motor_f( x, x );
-            	motor_r( r, r );
+            	motor_r( x, x );
 			}
-		}else if((c_cut == 1 && date_f_mode != 0) && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_c )> SEncoderTotal)){
-			
-			motor_mode_f( FREE, FREE );
-			motor_mode_r( FREE, FREE );
-				
-			motor_f( 100, 100 );
-            motor_r( 100, 100 );
-			
+	
         }else{
 			
 			motor_mode_f( FREE, FREE );
@@ -1604,10 +1684,10 @@ void main( void )
 			mode = 3;//左無視
 			
 			if((lEncoderTotal-sp) >= 140)iSetAngle = 105;
-			else iSetAngle = 95;
+			else iSetAngle = 100;
 			
-			motor_f( 100, -60 );          /* この部分は「角度計算(4WD時).xls」*/
-        	motor_r( -40, -50 );          /* で計算                        */
+			motor_f( 90, -45 );          /* この部分は「角度計算(4WD時).xls」*/
+        	motor_r( -30, -50 );          /* で計算                        */
 			
 		
 		}else{
@@ -1616,40 +1696,52 @@ void main( void )
 				
 			if(0 < Center  && (lEncoderTotal-sp) >= 150  || (Wide != 0 && -6 < Center  && (lEncoderTotal-sp) >= 250)){
 				iSetAngle = -45;
-				motor2_f( 0,   95 );         
+				motor2_f( 0,   85 );         
         		motor2_r( 0,   0 ); 
 		
 			}else if((lEncoderTotal-sp) >= 350){
 				iSetAngle = 100;
-				motor2_f( 95,   30 );         
-        		motor2_r( 50,   0 );  
+				motor2_f( 90,   10 );         
+        		motor2_r( 30,   0 );  
 				
 				
 			}else if((lEncoderTotal-sp) >= 250){
-				iSetAngle = 110;
-				motor2_f( 95,   0 );         
+				
+				if(i < 90)iSetAngle = 150;
+				else iSetAngle = 105;
+				
+				motor2_f( 90,   0 );         
         		motor2_r( 0,   0 );  
 			
 				
 			}else if((lEncoderTotal-sp) >= 150){
-				iSetAngle = 104;
-				motor2_f( 95,   0 );         
-        		motor2_r( 40,   0 );
+				
+				if(i < 85)iSetAngle = 150;
+				else iSetAngle = 100;
+				
+				motor2_f( 90,   0 );         
+        		motor2_r( 20,   0 );
 				
 			}else if((lEncoderTotal-sp) >= 100){
-				iSetAngle = 95;
-				motor2_f( 95,   30 );         
-        		motor2_r( 70,   25 );
+				
+				if(i < 75)iSetAngle = 150;
+				else iSetAngle = 95;
+				
+				motor2_f( 90,   10 );         
+        		motor2_r( 30,   0 );
 			
 			}else if((lEncoderTotal-sp) >= 50){
-				iSetAngle = 60;
-				motor2_f( 100,   35 );         
-        		motor2_r( 80,  30 );
+				
+				if(i < 45)iSetAngle = 100;
+				else iSetAngle = 85;
+				
+				motor2_f( 90,   15 );         
+        		motor2_r( 40,  0 );
 					
 			}else{
-				iSetAngle = 40;
-				motor2_f( 100,   45 );         
-        		motor2_r( 90,   40 );
+				iSetAngle = 55;
+				motor2_f( 90,   20 );         
+        		motor2_r( 50,   0 );
 			} 
 			
        	}
@@ -1659,7 +1751,7 @@ void main( void )
         if((( c_cut == 0 || date_f_mode == 0) && (lEncoderTotal-sp) >= 180) || ((c_cut == 1 && date_f_mode != 0) && (lEncoderTotal-sp) >= 270)){
 			if(Wide != 0){
 			//if (((20 < Center)&&(Center < 40)) || ((-15 < Center)&&(Center < 15))) {    /* 曲げ終わりチェック           */
-			if ( (( c_cut == 0 || date_f_mode == 0) && -15 < Center && Center < 25 /*&& 120 <= i*/) 
+			if ( (( c_cut == 0 || date_f_mode == 0) && -15 < Center && Center < 25 && (Wide != 0 && Wide < 30) ) 
 				|| ((c_cut == 1 && date_f_mode != 0) && -20 < Center && Center < -6 && (Wide_old == 0 || Wide > Wide_old))
 				  || ((c_cut == 1 && date_f_mode != 0) && -25 < Center && Center < 25 && (Wide_old != 0) && (lEncoderTotal-sp) >= 750)) {    /* 曲げ終わりチェック           */
 				
@@ -1688,8 +1780,8 @@ void main( void )
     case 32:
         /* 安定するまで (ショーカットは32には来ないよ)*/
 		
-        if((lEncoderTotal-sp) >= 90)iSetAngle = 100;
-		else iSetAngle = 105;
+        if((lEncoderTotal-sp) >= 90)iSetAngle = 90;
+		else iSetAngle = 95;
 	
 		servoPwmOut( iServoPwm2 );          /* 振りが弱いときは大きくする       */
 
@@ -1700,12 +1792,12 @@ void main( void )
 			motor_f( x, x );
            	motor_r( x, x );
        	}else{
-			motor2_f( 100, 100 );
-           	motor2_r( 60, 50 );
+			motor2_f( 90, 70 );
+           	motor2_r( 70, 60 );
 		}
          
 		
-		if((lEncoderTotal-sp) >= 50){ 
+		if((lEncoderTotal-sp) >= 90){ 
 			if(Wide != 0){                       
         		if(((-20 < Center)&&(Center < 20) && getServoAngle() < 120) 
 					|| ((-5 < Center)&&(Center < 5) && getServoAngle() < 128)) {    /*  直線になるまで          */
@@ -1735,7 +1827,7 @@ void main( void )
            	motor_r( x, x );
        	}else{
 			motor2_f( 100, 100 );
-           	motor2_r( 70, 70 );
+           	motor2_r( 80, 80 );
 		}
 			
 		if( (lEncoderTotal-sp) >= 200 && -30 < getServoAngle() && getServoAngle() < 30 ) {
@@ -1754,52 +1846,61 @@ void main( void )
         if(date_f_mode == 0 || c_cut == 0){
 			mode = 2;//右無視
 			
-			if((lEncoderTotal-sp) >= 155)iSetAngle = -105;
-			else iSetAngle = -95;
+			if((lEncoderTotal-sp) >= 140)iSetAngle = -105;
+			else iSetAngle = -100;
 			
-			motor_f( -60, 100 );          /* この部分は「角度計算(4WD時).xls」*/
-        	motor_r( -50, -40 );          /* で計算                        */
+			motor_f( -45, 90 );          /* この部分は「角度計算(4WD時).xls」*/
+        	motor_r( -50, -30 );          /* で計算                        */
 			
-		
+			
 		}else{
 			mode = 1;//見る範囲を狭く
 			
   
 			if((Center < 0 && (lEncoderTotal-sp) >= 100) || (Wide != 0 && Center < 6 && (lEncoderTotal-sp) >= 250)){
-				iSetAngle = 45;
-				motor2_f( 95,   0 );         
+				iSetAngle = -45;
+				motor2_f( 85,   0 );         
         		motor2_r( 0,   0 ); 
 		
 			}else if((lEncoderTotal-sp) >= 350){
 				iSetAngle = -100;
-				motor2_f( 30,   95 );         
-        		motor2_r( 0,   50 );  
+				motor2_f( 10,   90 );         
+        		motor2_r( 0,   30 );  
 				
 			}else if((lEncoderTotal-sp) >= 250){
-				iSetAngle = -110;
-				motor2_f( 0,   95 );         
+				
+				if(i > -90)iSetAngle = -150;
+				else iSetAngle = -105;
+				
+				motor2_f( 0,   90 );         
         		motor2_r( 0,   0 );  
 			
 				
 			}else if((lEncoderTotal-sp) >= 150){
-				iSetAngle = -100;
-				motor2_f( 0,   95 );         
-        		motor2_r( 0,   40 );
+				if(i > -85)iSetAngle = -150;
+				else iSetAngle = -100;
+				
+				motor2_f( 0,   90 );         
+        		motor2_r( 0,   20 );
 				
 			}else if((lEncoderTotal-sp) >= 100){
-				iSetAngle = -95;
-				motor2_f( 35,   95 );         
-        		motor2_r( 25,   70 );
+				if(i > -75)iSetAngle = -150;
+				else iSetAngle = -95;
+				
+				motor2_f( 10,   90 );         
+        		motor2_r( 0,   30 );
 			
 			}else if((lEncoderTotal-sp) >= 50){
-				iSetAngle = -60;
-				motor2_f( 40,   100 );         
-        		motor2_r( 35,  80 );
+				if(i > -45)iSetAngle = -100;
+				else iSetAngle = -85;
+				
+				motor2_f( 15,   90 );         
+        		motor2_r( 0,  40 );
 					
 			}else{
-				iSetAngle = -40;
-				motor2_f( 45,   100 );         
-        		motor2_r( 40,   90 );
+				iSetAngle = -55;
+				motor2_f( 20,   90 );         
+        		motor2_r( 0,   50 );
 			}  
        	}
 		
@@ -1808,7 +1909,7 @@ void main( void )
 		if(((c_cut == 0 || date_f_mode == 0) && (lEncoderTotal-sp) >= 180) || ((c_cut == 1 && date_f_mode != 0) && (lEncoderTotal-sp) >= 150)){
 			if(Wide != 0){ 
 			//if( ((-40 < Center)&&(Center < -20)) || ((-15 < Center)&&(Center < 15))) {    /* 曲げ終わりチェック           */
-	 		if(( (c_cut == 0 || date_f_mode == 0) && -25 < Center && Center < 15) 
+	 		if(( (c_cut == 0 || date_f_mode == 0) && -25 < Center && Center < 15 && (Wide != 0 && Wide < 30)) 
 				|| ( (c_cut == 1 && date_f_mode != 0) && 6 < Center && Center < 20 && (Wide_old == 0 || Wide < Wide_old)) 
 					|| ((c_cut == 1 && date_f_mode != 0) && -25 < Center && Center < 25 && (Wide_old != 0) && (lEncoderTotal-sp) >= 750)){    /* 曲げ終わりチェック           */
 	 	
@@ -1837,8 +1938,9 @@ void main( void )
     case 42:
 		/* 安定するまで (ショーカットは42には来ないよ)*/
 		
-		if((lEncoderTotal-sp) >= 120)iSetAngle = -90;
-		else iSetAngle = -100;
+		if((lEncoderTotal-sp) >= 90)iSetAngle = -90;
+		else iSetAngle = -95;
+		
 		
 		servoPwmOut( iServoPwm2 );          /* 振りが弱いときは大きくする       */
 
@@ -1849,8 +1951,9 @@ void main( void )
 			motor_f( x, x );
            	motor_r( x, x );
        	}else{
-			motor2_f( 100, 100);
-           	motor2_r( 50, 60 );
+			motor2_f( 70, 90);
+           	motor2_r( 60, 70 );
+			
 		}
          	  
 		
@@ -1936,11 +2039,11 @@ void main( void )
 	case 52://ハーフライン後
 	//	if( date_f_mode != 0 && (lEncoderTotal - sp) >= 100 )mode = 3;//左無視
 		 
-		if(Center > 16){//寄りすぎ
-			Center_offset = -13;//左に寄る
+		if(Center > 13){//寄りすぎ
+			Center_offset = -8;//左に寄る
 			servoPwmOut( iServoPwm *2);
 		}else{
-			Center_offset = -14;//左に寄る
+			Center_offset = -11;//左に寄る
 			servoPwmOut( iServoPwm  );
 		}
 		
@@ -2000,9 +2103,9 @@ void main( void )
 		
 		if(date_f_mode == 0 || h_cut == 0){
         	//iSetAngle = -45;//-48 -47 壁なし
-			iSetAngle = -40;//
+			iSetAngle = -45;//
 		}else{
-			iSetAngle = -35;
+			iSetAngle = -25;
 		}
 		
 		servoPwmOut( iServoPwm2 );          /* 振りが弱いときは大きくする       */
@@ -2016,7 +2119,7 @@ void main( void )
            		motor_r( x, x );
        		}else{
            		motor_f( 0, 100 );
-           		motor_r( 50, 50 );
+           		motor_r( 40, 50 );
 			}
 		}else{
 			if( iEncoder10 >= H_TOPSPEED2_S ) {          /* エンコーダによりスピード制御 */
@@ -2187,12 +2290,12 @@ void main( void )
 		
 	//	if( date_f_mode != 0 && (lEncoderTotal - sp) >= 100 )mode = 2;//右無視
 		
-		if(Center < -16){//
-			Center_offset = 13;//右に寄る
+		if(Center < -14){//
+			Center_offset = 9;//右に寄る
 			servoPwmOut( iServoPwm  * 2);
 				
 		}else{
-			Center_offset = 15;//右に寄る
+			Center_offset = 12;//右に寄る
 			servoPwmOut( iServoPwm );
 		}
 		
@@ -2254,9 +2357,9 @@ void main( void )
 		
 		if(date_f_mode == 0 || h_cut == 0){
        		//iSetAngle = 50;//48 47
-			iSetAngle = 40;//48 47
+			iSetAngle = 45;//48 47
 		}else{
-			iSetAngle = 38;//48 47
+			iSetAngle = 30;//48 47
 		}
 		
 		servoPwmOut( iServoPwm2 );          /* 振りが弱いときは大きくする       */
@@ -2270,7 +2373,7 @@ void main( void )
     	       	motor_r( x, x );
        		}else{
            		motor_f( 100, 0 );
-           		motor_r( 50, 50 );
+           		motor_r( 50, 40 );
 			}
 		}else{
 			if( iEncoder10 >= H_TOPSPEED2_S ) {          /* エンコーダによりスピード制御 */
@@ -2486,6 +2589,7 @@ void main( void )
 		}
 		
 		if(savecnt > 0) {
+			date_f_make(-1,0,0,0);
             printf( "End.\n" );
             pattern = 108;
 			cnt1  = 0 ;
@@ -2781,6 +2885,24 @@ int date_f_make(int patern, int angle, int encoder, int rmode){
 	Encoder += encoder;
 	
 	switch(patern){
+		case -1:
+			if(	Encoder >= 500){//この距離以下は無視
+				if(mode == 'S'){
+					if(Encoder > 1000){
+						date_f_buff_int[buff_num_int] += Encoder;
+						buff_num_int++;
+						
+						date_f_buff[buff_num] = Encoder/100;
+						buff_num++;
+						date_f_buff[buff_num] = Encoder - ((Encoder/100)*100);
+						buff_num++;
+					}
+					
+					Encoder =0;
+					mode = 'F';
+				}
+			}
+			break;
 		case 10:
 		case 11:
 		if(	Encoder >= 500){//この距離以下は無視
@@ -3089,7 +3211,7 @@ void intTRB( void )
 	static unsigned int EncoderMod = 0;
 	static int iEncoder5_old = 0; 
 	int a;
-	static int flag = 0,flag20 = 0;
+	static int flag = 0,flag20 = 0,flag56 = 0;
 	signed char *p;
 	
     asm(" fset I ");                    /* タイマRB以上の割り込み許可   */
@@ -3162,17 +3284,39 @@ void intTRB( void )
 			//直線 
 			if((pattern == 11 || pattern == 10) && (((mode == 0) &&(-Cu_Angle < a && a < Cu_Angle)) || ((mode != 0) &&(-(Cu_Angle+10) < a && a < Cu_Angle+10)) ) ){
 				SEncoderTotal += iEncoder5;//距離計測
-				if(date_f_buff_int[date_f_num] - date_f_brake < SEncoderTotal)flag = 1;//記録した直線を走った
+				
+				if(flag56 == 1){//ハーフ後の距離補正
+					date_f_buff_int[date_f_num] -= date_f_plus_h;
+					flag56 = 0;	
+				}
+				
+				if(mode == 0){
+					if(date_f_buff_int[date_f_num] - date_f_brake < SEncoderTotal)flag = 1;//記録した直線を走った
+				}else{
+					if(date_f_buff_int[date_f_num] - date_f_brake - 300 < SEncoderTotal)flag = 1;//記録した直線を走った
+				}
 				flag20 = 0;
 			
-			}else if(pattern == 21 || pattern == 22 || pattern == 51 || pattern == 52 || pattern == 61 || pattern == 62 ){
+			}else if(pattern == 21 || pattern == 22  ){
 				if(flag20 == 0){
 					flag20 = 1;
+					flag56 = 0;
 					//SEncoderTotal = 0;
 					SEncoderTotal = iEncoder5;
 				}else{
 					SEncoderTotal += iEncoder5;//クロスラインなどからの距離計測
 				}
+				
+			}else if( pattern == 51 || pattern == 52 || pattern == 61 || pattern == 62 ){
+				if(flag20 == 0){
+					flag20 = 1;
+					flag56 = 1;
+					//SEncoderTotal = 0;
+					SEncoderTotal = iEncoder5;
+				}else{
+					SEncoderTotal += iEncoder5;//クロスラインなどからの距離計測
+				}
+				
 			}else{//カーブ or クランク,ハーフ曲がり中 
 				 SEncoderTotal = 0;
 				 if(flag == 1){
@@ -3212,6 +3356,9 @@ void intTRB( void )
             *p++ = flag2;/*坂道回数*/
             *p++ = (char)(angle_y/10);
             *p++ = (char)(angle_x/10);
+			
+		//	*p++ = (char)(IR_L());
+        //    *p++ = (char)(IR_R());
             
 			
             /* バッファに記録 ここまで */
@@ -3693,7 +3840,7 @@ unsigned char check_startgate( void )
 	
 	ret = 0;
 	
-	if(ad7  < 8){//37
+	if(IR_R() > 150){//37
 		ret = 1;
 	}
 	/*
@@ -3716,7 +3863,7 @@ unsigned char check_crossline( void )
 	//cam_in();//値の取得
 	
 	ret = 0;
-	if( (Wide > 70) || ((Wide >= 50) && (-9 < Center ) && (Center < 9)) ){// || ((Wide >= 30) && (Center > -4) && (Center < 4))){
+	if( (Wide > 70) || ((Wide >= 50) && (-13 < Center ) && (Center < 13)) ){// || ((Wide >= 30) && (Center > -4) && (Center < 4))){
 	
 		ret = 1;			/* クロスライン発見 */
 	}
@@ -3734,7 +3881,7 @@ unsigned char check_halfline( void )
 	int center;
 	
 	ret = 0;
-	if(Wide > 40 && Wide < 50){
+	if(Wide > 36 && Wide < 55){
 		if(Center < -7){//センター左寄り
 			ret = 1;
 			
@@ -3742,15 +3889,15 @@ unsigned char check_halfline( void )
 			ret = 2;
 			
 		}
-	}else if(Wide > 35){
-		if(Center < -13){//センター左寄り
+	}else if(Wide > 32){
+		if(Center < -11){//センター左寄り
 			ret = 1;
 			
-		}else if(Center > 13){//センター右寄り
+		}else if(Center > 11){//センター右寄り
 			ret = 2;
 			
 		}
-	}else if(Wide > 30){
+	}else if(Wide > 28){
 		if(Center < -18){//センター左寄り
 			ret = 1;
 			
@@ -3774,7 +3921,7 @@ unsigned char check_wideline( void )
 	//cam_in();//値の取得
 	
 	ret = 0;
-	if(Wide >= 37){
+	if(Wide >= 28){
 	
 		ret = 1;			/* wideライン発見 */
 	}
@@ -3799,9 +3946,9 @@ void servoControl( void )
     	iD = kd * (iSensorBefore - (Center + Center_offset));     /* 微分(目安はPの5～10倍)       */
 		iRet = iP - iD - iI * ki;
 	}else{
-		iP = kp_ir * (Center + Center_offset);      /* 比例                         */
-		iI = iI + (iSensorBefore - (Center + Center_offset) );
-    	iD = kd_ir * (iSensorBefore - (Center + Center_offset));     /* 微分(目安はPの5～10倍)       */
+		iP = kp_ir * (Center_IR);      /* 比例                         */
+		iI = iI + (iSensorBeforeIR - (Center_IR) );
+    	iD = kd_ir * (iSensorBeforeIR - (Center_IR));     /* 微分(目安はPの5～10倍)       */
 		iRet = iP - iD - iI * ki_ir;
 	}
     iRet /= 2;//256 128
@@ -3812,6 +3959,7 @@ void servoControl( void )
     iServoPwm = iRet;
 
     iSensorBefore = (Center + Center_offset );                  /* 次回はこの値が1ms前の値となる*/
+	iSensorBeforeIR = Center_IR;
 }
 
 /************************************************************************/
@@ -3867,7 +4015,7 @@ void cam_in(){
 
 	
 	if(1 < Wide  && Wide < 100){//カメラの取り付けで少しずれていすので
-		Center = (p5 & 0x7f) - 64 + 1;	
+		Center = (p5 & 0x7f) - 64 + 3;	
 	}else{
 		Center = (p5 & 0x7f) - 64;
 	}
@@ -3889,7 +4037,7 @@ int camera(int center, int wide){
 	
 	int start = 17,end = 111,i,led = 0,cnt = 1;
 	// (end - start)/7 = 13
-	int led_bit[8] = {999,42,52,62,999,70,80,90};//4は不調
+	int led_bit[8] = {999,42,52,62,999,66,76,86};//4は不調
 	
 	center += 64;
 	wide /= 2;
@@ -3970,10 +4118,86 @@ int angle_check(){
 
 
 
+/**************************************************************************/
+/*	IR_L												  */
+/**************************************************************************/
+int IR_L(){
+	
+	return 100 * (ad6 - IR_min[0]) / (IR_max[0] - IR_min[0]);
+}
+/**************************************************************************/
+/*	IR_R												  */
+/**************************************************************************/
+int IR_R(){
+	
+	return 100 * (ad7 - IR_min[1]) / (IR_max[1] - IR_min[1]);
+}
+/**************************************************************************/
+/*	Get_Center_IR											  */
+/**************************************************************************/
+void Get_Center_IR(){
+	int l = IR_L(),r = IR_R();
+	IR_old = Center_IR;
+	
+	Center_IR = (r-l)/5;
+	
+	if(l < 15 && r < 15){
+		if(	IR_old < 0)Center_IR = -30;
+		else Center_IR = 30;
+	}
+	
+}
+/**************************************************************************/
+/*	赤外線センサーのキャリブレーション												  */
+/**************************************************************************/
+void IRcalibration( ){
+	int i ,j,l,r,p = 20,a = 60;
+
+	iAngle0 = 0;
+	iAngle0 = getServoAngle();  /* 0度の位置記憶                */
+	i = getServoAngle();
+	
+	for(j = 0; j < 2;j++){
+		while(-a < i){
+			i = getServoAngle();
+			servoPwmOut(p);
+			r = ad7;
+			if(IR_max[1] < r)IR_max[1] = r;
+			if(r < IR_min[1])IR_min[1] = r;
+			l = ad6;
+			if(IR_max[0] < l)IR_max[0] = l;
+			if(l < IR_min[0])IR_min[0] = l;
+		}
+	
+		while(i < a){
+			i = getServoAngle();
+			servoPwmOut(-p);
+			r = ad7;
+			if(IR_max[1] < r)IR_max[1] = r;
+			if(r < IR_min[1])IR_min[1] = r;
+			l = ad6;
+			if(IR_max[0] < l)IR_max[0] = l;
+			if(l < IR_min[0])IR_min[0] = l;
+		}
+	}
+	while(0 < i){
+		i = getServoAngle();
+		servoPwmOut(p);
+		r = ad7;
+		if(IR_max[1] < r)IR_max[1] = r;
+		if(r < IR_min[1])IR_min[1] = r;
+		l = ad6;
+		if(IR_max[0] < l)IR_max[0] = l;
+		if(l < IR_min[0])IR_min[0] = l;
+	}
+	servoPwmOut( 0 );
+}
 
 /************************************************************************/
 /* end of file                                                          */
 /************************************************************************/
+
+
 
 /*
 改訂経歴
