@@ -2912,6 +2912,8 @@ void main( void )
 			if(mode >= 4)mode = 0;
 			while(pushsw_get());
 		}
+		
+		
 		cam_in();
 		led_out(camera(Center,Wide));
 	
@@ -4096,14 +4098,28 @@ void wait(int t)
 /**************************************************************************/
 void cam_in(){
 	int wide = 0;
-		
+	
+	/*	
+	//Žè”zü
 	wide += ((p6 >> 5 ) & 0x07);//012
 	wide += ((p3 << 2 ) & 0x08);//3
 	wide += ((p3 << 1 ) & 0x30);//45
 	wide += ( p3 & 0x40);//6
+	*/
+	
+	//NEW
+	wide += ((p3 >> 6 ) & 0x01);
+	wide += ((p3 >> 3 ) & 0x02);
+	wide += ((p3 >> 1 ) & 0x04);
+	wide += ((p3 << 2 ) & 0x08);
+	wide += ((p6 >> 3 ) & 0x10);
+	wide += ((p6 >> 1 ) & 0x20);
+	wide += ((p6 << 1 ) & 0x40);
+	
 	
 	Wide = wide;
 
+	//Center = (p5 & 0x7f);
 	
 	if(1 < Wide  && Wide < 100){//ƒJƒƒ‰‚ÌŽæ‚è•t‚¯‚Å­‚µ‚¸‚ê‚Ä‚¢‚·‚Ì‚Å
 		Center = (p5 & 0x7f) - 64 + 3;	

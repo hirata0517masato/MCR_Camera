@@ -49,7 +49,7 @@ void WhiteLineWide(int,int);
 
 //AD0 /* CN3-9 P40 */
 
-#define		Line_Max	400		/* ライン白色MAX値の設定 760  550  black = 350くらい*/
+#define		Line_Max	500		/* ライン白色MAX値の設定 760  550  black = 350くらい*/
 
 #define 	LineStart 	27		/* カメラで見る範囲(通常モード) */
 #define 	LineStop  	100
@@ -94,7 +94,7 @@ int		Center_lasttime;		/* 前回のラインの重心 */
 
 int             White;					/* 白の数	*/
 
-int		mode;				/* 0 = 通常 1 = 坂 2 = 右無視 3 = 左無視	*/	
+int		mode = 0;				/* 0 = 通常 1 = 坂 2 = 右無視 3 = 左無視	*/	
 
 int		EXPOSURE_cnt = 0;		/* */		
 
@@ -124,7 +124,7 @@ void main(void)
 	//明るさの最大値が目標値に近づくまでループ && ラインを発見するまでループ
 	do{
 	
-		mode = (MODE_HIGH_BIT & 0x01) + ((MODE_LOW_BIT & 0x01) << 1);//モード判定に使用
+		mode = ((int)MODE_HIGH_BIT & 0x01) + (((int)MODE_LOW_BIT << 1) & 0x02);//モード判定に使用
 		
 		ImageCapture_base(LineStart,LineStop);
 		expose2();				//露光時間（全白、全黒でも時間変更)
@@ -144,7 +144,7 @@ void main(void)
 	while( 1 ) {
 	
 		#ifndef PRINT
-		mode = (MODE_HIGH_BIT & 0x01) + ((MODE_LOW_BIT & 0x01) << 1);//モード判定に使用
+		mode = ((int)MODE_HIGH_BIT & 0x01) + (((int)MODE_LOW_BIT << 1) & 0x02);//モード判定に使用
 		#endif
 		
 		switch(mode){
@@ -242,7 +242,7 @@ void CLK_init(void)
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */ 
 void IO_init(void)
 {
-	//unsigned int uc;
+	unsigned int uc;
 	
  //  PORTC.PCR.BYTE   = 0x03;        // PC0,1をプルアップ指定
     
@@ -253,20 +253,26 @@ void IO_init(void)
 
     PORT3.DDR.BYTE = 0x00;           // P3を入力に設定    
     PORT4.DDR.BYTE = 0x00;           // P4を入力に設定   AN0  
- /*   
+    
+    
+    //UART
+    //IOPORT.PFFSCI.BIT.SCI2S = 0; //SCI2端子選択bit P12をRxD2-A端子として設定 P11をSCK2-A端子として設定 P13をTxD2-A端子として設定
+    //PORTC.DDR.BIT.B1 = 1;	//P11を出力に設定
+    //PORTC.DDR.BIT.B2 = 0;	//P12を入力に設定
+    /*
     // シリアル通信 
-	MSTP(SCI1) = 0;			//ストップ解除
-	SCI1.SCR.BYTE = 0x00;	// 内蔵クロック、送受信禁止 
-	SCI1.SMR.BYTE = 0x00;	// PCLKクロック、STOP1bit、パリティ無し、8Bitデータ、調歩同期式 
-	SCI1.BRR = 80;			// 77 = 19200bps 
+	MSTP(SCI2) = 0;			//ストップ解除
+	SCI2.SCR.BYTE = 0x00;	// 内蔵クロック、送受信禁止 
+	SCI2.SMR.BYTE = 0x00;	// PCLKクロック、STOP1bit、パリティ無し、8Bitデータ、調歩同期式 
+	SCI2.BRR = 80;			// 77 = 19200bps 
 	for(uc=0;uc<1000;uc++);
-	SCI1.SSR.BYTE = 0x00;
+	SCI2.SSR.BYTE = 0x00;
 	// 送信許可 
-	SCI1.SCR.BYTE = 0x20;
-	IEN(SCI1,RXI1) = 1;	// SCI1のRXI1割り込み要求許可 
-	IPR(SCI1,RXI1) = 2;	// SCI1のRXI1割り込みレベル設定 
-	IR(SCI1,RXI1) = 0;
-*/	
+	SCI2.SCR.BYTE = 0x20;
+	IEN(SCI2,RXI2) = 1;	// SCI1のRXI1割り込み要求許可 
+	IPR(SCI2,RXI2) = 2;	// SCI1のRXI1割り込みレベル設定 
+	IR(SCI2,RXI2) = 0;
+	*/
 }
 
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
@@ -506,7 +512,7 @@ void binarization(int linestart, int linestop)
 	/* 黒は０　白は１にする */
 	White = 0;					/* 白の数を０にする */
 	
-	if(Max - Min > 100){
+	if(Max - Min > 70){
 		Ave_old = Ave;
 		for(i = linestart ; i <= linestop; i++) {
 			if(  ImageData[i] > Ave){	
@@ -517,8 +523,8 @@ void binarization(int linestart, int linestop)
 			}	
 		}
 	}else{
-		//if( Max > Line_Max - 180 ){
-		if( Min > Ave_old ){	
+		if( Max > Line_Max - 180 ){
+		//if( Min > Ave_old ){	//蛍光灯　ちらつき　苦手
 			White = 127;
 			for(i = linestart ; i <= linestop; i++) {
 				BinarizationData[i] = 1;
@@ -678,7 +684,8 @@ void cam_out(){
 	CENTER_OUT = center;
 	*/
 	
-	WIDE_OUT  = Wide;
+	WIDE_OUT  = (Wide << 1)&0xfe;//NEW
+	//WIDE_OUT  = Wide; //手配線
 	CENTER_OUT = Center;
 	
 	//WIDE_OUT  = Max/10;
