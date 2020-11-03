@@ -1,0 +1,49 @@
+r8c  rx621
+
+センター
+1 p50(CN5-17)   pc0(CN4-19)
+2 p51(CN5-16)   pc1(CN4-20)
+3 p52(CN5-15)   pc2(CN2-30)
+4 p53(CN5-14)   pc3(CN2-29)
+5 p54(CN5-13)   pc4(CN2-28)
+6 p55(CN5-12)   pc5(CN2-27)
+7 p56(CN5-11)   pc6(CN2-26)
+8 
+
+
+幅(NEW)
+1 p36(CN5-3)   p21(CN2-15) 
+2 p34(CN5-5)   p22(CN2-14) 
+3 p33(CN5-6)   p23(CN2-13) 
+4 p31(CN5-8)   p24(CN2-12) 
+5 p67(CN5-18)   p25(CN2-11)  
+6 p66(CN5-19)   p26(CN2-10)
+7 p65(CN5-20)   p27(CN2-9)
+8                              
+
+幅(手配線)
+1 p65(CN5-20)   p20(CN2-16) 
+2 p66(CN5-19)   p21(CN2-15) 
+3 p67(CN5-18)   p22(CN2-14)   
+4 p31(CN5-8)   p23(CN2-13)   
+5 p33(CN5-6)   p24(CN2-12) 
+6 p34(CN5-5)   p25(CN2-11) 
+7 p36(CN5-3)   p26(CN2-10) 
+8                        
+
+モード
+1 p35(CN5-4)   p30(CN2-8)
+2 p37(CN5-2)   p31(CN2-7)
+
+VCC cn3-1
+VSS cn2-1,2
+
+/* TAOS TSL1401CL */
+#define	TAOS_SI_HIGH	PORTD.DR.BIT.B0 = 1	/* CN3-17 */
+#define	TAOS_SI_LOW 	PORTD.DR.BIT.B0 = 0	/* CN3-17 */
+#define	TAOS_CLK_HIGH	PORTD.DR.BIT.B1 = 1	/* CN3-18 */
+#define	TAOS_CLK_LOW	PORTD.DR.BIT.B1 = 0	/* CN3-18 */
+
+AD0 /* CN3-9 P40 */
+
+a0 gnd vdd non clk si
