@@ -23,7 +23,6 @@ void CMT_init(void);
 
 void cam_out(void);
 void ImageCapture(int,int);
-void ImageCapture_base(int,int);
 int  get_ad( void );
 void expose( void );
 void expose2( void );
@@ -49,7 +48,7 @@ void WhiteLineWide(int,int);
 
 //AD0 /* CN3-9 P40 */
 
-#define		Line_Max	500		/* ライン白色MAX値の設定 760  550  black = 350くらい*/
+#define		Line_Max	760		/* ライン白色MAX値の設定 */
 
 #define 	LineStart 	27		/* カメラで見る範囲(通常モード) */
 #define 	LineStop  	100
@@ -71,11 +70,9 @@ void WhiteLineWide(int,int);
 unsigned long   cnt1000 =  0;
 
 /* カメラ関連 */
-unsigned long	EXPOSURE_timer = 5000;	/* 露光時間	20000				*/
-int		ImageData[128];			/* カメラの値				*/
-int 		BinarizationData[128];	/* ２値化					*/
-
-int 	Min_base = 0;/* 露光無し時の最小値=環境光）			*/
+unsigned long	EXPOSURE_timer = 3000;	/* 露光時間	20000				*/
+int		ImageData[130];			/* カメラの値				*/
+int 		BinarizationData[130];	/* ２値化					*/
 
 int		Max = 0,Min,Ave;	/*カメラ読み取り最大値、最小値、平均値*/
 int 	Ave_old = 0;
@@ -94,7 +91,7 @@ int		Center_lasttime;		/* 前回のラインの重心 */
 
 int             White;					/* 白の数	*/
 
-int		mode = 0;				/* 0 = 通常 1 = 坂 2 = 右無視 3 = 左無視	*/	
+int		mode;				/* 0 = 通常 1 = 坂 2 = 右無視 3 = 左無視	*/	
 
 int		EXPOSURE_cnt = 0;		/* */		
 
@@ -113,7 +110,7 @@ void main(void)
 	
 	
 	/* Data Initialization */
-	for(i=0;i<128;i++){
+	for(i=0;i<130;i++){
 		ImageData[i] = 0;			/* カメラの値				*/
 		BinarizationData[i] = 0;	/* ２値化					*/
 	}
@@ -124,9 +121,8 @@ void main(void)
 	//明るさの最大値が目標値に近づくまでループ && ラインを発見するまでループ
 	do{
 	
-		mode = ((int)MODE_HIGH_BIT & 0x01) + (((int)MODE_LOW_BIT << 1) & 0x02);//モード判定に使用
+		mode = (MODE_HIGH_BIT & 0x01) + ((MODE_LOW_BIT & 0x01) << 1);//モード判定に使用
 		
-		ImageCapture_base(LineStart,LineStop);
 		expose2();				//露光時間（全白、全黒でも時間変更)
 		
 		ImageCapture(LineStart,LineStop);			//イメージキャプチャー
@@ -144,15 +140,13 @@ void main(void)
 	while( 1 ) {
 	
 		#ifndef PRINT
-		mode = ((int)MODE_HIGH_BIT & 0x01) + (((int)MODE_LOW_BIT << 1) & 0x02);//モード判定に使用
+		mode = (MODE_HIGH_BIT & 0x01) + ((MODE_LOW_BIT & 0x01) << 1);//モード判定に使用
 		#endif
 		
 		switch(mode){
 			case 0://通常モード
-				ImageCapture_base(LineStart,LineStop);
-				//PORTE.DR.BIT.B4 = 1;
 				expose();				//露光時間
-				//PORTE.DR.BIT.B4 = 0;	
+				
 				ImageCapture(LineStart,LineStop);			//イメージキャプチャー
 		
 				binarization(LineStart,LineStop); 		//２値化
@@ -162,10 +156,8 @@ void main(void)
 				break;
 				
 			case 1://坂モード
-				ImageCapture_base(LineStartSaka,LineStopSaka);
-				//PORTE.DR.BIT.B4 = 1;
 				expose();				//露光時間
-				//PORTE.DR.BIT.B4 = 0;
+				
 				ImageCapture(LineStartSaka,LineStopSaka);			//イメージキャプチャー
 		
 				binarization(LineStartSaka,LineStopSaka); 		//２値化
@@ -175,10 +167,8 @@ void main(void)
 				break;
 				
 			case 2://右無視
-				ImageCapture_base(LineStartNonR,LineStopNonR);
-				//PORTE.DR.BIT.B4 = 1;
 				expose();				//露光時間
-				//PORTE.DR.BIT.B4 = 0;
+				
 				ImageCapture(LineStartNonR,LineStopNonR);			//イメージキャプチャー
 		
 				binarization(LineStartNonR,LineStopNonR); 		//２値化
@@ -188,10 +178,8 @@ void main(void)
 				break;
 				
 			case 3://左無視
-				ImageCapture_base(LineStartNonL,LineStopNonL);
-				//PORTE.DR.BIT.B4 = 1;
 				expose();				//露光時間
-				//PORTE.DR.BIT.B4 = 0;
+				
 				ImageCapture(LineStartNonL,LineStopNonL);			//イメージキャプチャー
 		
 				binarization(LineStartNonL,LineStopNonL); 		//２値化
@@ -206,16 +194,16 @@ void main(void)
 		Center_lasttime = Center;//過去の値を保存
 		
 				
-		#ifdef PRINT
-			/*cnt1000++;
+/*		#ifdef PRINT
+			cnt1000++;
 			
 			if(cnt1000>500){
 				for(i = LineStart; i <= LineStop; i++)sprintf("%d",BinarizationData[i]);
 				sprintf("Max = %d Min = %d Center = %d Wide = %d Lsensor = %d Rsensor = %d time = %d mode = %d",Max,Min,Center,Wide,Lsensor,Rsensor,EXPOSURE_timer,mode);
 				sprintf("\nOFF\n");
 				cnt1000=0;
-			}*/
-		#endif
+			}
+		#endif*/
     }
 }
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
@@ -242,37 +230,30 @@ void CLK_init(void)
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */ 
 void IO_init(void)
 {
-	unsigned int uc;
+	//unsigned int uc;
 	
  //  PORTC.PCR.BYTE   = 0x03;        // PC0,1をプルアップ指定
     
     PORT2.DDR.BYTE = 0xff;           // P2を出力に設定
     PORTC.DDR.BYTE = 0xff;           // PCを出力に設定
     PORTD.DDR.BYTE = 0xff;           // PDを出力に設定
-    PORTE.DDR.BYTE = 0xff;           // PEを出力に設定
 
     PORT3.DDR.BYTE = 0x00;           // P3を入力に設定    
     PORT4.DDR.BYTE = 0x00;           // P4を入力に設定   AN0  
-    
-    
-    //UART
-    //IOPORT.PFFSCI.BIT.SCI2S = 0; //SCI2端子選択bit P12をRxD2-A端子として設定 P11をSCK2-A端子として設定 P13をTxD2-A端子として設定
-    //PORTC.DDR.BIT.B1 = 1;	//P11を出力に設定
-    //PORTC.DDR.BIT.B2 = 0;	//P12を入力に設定
-    /*
+ /*   
     // シリアル通信 
-	MSTP(SCI2) = 0;			//ストップ解除
-	SCI2.SCR.BYTE = 0x00;	// 内蔵クロック、送受信禁止 
-	SCI2.SMR.BYTE = 0x00;	// PCLKクロック、STOP1bit、パリティ無し、8Bitデータ、調歩同期式 
-	SCI2.BRR = 80;			// 77 = 19200bps 
+	MSTP(SCI1) = 0;			//ストップ解除
+	SCI1.SCR.BYTE = 0x00;	// 内蔵クロック、送受信禁止 
+	SCI1.SMR.BYTE = 0x00;	// PCLKクロック、STOP1bit、パリティ無し、8Bitデータ、調歩同期式 
+	SCI1.BRR = 80;			// 77 = 19200bps 
 	for(uc=0;uc<1000;uc++);
-	SCI2.SSR.BYTE = 0x00;
+	SCI1.SSR.BYTE = 0x00;
 	// 送信許可 
-	SCI2.SCR.BYTE = 0x20;
-	IEN(SCI2,RXI2) = 1;	// SCI1のRXI1割り込み要求許可 
-	IPR(SCI2,RXI2) = 2;	// SCI1のRXI1割り込みレベル設定 
-	IR(SCI2,RXI2) = 0;
-	*/
+	SCI1.SCR.BYTE = 0x20;
+	IEN(SCI1,RXI1) = 1;	// SCI1のRXI1割り込み要求許可 
+	IPR(SCI1,RXI1) = 2;	// SCI1のRXI1割り込みレベル設定 
+	IR(SCI1,RXI1) = 0;
+*/	
 }
 
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
@@ -339,27 +320,22 @@ void expose( void )
 	//if( Wide != 0 && White <= 60){//黒でなく白でもない
 	if( Wide == 0 || White >= 70){//黒or白
 		EXPOSURE_cnt++;
-		if(EXPOSURE_cnt > 10)EXPOSURE_cnt = 10;
 	}else{
 		EXPOSURE_cnt = 0;
 	}
 	
-	if(EXPOSURE_cnt < 1){
+	if(EXPOSURE_cnt < 2){
 		//if(-20 < sa && sa < 20)EXPOSURE_timer += (long)(sa*5);
 		//else 
-		
-		sa *= 10;
-		if(sa < -200)sa = -200;
-		if(200 < sa)sa = 200;
-		
-		EXPOSURE_timer += (long)sa;
+		EXPOSURE_timer += (long)(sa*10);
 	}	
 		
 	
-	if( EXPOSURE_timer > 100000) EXPOSURE_timer = 100000;
-	else if( EXPOSURE_timer <= 3000 ) EXPOSURE_timer = 3000;
+	if( EXPOSURE_timer > 1000000000) EXPOSURE_timer = 1000000000;
+	else if( EXPOSURE_timer <= 0 ) EXPOSURE_timer = 0;
 
 	for(i=0;i<EXPOSURE_timer;i++);
+
 }
 
 /************************************************************************/
@@ -382,6 +358,7 @@ void expose2( void )
 	else if( EXPOSURE_timer <= 0 ) EXPOSURE_timer = 0;
 	
 	for(i=0;i<EXPOSURE_timer;i++);
+
 }
  
  /************************************************************************/
@@ -391,26 +368,26 @@ void ImageCapture(int linestart, int linestop){
 	
 	unsigned char i;
 
-	Max = -4096,Min = 4096;
+	Max = 0,Min = 4096;
 
 	TAOS_SI_HIGH;
 	TAOS_CLK_HIGH;
 	TAOS_SI_LOW;
+	ImageData[0] = 0;
 	TAOS_CLK_LOW;
-	
-	for(i = 0; i < LineStart; i++) {		
+	for(i = 1; i < LineStart; i++) {		
 		TAOS_CLK_HIGH;		
 		TAOS_CLK_LOW;
 	}
 	for(i = LineStart; i < linestart; i++) {		
 		TAOS_CLK_HIGH;	
-		ImageData[i] = get_ad() - Min_base;//ImageData_base[i];
+		ImageData[i] = get_ad();
 		TAOS_CLK_LOW;
 	}
 	for(i = linestart; i <= linestop; i++) {				
 		 
 		TAOS_CLK_HIGH;
-		ImageData[i] = get_ad() - Min_base;//ImageData_base[i];	// inputs data from camera (one pixel each time through loop) 
+		ImageData[i] = get_ad();	// inputs data from camera (one pixel each time through loop) 
 		TAOS_CLK_LOW;
 		
 		if(Max < ImageData[i]){
@@ -423,57 +400,16 @@ void ImageCapture(int linestart, int linestop){
 	}
 	for(i = linestop+1; i <= LineStop; i++) {		
 		TAOS_CLK_HIGH;	
-		ImageData[i] = get_ad() - Min_base;// ImageData_base[i];
+		ImageData[i] = get_ad();
 		TAOS_CLK_LOW;
 	}
 	for(i = LineStop+1; i < 128; i++) {		
 		TAOS_CLK_HIGH;		
 		TAOS_CLK_LOW;
 	}
-}
-
-
- /************************************************************************/
-/* イメージキャプチャ                                                   */
-/************************************************************************/
-void ImageCapture_base(int linestart, int linestop){	 
 	
-	unsigned char i;
-	int data;
-	Min_base = 4096;
-
-	TAOS_SI_HIGH;
 	TAOS_CLK_HIGH;
-	TAOS_SI_LOW;
 	TAOS_CLK_LOW;
-	
-	for(i = 0; i < LineStart; i++) {		
-		TAOS_CLK_HIGH;		
-		TAOS_CLK_LOW;
-	}
-	for(i = LineStart; i < linestart; i++) {		
-		TAOS_CLK_HIGH;	
-		data = get_ad();
-		TAOS_CLK_LOW;
-	}
-	for(i = linestart; i <= linestop; i++) {				
-		 
-		TAOS_CLK_HIGH;
-		data = get_ad();	// inputs data from camera (one pixel each time through loop) 
-		TAOS_CLK_LOW;
-		
-		if(Min_base > data)Min_base = data;
-		
-	}
-	for(i = linestop+1; i <= LineStop; i++) {		
-		TAOS_CLK_HIGH;	
-		data = get_ad();
-		TAOS_CLK_LOW;
-	}
-	for(i = LineStop+1; i < 128; i++) {		
-		TAOS_CLK_HIGH;		
-		TAOS_CLK_LOW;
-	}
 }
 /************************************************************************/
 /* A/D値読み込み(AN0)                                                 */
@@ -512,34 +448,10 @@ void binarization(int linestart, int linestop)
 	/* 黒は０　白は１にする */
 	White = 0;					/* 白の数を０にする */
 	
-	if(Max - Min > 70){
-		Ave_old = Ave;
-		for(i = linestart ; i <= linestop; i++) {
-			if(  ImageData[i] > Ave){	
-				White++;			
-				BinarizationData[i] = 1;
-			}else{
-				BinarizationData[i] = 0;
-			}	
-		}
-	}else{
-		if( Max > Line_Max - 180 ){
-		//if( Min > Ave_old ){	//蛍光灯　ちらつき　苦手
-			White = 127;
-			for(i = linestart ; i <= linestop; i++) {
-				BinarizationData[i] = 1;
-			}
-		}else{
-			for(i = linestart ; i <= linestop; i++) {
-				BinarizationData[i] = 0;
-			}
-		}
-	}
-	/*
-	if( Max > Line_Max - 200 ){//320 -150  250 400
-		// 白が一直線のとき 
+	if( Max > Line_Max - 400 ){//320 -150  250
+		/* 白が一直線のとき */
 		//if(Min > Line_Max - 80 ){//260
-		if(Max - Min < 130){//130
+		if(Max - Min < 130){
 			White = 127;
 			for(i = linestart ; i <= linestop; i++) {
 				BinarizationData[i] = 1;
@@ -554,13 +466,12 @@ void binarization(int linestart, int linestop)
 				}	
 			}
 		}
-	// 黒が一面のとき 
+	/* 黒が一面のとき */
 	}else{
 		for(i = linestart ; i <= linestop; i++) {
 			BinarizationData[i] = 0;
 		}
 	}
-*/
 
 	//範囲外は黒に
 	for(i = 0; i < linestart; i++){

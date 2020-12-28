@@ -271,13 +271,13 @@ int			saka_max	  =		  1;	//認識可能な坂の数
 
 
 //クランク
-int		    C_TOPSPEED	=		30;		//クランク(入)  25 33
+int		    C_TOPSPEED	=		31;		//クランク(入)  25 33
 int		    C_TOPSPEED2	=		50;		//クランク(出)	40
 
 int 		C_TOPSPEED4 = 		47;		//再生走行時のブレーキ前
 int		    C_TOPSPEED3	=		40;		//クランク(入)  25 33 再生走行用
 
-int			C_short_len =		650;	//この距離未満はショート、以上はロング
+int			C_short_len =		600;	//この距離未満はショート、以上はロング
 
 int			date_f_brake_c	=	500;	//再生走行時のブレーキ使用可能距離(mm) クランク用
 int			date_f_shortcat_c=	240;	//再生走行時のショートカット距離(mm) クランク用 210
@@ -1146,7 +1146,7 @@ void main( void )
 				
 				motor2_r(or,r);
 					
-			}else if((Center  + Center_offset > 10) || (i >= 60 && cnt8 <= Cu_N_time)) {//外寄り
+			}else if((Center  + Center_offset > 10) || (i >= 60 && cnt8 <= Cu_N_time) || (i >= 118)) {//外寄り
 				
 				if(MOTOR_in_F > 0)f = (MOTOR_out_base - ((i / MOTOR_in_F) * OUT_M_DOWN));
 				else f = (MOTOR_out_base - ((i * -MOTOR_in_F) * OUT_M_DOWN));
@@ -1161,7 +1161,7 @@ void main( void )
 				
 				if(or < 0) or = 0;
 					
-				motor2_f( MOTOR_out_base, f);
+				motor2_f( MOTOR_out_base-10, f);
 				motor2_r( or, r);
 					
         	}else{
@@ -1276,7 +1276,7 @@ void main( void )
 				motor_f( r, x );
             	motor_r( r, f );
 				
-			}else if((Center  + Center_offset < -10) || (i <= -60 && cnt8 <= Cu_N_time) ) {//外寄り
+			}else if((Center  + Center_offset < -10) || (i <= -60 && cnt8 <= Cu_N_time)|| (i <= -118) ) {//外寄り
 				
 				if(MOTOR_in_F > 0)f = (MOTOR_out_base - ((-i / MOTOR_in_F) * OUT_M_DOWN));
 				else f = (MOTOR_out_base - ((-i * -MOTOR_in_F) * OUT_M_DOWN));
@@ -1290,7 +1290,7 @@ void main( void )
 				else or = (MOTOR_out_base - (-i * -MOTOR_out_R));
 				if(or < 0) or = 0;
 				
-				motor2_f(f, MOTOR_out_base);
+				motor2_f(f, MOTOR_out_base-10);
 				motor2_r(r, or);
 					
 			}else if(Center  + Center_offset > 10) {//きりかえし
@@ -1490,14 +1490,17 @@ void main( void )
 			x=(C_TOPSPEED-iEncoder10)*10;
 			r = x;
 			
-			if(r < BRAKE_MAX) r = BRAKE_MAX;
+			if(x < BRAKE_MAX) x = BRAKE_MAX;
 			
+			if(r < -50 && (c_cut == 0 || date_f_mode == 0)) r = -50;
+			else if(r < BRAKE_MAX) r = BRAKE_MAX;
+				
 			
 			motor_mode_f( BRAKE, BRAKE );
 			motor_mode_r( BRAKE, BRAKE );
 			
 			motor_f( x, x );
-            motor_r( x, x );
+            motor_r( r, r );
 			
 			
 		//	motor_f( 40, 40 );
@@ -1564,7 +1567,7 @@ void main( void )
 					date_buff_ch_int[date_num_ch++] = lEncoderTotal - lEncoderTotal_ch;	
 				}
 				
-				if(C_short_len < lEncoderTotal - lEncoderTotal_ch){//距離が短いと減速ができていない可能性がある
+				if(C_short_len > lEncoderTotal - lEncoderTotal_ch){//距離が短いと減速ができていない可能性がある
 					c_short_mode = 1;
 				}else{
 					c_short_mode = 0;
@@ -1608,7 +1611,7 @@ void main( void )
 					date_buff_ch_int[date_num_ch++] = lEncoderTotal - lEncoderTotal_ch;	
 				}
 				
-				if(C_short_len < lEncoderTotal - lEncoderTotal_ch){//距離が短いと減速ができていない可能性がある
+				if(C_short_len > lEncoderTotal - lEncoderTotal_ch){//距離が短いと減速ができていない可能性がある
 					c_short_mode = 1;
 				}else{
 					c_short_mode = 0;
@@ -1665,7 +1668,7 @@ void main( void )
  		}else if( ((date_f_mode == 0) && iEncoder10 >= C_TOPSPEED) 
 				|| ((c_cut == 1 && date_f_mode != 0) && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_c )< (lEncoderTotal - lEncoderTotal_ch))&& iEncoder10 >= C_TOPSPEED3) 
 				|| ((c_cut == 0 && date_f_mode != 0) && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_c )< (lEncoderTotal - lEncoderTotal_ch))&& iEncoder10 >= C_TOPSPEED)   ) {          // エンコーダによりスピード制御 
-             
+            /* 
 			if((i < -20 || 20 < i) && 
 				((date_f_mode != 0 && ( date_f_buff_ch_int[date_f_num_ch-1] == 31 || date_f_buff_ch_int[date_f_num_ch-1] == 41) && (lEncoderTotal-sp) >= 300) 
 				|| (date_f_mode == 0))){//abs
@@ -1687,12 +1690,12 @@ void main( void )
 				motor_f( x, x );
             	motor_r( r, r );
 			
-			}else{
+			}else{*/
 				if(c_cut == 0 || date_f_mode == 0)x=(C_TOPSPEED -iEncoder10)*20;
 				else x=(C_TOPSPEED3 -iEncoder10)*30;
 			
 				r = x;
-				if(r < -50 && (c_cut == 0 || date_f_mode == 0)) r = -50;
+				if(r < -90 && (c_cut == 0 || date_f_mode == 0)) r = -90;
 				else if(r < BRAKE_MAX) r = BRAKE_MAX;
 				
 				if(x < BRAKE_MAX) x = BRAKE_MAX;
@@ -1701,8 +1704,8 @@ void main( void )
 				motor_mode_r( BRAKE, BRAKE );
 				
 				motor_f( x, x );
-            	motor_r( x, x );
-			}
+            	motor_r( r, r );
+		//	}
 	
         }else{
 			
@@ -2186,7 +2189,7 @@ void main( void )
 	//	if((lEncoderTotal-sp) >= 300 ){
 	//		if((( h_cut == 0 || date_f_mode == 0)  && Wide == 0) || (( h_cut == 1 && date_f_mode != 0) && ((date_f_buff_ch_int[date_f_num_ch] - date_f_shortcat_h)< (lEncoderTotal - lEncoderTotal_ch)) )){ //脱線チェック
         
-		if(((h_cut == 0 || date_f_mode == 0)  && Wide == 0 && (lEncoderTotal-sp) >= 250 )  || (( h_cut == 1 && date_f_mode != 0) && ((date_f_buff_ch_int[date_f_num_ch] - date_f_shortcat_h)< (lEncoderTotal - lEncoderTotal_ch)) )){ //脱線チェック
+		if(((h_cut == 0 || date_f_mode == 0)  && (Wide == 0 || check_crossline()) && (lEncoderTotal-sp) >= 250 )  || (( h_cut == 1 && date_f_mode != 0) && ((date_f_buff_ch_int[date_f_num_ch] - date_f_shortcat_h)< (lEncoderTotal - lEncoderTotal_ch)) )){ //脱線チェック
             
             cnt1 = 0;
 			sp = lEncoderTotal;
@@ -2441,7 +2444,7 @@ void main( void )
            	motor_r( 100, 100 );
 		}
         
-		if(((h_cut == 0 || date_f_mode == 0)  && Wide == 0 && (lEncoderTotal-sp) >= 250 )  || (( h_cut == 1 && date_f_mode != 0) && ((date_f_buff_ch_int[date_f_num_ch] - date_f_shortcat_h)< (lEncoderTotal - lEncoderTotal_ch)) )){ //脱線チェック
+		if(((h_cut == 0 || date_f_mode == 0)  && (Wide == 0 || check_crossline()) && (lEncoderTotal-sp) >= 250 )  || (( h_cut == 1 && date_f_mode != 0) && ((date_f_buff_ch_int[date_f_num_ch] - date_f_shortcat_h)< (lEncoderTotal - lEncoderTotal_ch)) )){ //脱線チェック
             
             cnt1 = 0;
 			sp = lEncoderTotal;
