@@ -9,7 +9,9 @@
 /****************************************************************************************************/                  
 #include "iodefine.h"
 #include <machine.h>
-#include "lowsrc.h"
+//#include "lowsrc.h"
+
+#include "usb.h"
 
 /*======================================*/
 /* プロトタイプ宣言                     */
@@ -107,7 +109,10 @@ void main(void)
  	IO_init();   // IOの初期化
  //	CMT_init();  // CMTの初期化
  	AD_init();   // A/Dの初期化
-	
+		
+#ifdef PRINT
+	USB_init();  //USB CDCの初期化
+#endif //PRINT
 	
 	/* Data Initialization */
 	for(i=0;i<130;i++){
@@ -120,8 +125,10 @@ void main(void)
 	
 	//明るさの最大値が目標値に近づくまでループ && ラインを発見するまでループ
 	do{
-	
+		
+		#ifndef PRINT
 		mode = (MODE_HIGH_BIT & 0x01) + ((MODE_LOW_BIT & 0x01) << 1);//モード判定に使用
+		#endif
 		
 		expose2();				//露光時間（全白、全黒でも時間変更)
 		
@@ -194,16 +201,17 @@ void main(void)
 		Center_lasttime = Center;//過去の値を保存
 		
 				
-/*		#ifdef PRINT
+		#ifdef PRINT
 			cnt1000++;
 			
-			if(cnt1000>500){
-				for(i = LineStart; i <= LineStop; i++)sprintf("%d",BinarizationData[i]);
-				sprintf("Max = %d Min = %d Center = %d Wide = %d Lsensor = %d Rsensor = %d time = %d mode = %d",Max,Min,Center,Wide,Lsensor,Rsensor,EXPOSURE_timer,mode);
-				sprintf("\nOFF\n");
+			if(cnt1000 > 500){
+				//for(i = LineStart; i <= LineStop; i++)printf("%d",BinarizationData[i]);
+				for(i = LineStart; i <= LineStop; i+=2)printf("%d",BinarizationData[i]);
+				//printf("Max = %d Min = %d Center = %d Wide = %d Lsensor = %d Rsensor = %d time = %d mode = %d",Max,Min,Center,Wide,Lsensor,Rsensor,EXPOSURE_timer,mode);
+				printf("\n");
 				cnt1000=0;
 			}
-		#endif*/
+		#endif
     }
 }
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
@@ -384,6 +392,7 @@ void ImageCapture(int linestart, int linestop){
 		ImageData[i] = get_ad();
 		TAOS_CLK_LOW;
 	}
+	
 	for(i = linestart; i <= linestop; i++) {				
 		 
 		TAOS_CLK_HIGH;
@@ -398,6 +407,7 @@ void ImageCapture(int linestart, int linestop){
 		}
 		
 	}
+	
 	for(i = linestop+1; i <= LineStop; i++) {		
 		TAOS_CLK_HIGH;	
 		ImageData[i] = get_ad();

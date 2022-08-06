@@ -110,8 +110,8 @@ void Excep_USB0_D0FIFO0(void);
 void Excep_USB0_D1FIFO0(void);
 
 // USB0 USBI0
-#pragma interrupt (Excep_USB0_USBI0(vect=38))
-void Excep_USB0_USBI0(void);
+//#pragma interrupt (Excep_USB0_USBI0(vect=38))
+//void Excep_USB0_USBI0(void);
 
 // USB1 D0FIFO1
 #pragma interrupt (Excep_USB1_D0FIFO1(vect=40))
@@ -122,8 +122,8 @@ void Excep_USB1_D0FIFO1(void);
 void Excep_USB1_D1FIFO1(void);
 
 // USB1 USBI1
-#pragma interrupt (Excep_USB1_USBI1(vect=42))
-void Excep_USB1_USBI1(void);
+//#pragma interrupt (Excep_USB1_USBI1(vect=42))
+//void Excep_USB1_USBI1(void);
 
 // RSPI0 SPEI0
 #pragma interrupt (Excep_RSPI0_SPEI0(vect=44))

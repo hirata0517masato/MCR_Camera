@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <MicomToolCommonProjectFile Version="1.00">
-  <CreatorType Name="CubeSuite+" Version="V3.03.00  [16 Nov 2015]" />
+  <CreatorType Name="CubeSuite+" Version="V8.05.00  [26 Nov 2020]" />
   <Placeholders>
     <PlaceholderPrefix>%</PlaceholderPrefix>
     <PlaceholderPostfix>%</PlaceholderPostfix>
@@ -10,18 +10,47 @@
       <Path>dbsct.c</Path>
       <Path>intprg.c</Path>
       <Path>resetprg.c</Path>
+      <Path>rspi.c</Path>
+      <Path>wait.h</Path>
       <Path>RX621_SAMPLE.c</Path>
+      <Path>Gyro.c</Path>
+      <Path>wait.c</Path>
+      <Path>Gyro.h</Path>
+      <Path>rspi.h</Path>
       <Path>sbrk.c</Path>
+      <Path>usb.h</Path>
+      <Path>MPU9250.h</Path>
       <Path>vecttbl.c</Path>
+      <Path>MPU9250.c</Path>
       <Path>iodefine.h</Path>
+      <Path>usb.c</Path>
       <Path>sbrk.h</Path>
-      <Path>lowsrc.h</Path>
       <Path>stacksct.h</Path>
       <Path>typedefine.h</Path>
       <Path>vect.h</Path>
+      <Category Name="USBStack">
+        <Category Name="CDC">
+          <Path>USBStack\CDC\lowsrc.c</Path>
+          <Path>USBStack\CDC\usbdescriptors.c</Path>
+          <Path>USBStack\CDC\usbdescriptors.h</Path>
+          <Path>USBStack\CDC\usb_cdc.c</Path>
+          <Path>USBStack\CDC\usb_cdc.h</Path>
+        </Category>
+        <Path>USBStack\usb_common.h</Path>
+        <Path>USBStack\usb_core.c</Path>
+        <Path>USBStack\usb_core.h</Path>
+        <Path>USBStack\usb_hal.c</Path>
+        <Path>USBStack\usb_hal.h</Path>
+      </Category>
     </Files>
+    <DebugOptions>
+      <ConnectSettings>
+        <MainClock>12000000</MainClock>
+      </ConnectSettings>
+      <DebugToolSettings />
+    </DebugOptions>
     <Device Series="RX">R5F56218BxFP</Device>
-    <BuildOptions Name="CC-RX" Version="V2.04.01">
+    <BuildOptions Name="CC-RX" Version="V3.03.00">
       <BuildMode Name="DefaultBuild" Active="True">
         <GeneralOptions>
           <SimultaneouslyBuild>true</SimultaneouslyBuild>
@@ -30,9 +59,12 @@
           <Option>-isa=rxv1</Option>
           <Option>-fpu</Option>
           <Option>-lang=c</Option>
+          <Option>-include=USBStack\CDC</Option>
+          <Option>-include=USBStack</Option>
           <Option>-include=.</Option>
           <Option>-output=obj</Option>
           <Option>-debug</Option>
+          <Option>-g_line</Option>
           <Option>-speed</Option>
           <Option>-nologo</Option>
         </CompileOptions>
@@ -41,6 +73,7 @@
           <Option>-fpu</Option>
           <Option>-output=%BuildModeName%\%FileLeaf%.obj</Option>
           <Option>-nologo</Option>
+          <Option>-debug</Option>
         </AssembleOptions>
         <LinkOptions>
           <Option>-output=%BuildModeName%\%ProjectName%.abs</Option>
@@ -68,11 +101,23 @@
           <Path>DefaultBuild\dbsct.obj</Path>
           <Path>DefaultBuild\intprg.obj</Path>
           <Path>DefaultBuild\resetprg.obj</Path>
-          <Path>DefaultBuild\RX621_SAMPLE.obj</Path>
           <Path>DefaultBuild\sbrk.obj</Path>
           <Path>DefaultBuild\vecttbl.obj</Path>
+          <Path>DefaultBuild\usb_core.obj</Path>
+          <Path>DefaultBuild\usb_hal.obj</Path>
+          <Path>DefaultBuild\lowsrc.obj</Path>
+          <Path>DefaultBuild\usbdescriptors.obj</Path>
+          <Path>DefaultBuild\usb_cdc.obj</Path>
+          <Path>DefaultBuild\usb.obj</Path>
+          <Path>DefaultBuild\RX621_SAMPLE.obj</Path>
+          <Path>DefaultBuild\wait.obj</Path>
+          <Path>DefaultBuild\rspi.obj</Path>
+          <Path>DefaultBuild\Gyro.obj</Path>
+          <Path>DefaultBuild\MPU9250.obj</Path>
         </LinkOrder>
         <CommonOptions>
+          <IncludePathForC>USBStack\CDC</IncludePathForC>
+          <IncludePathForC>USBStack</IncludePathForC>
           <IncludePathForC>.</IncludePathForC>
         </CommonOptions>
       </BuildMode>
