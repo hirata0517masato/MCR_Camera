@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			125	  	/* ハンドル最大位置 115           */
 
-#define 	MAXTIME 			1350	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
+#define 	MAXTIME 			950	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
 
 
 /*======================================*/
@@ -192,8 +192,8 @@ unsigned char   types_dipsw;            /* ディップスイッチ値保存       */
 
 /*	パラメータ	*/
 //オフセット
-int  		Center_offset_MAX = 4;		/*カーブ時カメラセンターを移動＝寄せる 最小値 0 最大値	5			*/
-int  		Center_offset_Angle = -5;	/*この値につき１ＩＮ側に寄せる	正：IN　負：OUT		*/
+int  		Center_offset_MAX = 6;		/*カーブ時カメラセンターを移動＝寄せる 最小値 0 最大値	5			*/
+int  		Center_offset_Angle = -4;	/*この値につき１ＩＮ側に寄せる	正：IN　負：OUT		*/
 
 
 int			KASOKU = 15;	
@@ -208,15 +208,15 @@ int		    TOPSPEED	=		50;		//直線 44
 
 //前半
 int			SPEED_DOWN	=		7;		//角度によりTOPSPEEDを減速 カーブ前半
-int			MOTOR_out_R	=		 -2;		//外側モーター用パラメーター -2
+int			MOTOR_out_R	=		 1;		//外側モーター用パラメーター -2
 int			MOTOR_in_F	=		 1;		//内側モーター用パラメーター 2	1
-int			MOTOR_in_R	=		 -3;		//内側モーター用パラメーター -2
+int			MOTOR_in_R	=		 -2;		//内側モーター用パラメーター -2
 	
 //後半
-int			SPEED_DOWN_N=		8;		//角度によりTOPSPEEDを減速  カーブ後半
-int			MOTOR_out_R_N=		1;		//外側モーター用パラメーター 後半
-int			MOTOR_in_F_N=		2;		//内側モーター用パラメーター　後半
-int			MOTOR_in_R_N=		-2;		//内側モーター用パラメーター　後半
+int			SPEED_DOWN_N=		9;		//角度によりTOPSPEEDを減速  カーブ後半
+int			MOTOR_out_R_N=		2;		//外側モーター用パラメーター 後半
+int			MOTOR_in_F_N=		3;		//内側モーター用パラメーター　後半
+int			MOTOR_in_R_N=		1;		//内側モーター用パラメーター　後半
 
 
 int			S_para		=		1;		//S字きりかえし用パラメータ
@@ -271,7 +271,7 @@ int			saka_max	  =		  1;	//認識可能な坂の数
 
 
 //クランク
-int		    C_TOPSPEED	=		30;		//クランク(入)  25 33
+int		    C_TOPSPEED	=		28;		//クランク(入)  25 33
 int		    C_TOPSPEED2	=		50;		//クランク(出)	40
 
 int 		C_TOPSPEED4 = 		47;		//再生走行時のブレーキ前
@@ -2497,7 +2497,7 @@ void main( void )
        		//iSetAngle = 50;//48 47
 			iSetAngle = 50;//48 47 50
 		}else{
-			iSetAngle = 25;//48 47
+			iSetAngle = 18;//48 47
 		}
 		
 		servoPwmOut( iServoPwm2 );          /* 振りが弱いときは大きくする       */
@@ -3223,16 +3223,16 @@ void init( void )
     asm(" nop ");                       /* φADの1サイクルウエイト入れる*/
     adcon0  = 0x01;                     /* A/D変換スタート              */
 
-    /* タイマRG(位相計数モード)の設定 */
-  //  timsr = 0xc0;                       /* TRGCLKA,TRGCLKB端子割り当て  */
-    //trgcntc = 0xff;                     /* 位相計数ﾓｰﾄﾞのｶｳﾝﾄ方法指定   */
-  //  trgmr = 0x82;                       /* TRGのカウント開始            */
+ /* タイマRG(位相計数モード)の設定 */
+    timsr = 0xc0;                       /* TRGCLKA,TRGCLKB端子割り当て  */
+    trgcntc = 0xff;                     /* 位相計数ﾓｰﾄﾞのｶｳﾝﾄ方法指定   */
+    trgmr = 0x82;                       /* TRGのカウント開始            */
 	
 	/* タイマRG タイマモード(両エッジでカウント)の設定 */
-    timsr = 0x40;                       /* TRGCLKA端子 P3_0に割り当てる */
+    //timsr = 0x40;                       /* TRGCLKA端子 P3_0に割り当てる */
     //trgcr = 0x15;                       /* TRGCLKA端子の両エッジでカウント*/
-	trgcr = 0x05;                       /* TRGCLKA端子の立ち上がりエッジでカウント*/
-    trgmr = 0x80;                       /* TRGのカウント開始            */
+	//trgcr = 0x05;                       /* TRGCLKA端子の立ち上がりエッジでカウント*/
+    //trgmr = 0x80;                       /* TRGのカウント開始            */
    
 
     /* タイマRC PWMモード設定(左前モータ、右前モータ) */
@@ -3309,16 +3309,10 @@ void intTRB( void )
 	
 	////////////////////////////////////////////////////////
 	
-	/*if( pushsw_get() ) {
-		 	lEncoderTotal2 = 0;
-			lEncoderTotal = 0;	
-		}*/
-	
 	//33*3.14  // 1パルス*1.03 = 1mm  //1回転 100パルス
-	i = trg;
+	i = trg >> 1;
     iEncoder1_buf[iTimer10] = (i - uEncoderBuff);
 	lEncoderTotal += iEncoder1_buf[iTimer10];
-	//lEncoderTotal = lEncoderTotal2; 
     uEncoderBuff = i;
 	
 	iEncoder_buf = 0;
