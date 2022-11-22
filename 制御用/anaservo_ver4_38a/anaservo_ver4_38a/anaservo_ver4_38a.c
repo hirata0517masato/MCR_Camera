@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			125	  	/* ハンドル最大位置 115           */
 
-#define 	MAXTIME 			950	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
+#define 	MAXTIME 			1250	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
 
 
 /*======================================*/
@@ -214,9 +214,9 @@ int			MOTOR_in_R	=		 -2;		//内側モーター用パラメーター -2
 	
 //後半
 int			SPEED_DOWN_N=		9;		//角度によりTOPSPEEDを減速  カーブ後半
-int			MOTOR_out_R_N=		2;		//外側モーター用パラメーター 後半
-int			MOTOR_in_F_N=		3;		//内側モーター用パラメーター　後半
-int			MOTOR_in_R_N=		1;		//内側モーター用パラメーター　後半
+int			MOTOR_out_R_N=		3;		//外側モーター用パラメーター 後半
+int			MOTOR_in_F_N=		4;		//内側モーター用パラメーター　後半
+int			MOTOR_in_R_N=		2;		//内側モーター用パラメーター　後半
 
 
 int			S_para		=		1;		//S字きりかえし用パラメータ
@@ -1178,7 +1178,7 @@ void main( void )
 					
 					if(f < 0) f = 0;
 					if(r < -5) r = -5;
-					if(or < 0) or = 0;
+					if(or < -5) or = -5;
 					if(f > MOTOR_out_base) f = MOTOR_out_base;
 					if(r > MOTOR_out_base) r = MOTOR_out_base;
 					if(or > MOTOR_out_base) or = MOTOR_out_base;
@@ -1325,7 +1325,7 @@ void main( void )
 					
 					if(f < 0) f = 0;
 					if(r < -5) r = -5;
-					if(or < 0) or = 0;
+					if(or < -5) or = -5;
 					if(f > MOTOR_out_base) f = MOTOR_out_base;
 					if(r > MOTOR_out_base) r = MOTOR_out_base;
 					if(or > MOTOR_out_base) or = MOTOR_out_base;
@@ -1775,7 +1775,7 @@ void main( void )
 				
 				}else iSetAngle = 95;
 			
-				motor_f( 90, -30 );          /* この部分は「角度計算(4WD時).xls」 85 -40*/
+				motor_f( 95, -25 );          /* この部分は「角度計算(4WD時).xls」 85 -40*/
         		motor_r( -20, -20 );          /* で計算                        */
 			}
 			
@@ -1844,7 +1844,7 @@ void main( void )
         if((( c_cut == 0 || date_f_mode == 0) && (lEncoderTotal-sp) >= 150) || ((c_cut == 1 && date_f_mode != 0) && (lEncoderTotal-sp) >= 240)){
 			if(Wide != 0){
 			//if (((20 < Center)&&(Center < 40)) || ((-15 < Center)&&(Center < 15))) {    /* 曲げ終わりチェック           */
-			if ( (( c_cut == 0 || date_f_mode == 0) && -25 < Center && Center < 25 && (Wide != 0 && Wide < 30) ) 
+			if ( (( c_cut == 0 || date_f_mode == 0) && -10 < Center && Center < 25 && (Wide != 0 && Wide < 30) ) 
 				|| ((c_cut == 1 && date_f_mode != 0) && -20 < Center && Center < 0 && (Wide_old == 0 || Wide > Wide_old))
 				  || ((c_cut == 1 && date_f_mode != 0) && -25 < Center && Center < 25 && (Wide_old != 0) && (lEncoderTotal-sp) >= 750)) {    /* 曲げ終わりチェック           */
 				
@@ -1894,7 +1894,7 @@ void main( void )
            		motor2_r( 30, 0 );
 		
 			}else{//long
-				motor2_f( 90, 40 );
+				motor2_f( 90, 60 );
            		motor2_r( 40, 0 );
 			}
 		}
@@ -1969,7 +1969,7 @@ void main( void )
 				
 				}else iSetAngle = -95;
 			
-				motor_f(  -30, 90 );          /* この部分は「角度計算(4WD時).xls」*/
+				motor_f(  -25, 95 );          /* この部分は「角度計算(4WD時).xls」*/
         		motor_r( -20, -20 );          /* で計算                        */
 			}
 		}else{
@@ -2028,7 +2028,7 @@ void main( void )
 		if(((c_cut == 0 || date_f_mode == 0) && (lEncoderTotal-sp) >= 150) || ((c_cut == 1 && date_f_mode != 0) && (lEncoderTotal-sp) >= 240)){
 			if(Wide != 0){ 
 			//if( ((-40 < Center)&&(Center < -20)) || ((-15 < Center)&&(Center < 15))) {    /* 曲げ終わりチェック           */
-	 		if(( (c_cut == 0 || date_f_mode == 0) && -25 < Center && Center < 25 && (Wide != 0 && Wide < 30)) 
+	 		if(( (c_cut == 0 || date_f_mode == 0) && -25 < Center && Center < 10 && (Wide != 0 && Wide < 30)) 
 				|| ( (c_cut == 1 && date_f_mode != 0) && 0 < Center && Center < 20 && (Wide_old == 0 || Wide < Wide_old)) 
 					|| ((c_cut == 1 && date_f_mode != 0) && -25 < Center && Center < 25 && (Wide_old != 0) && (lEncoderTotal-sp) >= 750)){    /* 曲げ終わりチェック           */
 	 	
@@ -2077,7 +2077,7 @@ void main( void )
 				motor2_f( 20, 90);
            		motor2_r( 0, 30 );
 			}else{//long
-				motor2_f( 40, 90);
+				motor2_f( 60, 90);
            		motor2_r( 0, 40 );
 			}
 		}
