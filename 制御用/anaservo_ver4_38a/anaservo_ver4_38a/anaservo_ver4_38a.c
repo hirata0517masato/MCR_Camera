@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			125	  	/* ハンドル最大位置 115           */
 
-#define 	MAXTIME 			1250	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
+#define 	MAXTIME 			900	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
 
 
 /*======================================*/
@@ -192,7 +192,7 @@ unsigned char   types_dipsw;            /* ディップスイッチ値保存       */
 
 /*	パラメータ	*/
 //オフセット
-int  		Center_offset_MAX = 6;		/*カーブ時カメラセンターを移動＝寄せる 最小値 0 最大値	5			*/
+int  		Center_offset_MAX = 10;		/*カーブ時カメラセンターを移動＝寄せる 最小値 0 最大値	5			*/
 int  		Center_offset_Angle = -4;	/*この値につき１ＩＮ側に寄せる	正：IN　負：OUT		*/
 
 
@@ -207,16 +207,16 @@ int			MOTOR_out_base	=		 95;		//カーブ前半用　外側モーター用パラメーター
 int		    TOPSPEED	=		50;		//直線 44
 
 //前半
-int			SPEED_DOWN	=		7;		//角度によりTOPSPEEDを減速 カーブ前半
-int			MOTOR_out_R	=		 1;		//外側モーター用パラメーター -2
-int			MOTOR_in_F	=		 1;		//内側モーター用パラメーター 2	1
-int			MOTOR_in_R	=		 -2;		//内側モーター用パラメーター -2
+int			SPEED_DOWN	=		9;		//角度によりTOPSPEEDを減速 カーブ前半
+int			MOTOR_out_R	=		 2;		//外側モーター用パラメーター -2
+int			MOTOR_in_F	=		 3;		//内側モーター用パラメーター 2	1
+int			MOTOR_in_R	=		 1;		//内側モーター用パラメーター -2
 	
 //後半
-int			SPEED_DOWN_N=		9;		//角度によりTOPSPEEDを減速  カーブ後半
-int			MOTOR_out_R_N=		3;		//外側モーター用パラメーター 後半
-int			MOTOR_in_F_N=		4;		//内側モーター用パラメーター　後半
-int			MOTOR_in_R_N=		2;		//内側モーター用パラメーター　後半
+int			SPEED_DOWN_N=		11;		//角度によりTOPSPEEDを減速  カーブ後半
+int			MOTOR_out_R_N=		6;		//外側モーター用パラメーター 後半
+int			MOTOR_in_F_N=		7;		//内側モーター用パラメーター　後半
+int			MOTOR_in_R_N=		5;		//内側モーター用パラメーター　後半
 
 
 int			S_para		=		1;		//S字きりかえし用パラメータ
@@ -1775,8 +1775,8 @@ void main( void )
 				
 				}else iSetAngle = 95;
 			
-				motor_f( 95, -25 );          /* この部分は「角度計算(4WD時).xls」 85 -40*/
-        		motor_r( -20, -20 );          /* で計算                        */
+				motor_f( 95, -45 );          /* この部分は「角度計算(4WD時).xls」 85 -40*/
+        		motor_r( -40, -40 );          /* で計算                        */
 			}
 			
 		
@@ -1793,14 +1793,14 @@ void main( void )
 			}else if((lEncoderTotal-sp) >= 350){
 				
 				iSetAngle = 100;
-				motor2_f( 85,   10 );         
-        		motor2_r( 30,   0 );  
+				motor2_f( 85,   5 );         
+        		motor2_r( 25,   0 );  
 				
 				
 			}else if((lEncoderTotal-sp) >= 250){
 				
 				if(i < 70)iSetAngle = 120;
-				else iSetAngle = 90;
+				else iSetAngle = 98;
 				
 				motor2_f( 80,   0 );         
         		motor2_r( 0,   0 );  
@@ -1809,31 +1809,31 @@ void main( void )
 			}else if((lEncoderTotal-sp) >= 150){
 				
 				if(i < 45)iSetAngle = 90;
-				else iSetAngle = 75;
+				else iSetAngle = 80;
 				
-				motor2_f( 85,   10 );         
-        		motor2_r( 20,   0 );
+				motor2_f( 85,   5 );         
+        		motor2_r( 15,   0 );
 				
 			}else if((lEncoderTotal-sp) >= 100){
 				
 				if(i < 30)iSetAngle = 80;
-				else iSetAngle = 50;
+				else iSetAngle = 55;
 				
-				motor2_f( 85,   30 );         
-        		motor2_r( 25,   0 );
+				motor2_f( 85,   25 );         
+        		motor2_r( 20,   0 );
 			
 			}else if((lEncoderTotal-sp) >= 50){
 				
 				if(i < 20)iSetAngle = 50;
-				else iSetAngle = 35;
+				else iSetAngle = 38;
 				
-				motor2_f( 90,   35 );         
-        		motor2_r( 35,  0 );
+				motor2_f( 90,   30 );         
+        		motor2_r( 30,  0 );
 					
 			}else{
 				iSetAngle = 25;
-				motor2_f( 90,   40 );         
-        		motor2_r( 40,   0 );
+				motor2_f( 90,   35 );         
+        		motor2_r( 35,   0 );
 			} 
 			
        	}
@@ -1894,7 +1894,7 @@ void main( void )
            		motor2_r( 30, 0 );
 		
 			}else{//long
-				motor2_f( 90, 60 );
+				motor2_f( 90, 50 );
            		motor2_r( 40, 0 );
 			}
 		}
@@ -1969,8 +1969,8 @@ void main( void )
 				
 				}else iSetAngle = -95;
 			
-				motor_f(  -25, 95 );          /* この部分は「角度計算(4WD時).xls」*/
-        		motor_r( -20, -20 );          /* で計算                        */
+				motor_f(  -45, 95 );          /* この部分は「角度計算(4WD時).xls」*/
+        		motor_r(  -40, -40 );          /* で計算                        */
 			}
 		}else{
 			mode = 1;//見る範囲を狭く
@@ -1983,13 +1983,13 @@ void main( void )
 		
 			}else if((lEncoderTotal-sp) >= 350){
 				iSetAngle = -100;
-				motor2_f( 10,   85 );         
-        		motor2_r( 0,   30 );  
+				motor2_f( 5,   85 );         
+        		motor2_r( 0,   25 );  
 				
 			}else if((lEncoderTotal-sp) >= 250){
 				
 				if(i > -70)iSetAngle = -120;
-				else iSetAngle = -95;
+				else iSetAngle = -98;
 				
 				motor2_f( 0,   80 );         
         		motor2_r( 0,   0 );  
@@ -1997,29 +1997,29 @@ void main( void )
 				
 			}else if((lEncoderTotal-sp) >= 150){
 				if(i > -45)iSetAngle = -90;
-				else iSetAngle = -75;
+				else iSetAngle = -80;
 				
-				motor2_f( 10,   85 );         
-        		motor2_r( 0,   20 );
+				motor2_f( 5,   85 );         
+        		motor2_r( 0,   15 );
 				
 			}else if((lEncoderTotal-sp) >= 100){
 				if(i > -30)iSetAngle = -80;
-				else iSetAngle = -50;
+				else iSetAngle = -55;
 				
-				motor2_f( 30,   85 );         
-        		motor2_r( 0,   25 );
+				motor2_f( 25,   85 );         
+        		motor2_r( 0,   20 );
 			
 			}else if((lEncoderTotal-sp) >= 50){
 				if(i > -20)iSetAngle = -50;
-				else iSetAngle = -35;
+				else iSetAngle = -38;
 				
-				motor2_f( 35,   90 );         
-        		motor2_r( 0,  35 );
+				motor2_f( 30,   90 );         
+        		motor2_r( 0,  30 );
 					
 			}else{
 				iSetAngle = -25;
-				motor2_f( 40,   90 );         
-        		motor2_r( 0,   40 );
+				motor2_f( 35,   90 );         
+        		motor2_r( 0,   35 );
 			}  
        	}
 		
@@ -2077,7 +2077,7 @@ void main( void )
 				motor2_f( 20, 90);
            		motor2_r( 0, 30 );
 			}else{//long
-				motor2_f( 60, 90);
+				motor2_f( 50, 90);
            		motor2_r( 0, 40 );
 			}
 		}
@@ -2238,7 +2238,7 @@ void main( void )
         	//iSetAngle = -45;//-48 -47 壁なし
 			iSetAngle = -40;//
 		}else{
-			iSetAngle = -18;
+			iSetAngle = -15;
 		}
 		
 		servoPwmOut( iServoPwm2 );          /* 振りが弱いときは大きくする       */
@@ -2497,7 +2497,7 @@ void main( void )
        		//iSetAngle = 50;//48 47
 			iSetAngle = 50;//48 47 50
 		}else{
-			iSetAngle = 18;//48 47
+			iSetAngle = 15;//48 47
 		}
 		
 		servoPwmOut( iServoPwm2 );          /* 振りが弱いときは大きくする       */
@@ -3961,7 +3961,7 @@ unsigned char check_crossline( void )
 	//cam_in();//値の取得
 	
 	ret = 0;
-	if( (Wide > 70) || ((Wide >= 45) && (-12 < Center ) && (Center < 12))  || ((Wide >= 35) && (Center > -4) && (Center < 4))){
+	if( (Wide > 70) || ((Wide >= 50) && (-18 < Center ) && (Center < 18))  || ((Wide >= 44) && (Center > -12) && (Center < 12))){
 	
 		ret = 1;			/* クロスライン発見 */
 	}
