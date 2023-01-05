@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			125	  	/* ハンドル最大位置 115           */
 
-#define 	MAXTIME 			900	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
+#define 	MAXTIME 			1300	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
 
 
 /*======================================*/
@@ -237,7 +237,7 @@ int			saka_max	  =		  1;	//認識可能な坂の数
 #define 	KASA_Encoder1  	250	//坂開始
 #define 	KASA_Encoder2  	600	//上り終わり 
 #define		KASA_Encoder3  	2000	//坂上終わり  1450 2800 3800 2800 4600
-#define		KASA_Encoder4  	4000	//下り終わり 通常にもどる 4000 5000 4000
+#define		KASA_Encoder4  	5000	//下り終わり 通常にもどる 4000 5000 4000
 //斜面(下り)
 #define		    TOPSPEED4			48		//直線(坂）30 33
 #define			SPEED_DOWN4			7		//角度によりTOPSPEEDを減速(坂）カーブ前半
@@ -275,7 +275,7 @@ int		    C_TOPSPEED	=		28;		//クランク(入)  25 33
 int		    C_TOPSPEED2	=		50;		//クランク(出)	40
 
 int 		C_TOPSPEED4 = 		47;		//再生走行時のブレーキ前
-int		    C_TOPSPEED3	=		40;		//クランク(入)  25 33 再生走行用
+int		    C_TOPSPEED3	=		43;		//クランク(入)  25 33 再生走行用
 
 int			C_short_len =		625;	//この距離未満はショート、以上はロング
 
@@ -295,7 +295,7 @@ int		    H_TOPSPEED2_S=		50;		//ハーフ(斜め)  ショートカット用
 int			date_f_brake_h	=	500;	//再生走行時のブレーキ使用可能距離(mm)　ハーフ用 
 int			date_f_shortcat_h=	350;		//再生走行時のショートカット距離(mm)　ハーフ用
 
-int			date_f_plus_h	=	500;		//再生走行時の直後のストレート距離補正(mm)　ハーフ用  
+int			date_f_plus_h	=	700;		//再生走行時の直後のストレート距離補正(mm)　ハーフ用  
 int			h_cut 			 =	  1;	//再生走行時であっても 0= 再生しない 1= 再生する 
 
 ///////////////////////////////////
@@ -1817,23 +1817,23 @@ void main( void )
 			}else if((lEncoderTotal-sp) >= 100){
 				
 				if(i < 30)iSetAngle = 80;
-				else iSetAngle = 55;
+				else iSetAngle = 50;
 				
-				motor2_f( 85,   25 );         
-        		motor2_r( 20,   0 );
+				motor2_f( 85,   30 );         
+        		motor2_r( 25,   0 );
 			
 			}else if((lEncoderTotal-sp) >= 50){
 				
 				if(i < 20)iSetAngle = 50;
-				else iSetAngle = 38;
+				else iSetAngle = 35;
 				
-				motor2_f( 90,   30 );         
-        		motor2_r( 30,  0 );
+				motor2_f( 90,   35 );         
+        		motor2_r( 35,  0 );
 					
 			}else{
 				iSetAngle = 25;
-				motor2_f( 90,   35 );         
-        		motor2_r( 35,   0 );
+				motor2_f( 90,   40 );         
+        		motor2_r( 40,   0 );
 			} 
 			
        	}
@@ -2004,22 +2004,22 @@ void main( void )
 				
 			}else if((lEncoderTotal-sp) >= 100){
 				if(i > -30)iSetAngle = -80;
-				else iSetAngle = -55;
+				else iSetAngle = -50;
 				
-				motor2_f( 25,   85 );         
-        		motor2_r( 0,   20 );
+				motor2_f( 30,   85 );         
+        		motor2_r( 0,   25 );
 			
 			}else if((lEncoderTotal-sp) >= 50){
 				if(i > -20)iSetAngle = -50;
-				else iSetAngle = -38;
+				else iSetAngle = -35;
 				
-				motor2_f( 30,   90 );         
-        		motor2_r( 0,  30 );
+				motor2_f( 35,   90 );         
+        		motor2_r( 0,  35 );
 					
 			}else{
 				iSetAngle = -25;
-				motor2_f( 35,   90 );         
-        		motor2_r( 0,   35 );
+				motor2_f( 40,   90 );         
+        		motor2_r( 0,   40 );
 			}  
        	}
 		
@@ -2735,37 +2735,38 @@ void main( void )
             break;
         }
 
-		/* データの転送 */
-        printf( "%d,%4d,%4d,%5d,%5d,%5d,%5d,%5d,%5d,%4d,%4d,%4d,%4d,%4d,%4d\n",
-            (int)msdBuff[msdBuffAddress+0],                  /* パターン     */
-            (int)msdBuff[msdBuffAddress+1],					/* センター*/
-            (unsigned char)msdBuff[msdBuffAddress+2],                  /* ワイド */
-			(int)((unsigned char)msdBuff[msdBuffAddress+3]*0x100 +
-	             (unsigned char)msdBuff[msdBuffAddress+4] ),			/* 角度 */
-            /* サーボPWM */
-	            msdBuff[msdBuffAddress+6],
-	            /* 左前PWM */
-	            msdBuff[msdBuffAddress+7],
-	            /* 右前PWM */
-	            msdBuff[msdBuffAddress+8],
-	            /* 左後PWM */
-	            msdBuff[msdBuffAddress+9],
-	            /* 右後PWM */
-	            msdBuff[msdBuffAddress+10],
-	            /* エンコーダ */
-	            msdBuff[msdBuffAddress+11] * 2,
-				/* モード */
-	            msdBuff[msdBuffAddress+12],
-				/* 坂道回数 */
-	            msdBuff[msdBuffAddress+13],
-				/* 加速度センサーY */
-	            msdBuff[msdBuffAddress+14],
-				/* 加速度センサーX */
-	            msdBuff[msdBuffAddress+15],
-				/* 赤外線センサーの差 */
-	            msdBuff[msdBuffAddress+5]
+		if( (dipsw_get() & 0x04) == 0x00 ) {//ログ出力なし、早くコース記憶したい時用
+			/* データの転送 */
+	        printf( "%d,%4d,%4d,%5d,%5d,%5d,%5d,%5d,%5d,%4d,%4d,%4d,%4d,%4d,%4d\n",
+	            (int)msdBuff[msdBuffAddress+0],                  /* パターン     */
+	            (int)msdBuff[msdBuffAddress+1],					/* センター*/
+	            (unsigned char)msdBuff[msdBuffAddress+2],                  /* ワイド */
+				(int)((unsigned char)msdBuff[msdBuffAddress+3]*0x100 +
+		             (unsigned char)msdBuff[msdBuffAddress+4] ),			/* 角度 */
+	            /* サーボPWM */
+		            msdBuff[msdBuffAddress+6],
+		            /* 左前PWM */
+		            msdBuff[msdBuffAddress+7],
+		            /* 右前PWM */
+		            msdBuff[msdBuffAddress+8],
+		            /* 左後PWM */
+		            msdBuff[msdBuffAddress+9],
+		            /* 右後PWM */
+		            msdBuff[msdBuffAddress+10],
+		            /* エンコーダ */
+		            msdBuff[msdBuffAddress+11] * 2,
+					/* モード */
+		            msdBuff[msdBuffAddress+12],
+					/* 坂道回数 */
+		            msdBuff[msdBuffAddress+13],
+					/* 加速度センサーY */
+		            msdBuff[msdBuffAddress+14],
+					/* 加速度センサーX */
+		            msdBuff[msdBuffAddress+15],
+					/* 赤外線センサーの差 */
+		            msdBuff[msdBuffAddress+5]
         );		
-
+		}
         
 		if(date_f_mode != 0){
 			date_f_make((int)msdBuff[msdBuffAddress+0],(int)((unsigned char)msdBuff[msdBuffAddress+3]*0x100 +
@@ -3373,10 +3374,10 @@ void intTRB( void )
 				
 				if(mode == 0){
 					//if(date_f_buff_int[date_f_num] - date_f_brake < SEncoderTotal)flag = 1;//記録した直線を走った
-					if(date_f_buff_int[date_f_num] - 600 < SEncoderTotal)flag = 1;//記録した直線を走った
+					if(date_f_buff_int[date_f_num] - 700 < SEncoderTotal)flag = 1;//記録した直線を走った
 				}else{
 					//if(date_f_buff_int[date_f_num] - date_f_brake - 500 < SEncoderTotal)flag = 1;//記録した直線を走った
-					if(date_f_buff_int[date_f_num] - 600 - 500 < SEncoderTotal)flag = 1;//記録した直線を走った
+					if(date_f_buff_int[date_f_num] - 700 - 600 < SEncoderTotal)flag = 1;//記録した直線を走った
 				}
 				flag20 = 0;
 			
