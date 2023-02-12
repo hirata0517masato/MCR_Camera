@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			125	  	/* ハンドル最大位置 115           */
 
-#define 	MAXTIME 			1300	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
+#define 	MAXTIME 			1450	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
 
 
 /*======================================*/
@@ -222,7 +222,7 @@ int			MOTOR_in_R_N=		5;		//内側モーター用パラメーター　後半
 int			S_para		=		1;		//S字きりかえし用パラメータ
 int			OUT_M_DOWN	=		2;		//カーブ外寄りブレーキ用倍率
 
-#define		date_f_brake		400	//再生走行時のブレーキ使用可能距離(mm)
+#define		date_f_brake		800	//再生走行時のブレーキ使用可能距離(mm) 400
 
 #define		Cu_FREE_time  		10		//カーブ終了時の後輪フリーの時間(msec）
 
@@ -233,15 +233,18 @@ int			OUT_M_DOWN	=		2;		//カーブ外寄りブレーキ用倍率
 #define		Cu_N_time			200	//Cu_N_time ms カーブを走行すると後半になる 	
 
 //坂
+int			S_flag = 2;				//坂道　遇数回を　1 = 無視しない  2 = 無視する
 int			saka_max	  =		  1;	//認識可能な坂の数
 #define 	KASA_Encoder1  	250	//坂開始
 #define 	KASA_Encoder2  	600	//上り終わり 
 #define		KASA_Encoder3  	2000	//坂上終わり  1450 2800 3800 2800 4600
 #define		KASA_Encoder4  	5000	//下り終わり 通常にもどる 4000 5000 4000
+#define		KASA_Encoder4_2  5300	//下り終わり 通常にもどる 4000 5000 4000 ２回目の坂道 /////////////////逆走では入れ替えること
+
 //斜面(下り)
 #define		    TOPSPEED4			48		//直線(坂）30 33
-#define			SPEED_DOWN4			7		//角度によりTOPSPEEDを減速(坂）カーブ前半
-#define			SPEED_DOWN4_N		8		//角度によりTOPSPEEDを減速  カーブ後半
+#define			SPEED_DOWN4			8		//角度によりTOPSPEEDを減速(坂）カーブ前半
+#define			SPEED_DOWN4_N		9		//角度によりTOPSPEEDを減速  カーブ後半
 #define			MOTOR_out4_R		1	//外側モーター用パラメーター(坂）
 #define			MOTOR_in4_F			2		//内側モーター用パラメーター(坂）
 #define			MOTOR_in4_R			-2		//内側モーター用パラメーター(坂）
@@ -271,7 +274,7 @@ int			saka_max	  =		  1;	//認識可能な坂の数
 
 
 //クランク
-int		    C_TOPSPEED	=		28;		//クランク(入)  25 33
+int		    C_TOPSPEED	=		27;		//クランク(入)  25 33
 int		    C_TOPSPEED2	=		50;		//クランク(出)	40
 
 int 		C_TOPSPEED4 = 		47;		//再生走行時のブレーキ前
@@ -301,8 +304,6 @@ int			h_cut 			 =	  1;	//再生走行時であっても 0= 再生しない 1= 再生する
 ///////////////////////////////////
 
 int			BRAKE_MAX	=		-100;	//ブレーキの最大パワー 
-
-int			S_flag = 2;				//坂道　遇数回を　1 = 無視しない  2 = 無視する
 
 
 int				kp = -18;//- 8  3 -16 -19 -23  -13
@@ -553,6 +554,7 @@ void main( void )
 					j++;	
 				}
 				
+				
 				j = 0;
 				for(i = 0; i < 32; i+=3){
 					date_f_buff_ch_int[j] =(int)date_f_buff_ch[i];
@@ -561,7 +563,8 @@ void main( void )
 					date_f_buff_ch_int[j] = (int)(date_f_buff_ch[i+1])*100 + (int)date_f_buff_ch[i+2];
 					j++;
 				}
-
+				
+		
 				
 			/*	
 					//31：右クランク 41：左クランク 53:左ハーフ 63:右ハーフ
@@ -608,7 +611,7 @@ void main( void )
 					date_f_buff_ch_int[j] = (int)(date_f_buff_ch[i+1])*100 + (int)date_f_buff_ch[i+2];
 					j++;
 				}
-			
+		
 				
 				/*
 					//31：右クランク 41：左クランク 53:左ハーフ 63:右ハーフ
@@ -871,9 +874,8 @@ void main( void )
 		
 		
 		
-		if(-10 < i && i < 10){
+		if(-15 < i && i < 15){
 			if(angle_check() == 2 && ( (flag2%2 == 1) || ((lEncoderTotal-sp2) >= 500) && ((lEncoderTotal-sp) >= 1000))){//坂センサーチェック sp=クランク終了位置
-			
 				cnt5++;
 			}else{
 				cnt5 = 0;
@@ -882,7 +884,7 @@ void main( void )
 		
 		if(-60 < i && i < 60){
 			if(mode == 0){//坂中でなければ
-				if(lEncoderTotal > 200 && (lEncoderTotal-sp2) >= 1000 && (lEncoderTotal-sp) >= 150 && (lEncoderTotal-sp3) >= 0){//ゲートに反応しないように && 坂終了から少しの間は無視 && クランク、ハーフ終了後少し無視 && カーブ直後は無視
+				if(lEncoderTotal > 200 && (lEncoderTotal-sp2) >= 100 && (lEncoderTotal-sp) >= 150 && (lEncoderTotal-sp3) >= 0){//ゲートに反応しないように && 坂終了から少しの間は無視 && クランク、ハーフ終了後少し無視 && カーブ直後は無視
 				//if(lEncoderTotal > 200 ){//ゲートに反応しないように 
 				
 					if(date_f_mode == 0){
@@ -992,7 +994,8 @@ void main( void )
 		
 		}else if(mode == 1){//坂
 
-			if((lEncoderTotal-sp2) >= KASA_Encoder4){//通常に戻す
+			if(((saka_max > 0) && ((lEncoderTotal-sp2) >= KASA_Encoder4)) || 
+				((saka_max == 0) && ((lEncoderTotal-sp2) >= KASA_Encoder4_2))   ){//通常に戻す
 			
 				mode = 0;
 				
@@ -1051,7 +1054,7 @@ void main( void )
 					mode = 0;
 					
 					flag2--;//今回の分を無かったことに
-					
+					saka_max++;
 					sp2 = lEncoderTotal;//チャタリング防止
 				}
 			}	
@@ -1702,7 +1705,7 @@ void main( void )
 				else x=(C_TOPSPEED3 -iEncoder10)*30;
 			
 				r = x;
-				if(r < -90 && (c_cut == 0 || date_f_mode == 0)) r = -90;
+				if(r < -100 && (c_cut == 0 || date_f_mode == 0)) r = -100;
 				else if(r < BRAKE_MAX) r = BRAKE_MAX;
 				
 				if(x < BRAKE_MAX) x = BRAKE_MAX;
@@ -2735,7 +2738,7 @@ void main( void )
             break;
         }
 
-		if( (dipsw_get() & 0x04) == 0x00 ) {//ログ出力なし、早くコース記憶したい時用
+	//	if( (dipsw_get() & 0x04) == 0x00 ) {//ログ出力なし、早くコース記憶したい時用
 			/* データの転送 */
 	        printf( "%d,%4d,%4d,%5d,%5d,%5d,%5d,%5d,%5d,%4d,%4d,%4d,%4d,%4d,%4d\n",
 	            (int)msdBuff[msdBuffAddress+0],                  /* パターン     */
@@ -2766,7 +2769,7 @@ void main( void )
 					/* 赤外線センサーの差 */
 		            msdBuff[msdBuffAddress+5]
         );		
-		}
+	//	}
         
 		if(date_f_mode != 0){
 			date_f_make((int)msdBuff[msdBuffAddress+0],(int)((unsigned char)msdBuff[msdBuffAddress+3]*0x100 +
@@ -3374,10 +3377,10 @@ void intTRB( void )
 				
 				if(mode == 0){
 					//if(date_f_buff_int[date_f_num] - date_f_brake < SEncoderTotal)flag = 1;//記録した直線を走った
-					if(date_f_buff_int[date_f_num] - 700 < SEncoderTotal)flag = 1;//記録した直線を走った
+					if(date_f_buff_int[date_f_num] - 500 < SEncoderTotal)flag = 1;//記録した直線を走った
 				}else{
 					//if(date_f_buff_int[date_f_num] - date_f_brake - 500 < SEncoderTotal)flag = 1;//記録した直線を走った
-					if(date_f_buff_int[date_f_num] - 700 - 600 < SEncoderTotal)flag = 1;//記録した直線を走った
+					if(date_f_buff_int[date_f_num] - 500 - 600 < SEncoderTotal)flag = 1;//記録した直線を走った
 				}
 				flag20 = 0;
 			
@@ -4223,7 +4226,7 @@ void get_angle_x(){
 int angle_check(){
 
 	if(230 < angle_y && angle_y < 350){
-		if(angle_x <= 170)return 2;//上
+		if(angle_x <= 100)return 2;//上 170
 		if(angle_x > 440)return 0;//下
 	}
 	return 1;//変化無し
