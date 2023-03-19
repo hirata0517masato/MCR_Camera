@@ -56,7 +56,8 @@
 [WINDOW_POSITION_STATE_DATA_VD4]
 [WINDOW_Z_ORDER]
 "C:\WorkSpace\anaservo_ver4_38a\anaservo_ver4_38a\anaservo_ver4_38a.c" 
-"C:\WorkSpace\common_r8c38a\sfr_r838a.h" 
+"C:\WorkSpace\anaservo_ver4_38a\anaservo_ver4_38a\data_flash_lib.c" 
+"C:\WorkSpace\anaservo_ver4_38a\anaservo_ver4_38a\microsd_lib.c" 
 [TARGET_NAME]
 "" "" 1547330365 
 [STATUSBAR_STATEINFO_VD1]
