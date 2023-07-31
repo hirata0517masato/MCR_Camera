@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			125	  	/* ハンドル最大位置 115           */
 
-#define 	MAXTIME 			1450	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
+#define 	MAXTIME 			850	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
 
 
 /*======================================*/
@@ -207,16 +207,16 @@ int			MOTOR_out_base	=		 95;		//カーブ前半用　外側モーター用パラメーター
 int		    TOPSPEED	=		50;		//直線 44
 
 //前半
-int			SPEED_DOWN	=		9;		//角度によりTOPSPEEDを減速 カーブ前半
-int			MOTOR_out_R	=		 2;		//外側モーター用パラメーター -2
-int			MOTOR_in_F	=		 3;		//内側モーター用パラメーター 2	1
-int			MOTOR_in_R	=		 1;		//内側モーター用パラメーター -2
+int			SPEED_DOWN	=		8;		//角度によりTOPSPEEDを減速 カーブ前半
+int			MOTOR_out_R	=		 1;		//外側モーター用パラメーター -2
+int			MOTOR_in_F	=		 2;		//内側モーター用パラメーター 2	1
+int			MOTOR_in_R	=		 -2;		//内側モーター用パラメーター -2
 	
 //後半
 int			SPEED_DOWN_N=		11;		//角度によりTOPSPEEDを減速  カーブ後半
-int			MOTOR_out_R_N=		6;		//外側モーター用パラメーター 後半
-int			MOTOR_in_F_N=		7;		//内側モーター用パラメーター　後半
-int			MOTOR_in_R_N=		4;		//内側モーター用パラメーター　後半
+int			MOTOR_out_R_N=		5;		//外側モーター用パラメーター 後半
+int			MOTOR_in_F_N=		6;		//内側モーター用パラメーター　後半
+int			MOTOR_in_R_N=		3;		//内側モーター用パラメーター　後半
 
 
 int			S_para		=		1;		//S字きりかえし用パラメータ
@@ -238,16 +238,16 @@ int			S_flag = 2;				//坂道　遇数回を　1 = 無視しない  2 = 無視する
 int			saka_max	  =		  1;	//認識可能な坂の数
 #define 	KASA_Encoder1  	150	//坂開始
 #define 	KASA_Encoder2  	700	//上り途中 終わり
-#define 	KASA_Encoder3  	1500	//上り終わり 
+#define 	KASA_Encoder3  	1200	//上り終わり 
 
 #define		KASA_Encoder4  	0	//坂上終わり  
 #define		KASA_Encoder5  	0	//下り終わり 通常にもどる 
 
-#define		KASA_Encoder4_2  7000	//坂上終わり(最後の坂道)2500
-#define		KASA_Encoder5_2  8000	//坂上終わり(最後の坂道)3200
+#define		KASA_Encoder4_2  3500	//坂上終わり(最後の坂道)2500
+#define		KASA_Encoder5_2  4200	//坂上終わり(最後の坂道)3200
 
 //斜面(上り)
-#define		    TOPSPEED2			40		//直線(坂）30 33
+#define		    TOPSPEED2			45		//直線(坂）30 33
 #define			SPEED_DOWN2			10		//角度によりTOPSPEEDを減速(坂）カーブ前半
 #define			SPEED_DOWN2_N		10		//角度によりTOPSPEEDを減速  カーブ後半
 #define			MOTOR_out2_R		100	//外側モーター用パラメーター(坂）
@@ -269,18 +269,18 @@ int			saka_max	  =		  1;	//認識可能な坂の数
 #define			OUT_M_DOWN3			4		//カーブ外寄りブレーキ用倍率(坂）
 
 //上
-#define		    TOPSPEED4			45		//直線(坂上）30 33
+#define		    TOPSPEED4			50		//直線(坂上）30 33
 #define			SPEED_DOWN4			6		//角度によりTOPSPEEDを減速(坂上）カーブ前半
 #define			SPEED_DOWN4_N		6		//角度によりTOPSPEEDを減速  カーブ後半
 #define			MOTOR_out4_R		-1		//外側モーター用パラメーター(坂上)
-#define			MOTOR_in4_F			-3		//内側モーター用パラメーター(坂上）
-#define			MOTOR_in4_R			-3		//内側モーター用パラメーター(坂上）
+#define			MOTOR_in4_F			-1		//内側モーター用パラメーター(坂上）
+#define			MOTOR_in4_R			-2		//内側モーター用パラメーター(坂上）
 
 #define			S_para4				2		//S字きりかえし用パラメータ(坂上）
 #define			OUT_M_DOWN4			4		//カーブ外寄りブレーキ用倍率(坂上）
 
 //斜面(下り)
-#define		    TOPSPEED5			48		//直線(坂）30 33
+#define		    TOPSPEED5			50		//直線(坂）30 33
 #define			SPEED_DOWN5			8		//角度によりTOPSPEEDを減速(坂）カーブ前半
 #define			SPEED_DOWN5_N		9		//角度によりTOPSPEEDを減速  カーブ後半
 #define			MOTOR_out5_R		1	//外側モーター用パラメーター(坂）
@@ -291,7 +291,7 @@ int			saka_max	  =		  1;	//認識可能な坂の数
 #define			OUT_M_DOWN5			2		//カーブ外寄りブレーキ用倍率(坂）
 
 //クランク
-int		    C_TOPSPEED	=		27;		//クランク(入)  25 33
+int		    C_TOPSPEED	=		30;		//クランク(入)  25 33
 int		    C_TOPSPEED2	=		50;		//クランク(出)	40
 
 int 		C_TOPSPEED4 = 		47;		//再生走行時のブレーキ前
@@ -300,7 +300,7 @@ int		    C_TOPSPEED3	=		43;		//クランク(入)  25 33 再生走行用
 int			C_short_len =		625;	//この距離未満はショート、以上はロング
 
 int			date_f_brake_c	=	500;	//再生走行時のブレーキ使用可能距離(mm) クランク用
-int			date_f_shortcat_c=	240;	//再生走行時のショートカット距離(mm) クランク用 210
+int			date_f_shortcat_c=	230;	//再生走行時のショートカット距離(mm) クランク用 210
 
 char		c_cut_master  	 =	  1;	//再生走行時であっても 0= 再生しない 1= 再生する				
 int			c_cut_encoder	 =	540;  	//この距離未満の場合は再生しない
@@ -580,8 +580,6 @@ void main( void )
 					date_f_buff_ch_int[j] = (int)(date_f_buff_ch[i+1])*100 + (int)date_f_buff_ch[i+2];
 					j++;
 				}
-				
-		
 				
 				
 			/*	
@@ -917,7 +915,7 @@ void main( void )
 		
 		if(-60 < i && i < 60){
 			if(mode == 0){//坂中でなければ
-				if(lEncoderTotal > 200 && (lEncoderTotal-sp2) >= 1500 && (lEncoderTotal-sp) >= 150 && (lEncoderTotal-sp3) >= 0){//ゲートに反応しないように && 坂終了から少しの間は無視 && クランク、ハーフ終了後少し無視 && カーブ直後は無視
+				if(lEncoderTotal > 200 && (sp2 == 0 || (lEncoderTotal-sp2) >= 1500) && (sp == 0 || (lEncoderTotal-sp) >= 150) && (sp3 == 0 || (lEncoderTotal-sp3) >= 0)){//ゲートに反応しないように && 坂終了から少しの間は無視 && クランク、ハーフ終了後少し無視 && カーブ直後は無視
 				//if(lEncoderTotal > 200 ){//ゲートに反応しないように 
 				
 					if(date_f_mode == 0){
