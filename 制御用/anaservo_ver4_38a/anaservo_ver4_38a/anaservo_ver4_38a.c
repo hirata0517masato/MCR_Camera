@@ -223,9 +223,9 @@ int			S_para		=		1;		//S字きりかえし用パラメータ
 int			OUT_M_DOWN	=		2;		//カーブ外寄りブレーキ用倍率
 
 #define		date_f_brake		400	//再生走行時 通常走行と同様の速度制限をする距離 400
-#define		date_f_brake2		85	//再生走行時　残り距離/date_f_brake2 だけ速度上限を上げる 数値を大きくした方が遅くなる(0にはしないこと）
+#define		date_f_brake2		80	//再生走行時　残り距離/date_f_brake2 だけ速度上限を上げる 数値を大きくした方が遅くなる(0にはしないこと）
 
-#define		Cu_FREE_time  		10		//カーブ終了時の後輪フリーの時間(msec）
+#define		Cu_FREE_time  		15		//カーブ終了時の後輪フリーの時間(msec）
 
 #define		Cu_BRAKE_time  		5		//カーブ進入時のブレーキ時間 (msec)
 #define		Cu_BRAKE_SP 		43		//カーブ進入時にこの速度以上ならブレーキ
@@ -237,7 +237,7 @@ int			OUT_M_DOWN	=		2;		//カーブ外寄りブレーキ用倍率
 int			S_flag = 2;				//坂道　遇数回を　1 = 無視しない  2 = 無視する
 int			saka_max	  =		  1;	//認識可能な坂の数
 #define 	KASA_Encoder1  	150	//坂開始
-#define 	KASA_Encoder2  	700	//上り途中 終わり
+#define 	KASA_Encoder2  	650	//上り途中 終わり
 #define 	KASA_Encoder3  	1200	//上り終わり 
 
 #define		KASA_Encoder4  	0	//坂上終わり  
@@ -258,7 +258,7 @@ int			saka_max	  =		  1;	//認識可能な坂の数
 #define			OUT_M_DOWN2			2		//カーブ外寄りブレーキ用倍率(坂）
 
 //斜面(上り,頂上付近　飛び跳ね防止)
-#define		    TOPSPEED3			35		//直線(坂）30 33
+#define		    TOPSPEED3			30		//直線(坂）30 33
 #define			SPEED_DOWN3			6		//角度によりTOPSPEEDを減速(坂）カーブ前半
 #define			SPEED_DOWN3_N		6		//角度によりTOPSPEEDを減速  カーブ後半
 #define			MOTOR_out3_R		-1	//外側モーター用パラメーター(坂）
@@ -300,7 +300,7 @@ int		    C_TOPSPEED3	=		43;		//クランク(入)  25 33 再生走行用
 int			C_short_len =		625;	//この距離未満はショート、以上はロング
 
 int			date_f_brake_c	=	500;	//再生走行時のブレーキ使用可能距離(mm) クランク用
-int			date_f_shortcat_c=	230;	//再生走行時のショートカット距離(mm) クランク用 210
+int			date_f_shortcat_c=	240;	//再生走行時のショートカット距離(mm) クランク用 210
 
 char		c_cut_master  	 =	  1;	//再生走行時であっても 0= 再生しない 1= 再生する				
 int			c_cut_encoder	 =	540;  	//この距離未満の場合は再生しない
@@ -311,7 +311,7 @@ int			c_cut_encoder	 =	540;  	//この距離未満の場合は再生しない
 //ハーフ 
 int		    H_TOPSPEED	=		50;		//ハーフ（侵入）37 壁なし 47 46
 int		    H_TOPSPEED2	=		44;		//ハーフ(斜め)  31 壁なし 45
-int		    H_TOPSPEED2_S=		50;		//ハーフ(斜め)  ショートカット用
+int		    H_TOPSPEED2_S=		60;		//ハーフ(斜め)  ショートカット用
 int			date_f_brake_h	=	500;	//再生走行時のブレーキ使用可能距離(mm)　ハーフ用 
 int			date_f_shortcat_h=	350;		//再生走行時のショートカット距離(mm)　ハーフ用
 
@@ -913,7 +913,7 @@ void main( void )
 			}
 		}
 		
-		if(-60 < i && i < 60){
+		if(-25 < i && i < 25){
 			if(mode == 0){//坂中でなければ
 				if(lEncoderTotal > 200 && (sp2 == 0 || (lEncoderTotal-sp2) >= 1500) && (sp == 0 || (lEncoderTotal-sp) >= 150) && (sp3 == 0 || (lEncoderTotal-sp3) >= 0)){//ゲートに反応しないように && 坂終了から少しの間は無視 && クランク、ハーフ終了後少し無視 && カーブ直後は無視
 				//if(lEncoderTotal > 200 ){//ゲートに反応しないように 
@@ -2491,7 +2491,7 @@ void main( void )
 		
 		if(date_f_mode == 0 || h_cut == 0){
        		//iSetAngle = 50;//48 47
-			iSetAngle = 50;//48 47 50
+			iSetAngle = 55;//48 47 50
 		}else{
 			iSetAngle = 15;//48 47
 		}
@@ -2523,7 +2523,7 @@ void main( void )
 		}
                 
 		if( (date_f_mode == 0 && (lEncoderTotal - sp) >= 250 ) || (date_f_mode != 0 && (lEncoderTotal - sp) >= 350 )) {             
-        if((15 < Center)&&(Center < 50) && Wide != 0) {    /* 曲げ終わりチェック           */
+        if((20 < Center)&&(Center < 50) && Wide != 0) {    /* 曲げ終わりチェック           */
 		//if( 30 < Center) {    /* 曲げ終わりチェック           */
 		
             cnt1 = 0;
