@@ -1,0 +1,254 @@
+品質記録情報
+2023年8月14日 2:20:34
+
+------ ビルド開始(RX621_MCR_Camera, DefaultBuild) ------
+C:\Program Files (x86)\Renesas Electronics\CS+\CC\CC-RX\V3.05.00\Bin\ccrx.exe RX621_MCR_Camera.c -isa=rxv1 -fpu -lang=c -include=USBStack\CDC -include=USBStack -include=. -output=obj -obj_path=DefaultBuild -debug -g_line -optimize=0 -speed -nologo
+C:\Program Files (x86)\Renesas Electronics\CS+\CC\CC-RX\V3.05.00\Bin\rlink.exe -subcommand=DefaultBuild\RX621_MCR_Camera.clnk
+W0561016:The evaluation version of CC-RX V3 is valid for the remaining 56 days. After that, link size limit (128 Kbyte) will be applied. Please consider purchasing the product.
+W0561016:The evaluation version of CC-RX V3 is valid for the remaining 56 days. After that, link size limit (128 Kbyte) will be applied. Please consider purchasing the product.
+Renesas Optimizing Linker Completed
+------ ビルド終了(エラー:0個, 警告:2個)(RX621_MCR_Camera, DefaultBuild) ------
+
+--- CommandFile 1 ---
+DefaultBuild\RX621_MCR_Camera.clnk :
+-library=DefaultBuild\RX621_MCR_Camera.lib
+-input=DefaultBuild\dbsct.obj
+-input=DefaultBuild\intprg.obj
+-input=DefaultBuild\resetprg.obj
+-input=DefaultBuild\sbrk.obj
+-input=DefaultBuild\vecttbl.obj
+-input=DefaultBuild\usb_core.obj
+-input=DefaultBuild\usb_hal.obj
+-input=DefaultBuild\lowsrc.obj
+-input=DefaultBuild\usbdescriptors.obj
+-input=DefaultBuild\usb_cdc.obj
+-input=DefaultBuild\usb.obj
+-input=DefaultBuild\RX621_MCR_Camera.obj
+-input=DefaultBuild\wait.obj
+-input=DefaultBuild\rspi.obj
+-input=DefaultBuild\Gyro.obj
+-input=DefaultBuild\MPU9250.obj
+-noprelink
+-output=DefaultBuild\RX621_MCR_Camera.abs
+-list=DefaultBuild\RX621_MCR_Camera.map
+-nooptimize
+-start=B_1,R_1,B_2,R_2,B,R,SU,SI/04,PResetPRG/0FFF80000,C_1,C_2,C,C$DSEC,C$BSEC,C$INIT,C$VTBL,C$VECT,D_1,D_2,D,P,PIntPRG,W_1,W_2,W,L/0FFF80100,FIXEDVECT/0FFFFFFD0
+-rom=D=R,D_1=R_1,D_2=R_2
+-nologo
+-end
+-input=DefaultBuild\RX621_MCR_Camera.abs
+-output=DefaultBuild\RX621_MCR_Camera.mot
+-form=stype
+-exit
+
+
+--- SHA1 hash value of output files ---
+C:\WorkSpace\RX621_MCR_Camera\DefaultBuild\RX621_MCR_Camera.abs: 3486d8619b0c98fb873651ae38d6f477ff2daf48
+C:\WorkSpace\RX621_MCR_Camera\DefaultBuild\RX621_MCR_Camera.mot: 28dbd9f222bd900107ca4fde2686f132e018192f
+
+
+--- システム情報 ---
+*OS バージョン
+ Microsoft Windows 11 Pro (-, 10.0.22621, WOW64)
+*言語
+ 日本語 (日本)
+*.NET Framework バージョン
+ Microsoft .NET Framework 4 [.NET 4.8 or later] (533320)
+
+--- アプリケーション情報 ---
+*製品名
+ CS+ for CC
+*パッケージ・バージョン
+ V8.10.00  [06 Jun 2023]
+*バージョン
+ V9.10.00.03 [23 May 2023]
+*アセンブリ・バージョン
+ 3.12.10.1
+*製品ライセンス
+ 
+*実行場所
+ C:\Program Files (x86)\Renesas Electronics\CS+\CC
+*メモリ使用量
+ *プライベート・ワーキング・セット
+  291 MB
+ *GDIオブジェクト数
+  2041
+ *USERオブジェクト数
+  905
+ *開いているファイル
+  1 editors, 1 files, 22 KB
+
+--- ビルド・ツール・プラグイン情報 ---
+RH850ビルド・ツールCC-RH用プラグイン
+ *バージョン
+  V8.09.00.00 [07 Oct 2022]
+ *アセンブリ・バージョン
+  1.1.10.12
+ *DLL ファイル名
+  BuildToolCCRH.dll
+RL78ビルド・ツールCC-RL用プラグイン
+ *バージョン
+  V8.09.00.01 [07 Oct 2022]
+ *アセンブリ・バージョン
+  1.0.0.0
+ *DLL ファイル名
+  BuildToolCCRL.dll
+RXビルド・ツールCC-RX用プラグイン
+ *バージョン
+  V8.09.00.00 [07 Oct 2022]
+ *アセンブリ・バージョン
+  3.12.10.1
+ *DLL ファイル名
+  BuildToolCCRX.dll
+RH850ビルド・ツールGHS CCRH850用プラグイン
+ *バージョン
+  V1.08.00.00 [03 Apr 2023]
+ *アセンブリ・バージョン
+  1.0.0.0
+ *DLL ファイル名
+  BuildToolGHSCCRH850.dll
+
+--- デバッグ・ツール・プラグイン情報 ---
+デバッガ・コレクション・プラグイン
+ *バージョン
+  V8.10.00.02 [12 May 2023]
+ *アセンブリ・バージョン
+  2.12.10.1
+ *DLL ファイル名
+  DebugToolCollection.dll
+
+--- その他のプラグイン情報 ---
+RH850用コード生成
+ *バージョン
+  V1.02.02.05 [25 May 2018]
+ *アセンブリ・バージョン
+  1.0.0.0
+ *DLL ファイル名
+  CodeGeneratorRH850.dll
+コード生成プラグイン
+ *バージョン
+  V4.08.06.01 [28 Oct 2022]
+ *アセンブリ・バージョン
+  3.0.0.0
+ *DLL ファイル名
+  CodePart.dll
+コード生成／端子図プラグイン
+ *バージョン
+  V2.10.07.02 [08 Nov 2021]
+ *アセンブリ・バージョン
+  1.0.0.0
+ *DLL ファイル名
+  CodePart2.dll
+デバッグ・コンソール・プラグイン
+ *バージョン
+  V8.09.00.03 [24 Nov 2022]
+ *アセンブリ・バージョン
+  8.9.0.0
+ *DLL ファイル名
+  DebugConsole.dll
+Quick and Effective tool solution - QE
+ *バージョン
+  V9.09.00.01 [18 Oct 2022]
+ *アセンブリ・バージョン
+  1.15.10.16
+ *DLL ファイル名
+  InCarTools.dll
+端子配置プラグイン
+ *バージョン
+  V1.54.01.01 [31 Jul 2014]
+ *アセンブリ・バージョン
+  1.6.10.23
+ *DLL ファイル名
+  PinConfig.dll
+プログラム解析プラグイン
+ *バージョン
+  V4.13.00.03 [24 May 2023]
+ *アセンブリ・バージョン
+  3.12.11.9
+ *DLL ファイル名
+  ProgramAnalyzer.dll
+IronPythonコンソール・プラグイン
+ *バージョン
+  V1.46.00.02 [08 May 2023]
+ *アセンブリ・バージョン
+  1.6.10.23
+ *DLL ファイル名
+  PythonConsole.dll
+エディタ・パネル
+ *バージョン
+  V1.19.00.01 [24 Oct 2022]
+ *アセンブリ・バージョン
+  1.1.0.0
+ *DLL ファイル名
+  SEditor.dll
+スタック見積もりツール
+ *バージョン
+  V1.05.00.02 [30 Jul 2014]
+ *アセンブリ・バージョン
+  1.30.11.15
+ *DLL ファイル名
+  Stk.dll
+アップデート・マネージャ・プラグイン
+ *バージョン
+  V2.03.00.02 [29 Oct 2018]
+ *アセンブリ・バージョン
+  1.13.6.20
+ *DLL ファイル名
+  Update.dll
+
+デバッグ・ツール共通インタフェース
+ *バージョン
+  V8.10.00.02 [12 May 2023]
+ *アセンブリ・バージョン
+  3.12.10.1
+ *DLL ファイル名
+  CommonDebuggerInterface.dll
+デバイス情報共通インタフェース
+ *バージョン
+  V9.10.00.01 [14 Apr 2023]
+ *アセンブリ・バージョン
+  3.0.0.0
+ *DLL ファイル名
+  DeviceInformation.dll
+
+--- メイン・プロジェクト情報 ---
+C:\WorkSpace\RX621_MCR_Camera\RX621_MCR_Camera.mtpj
+マイクロコントローラ情報
+ *R5F56218BxFP
+  *ファイル名: バージョン
+   RX_Productlist.xml: V3.130000
+   R5F56218BxFP_common.xml: V3.13.00
+   -: -
+   -: -
+   RX62N.ddi: 1.40A
+  
+
+ビルド・ツール情報
+ *CC-RX
+   * プラグイン(*.dll)のバージョン
+     V8.10.00.02 [08 May 2023]
+   * コンパイラ・パッケージのバージョン
+     V3.05.00
+  
+
+デバッグ・ツール情報
+ *RX E1(JTAG)
+  Debugger Library V8.10.00.02 [12 May 2023]
+  
+
+その他のツール情報
+ *なし
+
+ *なし
+
+ *なし
+
+ *なし
+
+ *プログラム解析
+  *バージョン
+   V4.13.00.03 [24 May 2023]
+
+ *なし
+
+
