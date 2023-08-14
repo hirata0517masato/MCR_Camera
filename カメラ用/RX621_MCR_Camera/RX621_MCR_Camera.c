@@ -588,10 +588,10 @@ void binarization(int linestart, int linestop)
 	}
 */	
 	
-	if( Max > Line_Max - 500 ){//320 -150  250
+	if( Max > Line_Max - 500 ){//320 -150  250 黒はだいたい140くらい
 		// 白が一直線のとき 
 		//if(Min > Line_Max - 80 ){//260
-		if(Max - Min < 50){
+		if(Max - Min < 30){ //端のほうが暗いのでほぼ来ないパターン
 			White = 127;
 			for(i = linestart ; i <= linestop; i++) {
 				BinarizationData[i] = 1;
