@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			125	  	/* ハンドル最大位置 115           */
 
-#define 	MAXTIME 			850	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
+#define 	MAXTIME 			1250	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
 
 
 /*======================================*/
@@ -63,7 +63,6 @@ unsigned char check_halfline( void );//1 = 左, 2 = 右
 int getServoAngle( void );
 void servoControl( void );
 void servoControl2( void );
-int diff( int pwm );
 void cam_in(void);
 void wait(int);
 int camera(int, int);
@@ -222,7 +221,7 @@ int			MOTOR_in_R_N=		3;		//内側モーター用パラメーター　後半
 int			S_para		=		1;		//S字きりかえし用パラメータ
 int			OUT_M_DOWN	=		2;		//カーブ外寄りブレーキ用倍率
 
-#define		date_f_brake		400	//再生走行時 通常走行と同様の速度制限をする距離 400
+#define		date_f_brake		150	//再生走行時 通常走行と同様の速度制限をする距離 400
 #define		date_f_brake2		80	//再生走行時　残り距離/date_f_brake2 だけ速度上限を上げる 数値を大きくした方が遅くなる(0にはしないこと）
 
 #define		Cu_FREE_time  		15		//カーブ終了時の後輪フリーの時間(msec）
@@ -243,8 +242,8 @@ int			saka_max	  =		  1;	//認識可能な坂の数
 #define		KASA_Encoder4  	0	//坂上終わり  
 #define		KASA_Encoder5  	0	//下り終わり 通常にもどる 
 
-#define		KASA_Encoder4_2  3500	//坂上終わり(最後の坂道)2500
-#define		KASA_Encoder5_2  4200	//坂上終わり(最後の坂道)3200
+#define		KASA_Encoder4_2  2500	//坂上終わり(最後の坂道)2500
+#define		KASA_Encoder5_2  3200	//坂上終わり(最後の坂道)3200
 
 //斜面(上り)
 #define		    TOPSPEED2			45		//直線(坂）30 33
@@ -291,11 +290,14 @@ int			saka_max	  =		  1;	//認識可能な坂の数
 #define			OUT_M_DOWN5			2		//カーブ外寄りブレーキ用倍率(坂）
 
 //クランク
-int		    C_TOPSPEED	=		30;		//クランク(入)  25 33
+int		    C_TOPSPEED	=		27;		//クランク(入)  25 33
 int		    C_TOPSPEED2	=		50;		//クランク(出)	40
 
 int 		C_TOPSPEED4 = 		47;		//再生走行時のブレーキ前
 int		    C_TOPSPEED3	=		43;		//クランク(入)  25 33 再生走行用
+int 		C_TOPSPEED5 = 		36;		//再生走行時のブレーキ前 距離短い時用
+
+int 		C_short_len_boost = 600;  //再生走行　距離短い時用
 
 int			C_short_len =		625;	//この距離未満はショート、以上はロング
 
@@ -581,7 +583,7 @@ void main( void )
 					j++;
 				}
 				
-				
+
 			/*	
 					//31：右クランク 41：左クランク 53:左ハーフ 63:右ハーフ
 					//クランク　金具　近い：200　遠い：450
@@ -906,7 +908,8 @@ void main( void )
 		
 		
 		if(-15 < i && i < 15){
-			if(angle_check() == 2 && ( (flag2%2 == 1) || ((lEncoderTotal-sp2) >= 500) && ((lEncoderTotal-sp) >= 1000))){//坂センサーチェック sp=クランク終了位置
+			//if(angle_check() == 2 && ( (flag2%2 == 1) || ((lEncoderTotal-sp2) >= 1000) && ((lEncoderTotal-sp) >= 1000) )){//坂センサーチェック sp=クランク終了位置
+			if(angle_check() == 2 && ( ((lEncoderTotal-sp2) >= 2000) && ((lEncoderTotal-sp) >= 1000) )){//坂センサーチェック sp=クランク終了位置
 				cnt5++;
 			}else{
 				cnt5 = 0;
@@ -999,7 +1002,7 @@ void main( void )
 		
 		if(mode == 0){//通常
 		
-			if(cnt5 >= 1){//坂
+			if(cnt5 >= 5){//坂
 			
 				if(flag2 % S_flag == 0 && saka_max > 0){
 
@@ -1077,7 +1080,7 @@ void main( void )
 				OUT_M_DOWN = OUT_M_DOWN2;
 				
 				//if( (i < -20 || 20 < i) && (lEncoderTotal-sp2) >= KASA_Encoder1+500){//上っている途中でカーブはありえない
-				if( i < -20 || 20 < i){//上っている途中でカーブはありえない
+		/*		if( i < -20 || 20 < i){//上っている途中でカーブはありえない
 					TOPSPEED = topspeed;
 					SPEED_DOWN = speed_down;
 					SPEED_DOWN_N = speed_down_n;
@@ -1091,7 +1094,7 @@ void main( void )
 					flag2--;//今回の分を無かったことに
 					saka_max++;
 					sp2 = lEncoderTotal;//チャタリング防止
-				}
+				}*/
 			}	
 		}
 		
@@ -1671,7 +1674,29 @@ void main( void )
 				
 			motor_f( x, x );
             motor_r( x, x );
+		
+		}else if( (date_f_buff_ch_int[date_f_num_ch] < C_short_len_boost) && 
+				( ((date_f_mode == 0) && iEncoder10 >= C_TOPSPEED) 
+				|| ((c_cut == 1 && date_f_mode != 0) && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_c )< (lEncoderTotal - lEncoderTotal_ch))&& iEncoder10 >= C_TOPSPEED5) 
+				|| ((c_cut == 0 && date_f_mode != 0) && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_c )< (lEncoderTotal - lEncoderTotal_ch))&& iEncoder10 >= C_TOPSPEED))   ) {          // エンコーダによりスピード制御 
+   
+				if(c_cut == 0 || date_f_mode == 0)x=(C_TOPSPEED -iEncoder10)*10;
+				else x=(C_TOPSPEED5 -iEncoder10)*30;
 			
+				r = x;
+				if(r < -100 && (c_cut == 0 || date_f_mode == 0)) r = -100;
+				else if(r < BRAKE_MAX) r = BRAKE_MAX;
+				
+				if(x < BRAKE_MAX) x = BRAKE_MAX;
+				
+				motor_mode_f( BRAKE, BRAKE );
+				motor_mode_r( BRAKE, BRAKE );
+				
+				motor_f( x, x );
+            	motor_r( r, r );
+		//	}
+	
+      	
  		}else if( ((date_f_mode == 0) && iEncoder10 >= C_TOPSPEED) 
 				|| ((c_cut == 1 && date_f_mode != 0) && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_c )< (lEncoderTotal - lEncoderTotal_ch))&& iEncoder10 >= C_TOPSPEED3) 
 				|| ((c_cut == 0 && date_f_mode != 0) && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_c )< (lEncoderTotal - lEncoderTotal_ch))&& iEncoder10 >= C_TOPSPEED)   ) {          // エンコーダによりスピード制御 
