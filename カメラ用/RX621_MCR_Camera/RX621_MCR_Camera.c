@@ -7,9 +7,6 @@
 /* バージョン  ：0.00                                                                               */
 /* 作成日      ：2017/02/10 									    */
 /****************************************************************************************************/                  
-
-//メモ：最適化オプションは無しにしたほうが良い
-
 #include "iodefine.h"
 #include <machine.h>
 //#include "lowsrc.h"
@@ -34,8 +31,6 @@ void expose2( void );
 void binarization(int,int);
 void WhiteLineWide(int,int);
 
-void AE_check(void);
-
 
 /* 定数設定 */
 
@@ -56,8 +51,6 @@ void AE_check(void);
 //AD0 /* CN3-9 P40 */
 
 #define		Line_Max	760		/* ライン白色MAX値の設定 */
-#define		Line_Max_Core	80		/* Line_Max - Line_Max_Core < 現在の明るさ < Line_Max + Line_Max_Core  がAE収束状態とする　*/
-#define		Line_Max_Core2	250		/* 現在の明るさが大幅に外れていたら露光時間の変化量を増加させる＝早く目標値に到達させたい*/
 
 #define 	LineStart 	27		/* カメラで見る範囲(通常モード) */
 #define 	LineStop  	100
@@ -76,11 +69,10 @@ void AE_check(void);
 /*======================================*/
 /* グローバル変数の宣言                 */
 /*======================================*/
-unsigned long   print_cnt =  0;
-int    		print_cnt2=  0;
+unsigned long   cnt1000 =  0;
 
 /* カメラ関連 */
-unsigned long	EXPOSURE_timer = 15000;	/* 露光時間	20000				*/
+unsigned long	EXPOSURE_timer = 3000;	/* 露光時間	20000				*/
 int		ImageData[130];			/* カメラの値				*/
 int 		BinarizationData[130];	/* ２値化					*/
 
@@ -105,16 +97,6 @@ int		mode;				/* 0 = 通常 1 = 坂 2 = 右無視 3 = 左無視	*/
 
 int		EXPOSURE_cnt = 0;		/* */		
 
-char		AE_fin_fag = 0;			/* AEが完了 = 1 まだ = 0   明るさの最大値をチェックしているので真っ黒のときは０になるので注意 */
-
-//printf用バッファ
-unsigned int 	Rsensor_PBuf;				/* ラインの右端 */
-unsigned int 	Lsensor_PBuf;				/* ラインの左端 */
-unsigned int 	Wide_PBuf;				/* ラインの幅 */
-int		Center_PBuf;				/* ラインの重心 */
-int		Max_PBuf,Min_PBuf;
-unsigned long	EXPOSURE_timer_PBuf;
-char		AE_fin_fag_PBuf;
 /***********************************************************************/
 /* メインプログラム                                                    */
 /***********************************************************************/
@@ -150,18 +132,16 @@ void main(void)
 		
 		expose2();				//露光時間（全白、全黒でも時間変更)
 		
-		ImageCapture(LineStart,LineStop);	//イメージキャプチャー
+		ImageCapture(LineStart,LineStop);			//イメージキャプチャー
 		
-		AE_check();				//AE収束判定
+		binarization(LineStart,LineStop); 		//２値化
 		
-		binarization(LineStart,LineStop); 	//２値化
-		
-		WhiteLineWide(LineStart,LineStop);	//白ラインの測定	
+		WhiteLineWide(LineStart,LineStop);		//白ラインの測定	
 		
 		//cam_out();//制御用へ出力
 		Center_lasttime = Center;//過去の値を保存
 		
-	}while(!( (AE_fin_fag == 1) && (Wide != 0) && (Wide < 25)  ));// （明るさ調整OK　＆＆　ラインの幅がOK　）でなければ
+	}while(!((-50 < (Line_Max - Max)) && ((Line_Max - Max) < 50)) && (!((Wide != 0) && (Wide < 30))));
 	
 	
 	while( 1 ) {
@@ -174,52 +154,44 @@ void main(void)
 			case 0://通常モード
 				expose();				//露光時間
 				
-				ImageCapture(LineStart,LineStop);	//イメージキャプチャー
+				ImageCapture(LineStart,LineStop);			//イメージキャプチャー
 		
-				AE_check();				//AE収束判定
-				
-				binarization(LineStart,LineStop); 	//２値化
+				binarization(LineStart,LineStop); 		//２値化
 		
-				WhiteLineWide(LineStart,LineStop);	//白ラインの測定
+				WhiteLineWide(LineStart,LineStop);		//白ラインの測定
 				
 				break;
 				
 			case 1://坂モード
-				expose();					//露光時間
+				expose();				//露光時間
 				
-				ImageCapture(LineStartSaka,LineStopSaka);	//イメージキャプチャー
+				ImageCapture(LineStartSaka,LineStopSaka);			//イメージキャプチャー
 		
-				AE_check();					//AE収束判定
-				
-				binarization(LineStartSaka,LineStopSaka); 	//２値化
+				binarization(LineStartSaka,LineStopSaka); 		//２値化
 		
-				WhiteLineWide(LineStartSaka,LineStopSaka);	//白ラインの測定
+				WhiteLineWide(LineStartSaka,LineStopSaka);		//白ラインの測定
 				
 				break;
 				
 			case 2://右無視
-				expose();					//露光時間
+				expose();				//露光時間
 				
-				ImageCapture(LineStartNonR,LineStopNonR);	//イメージキャプチャー
+				ImageCapture(LineStartNonR,LineStopNonR);			//イメージキャプチャー
 		
-				AE_check();					//AE収束判定
-				
-				binarization(LineStartNonR,LineStopNonR); 	//２値化
+				binarization(LineStartNonR,LineStopNonR); 		//２値化
 		
-				WhiteLineWide(LineStartNonR,LineStopNonR);	//白ラインの測定
+				WhiteLineWide(LineStartNonR,LineStopNonR);		//白ラインの測定
 				
 				break;
 				
 			case 3://左無視
-				expose();					//露光時間
+				expose();				//露光時間
 				
-				ImageCapture(LineStartNonL,LineStopNonL);	//イメージキャプチャー
+				ImageCapture(LineStartNonL,LineStopNonL);			//イメージキャプチャー
 		
-				AE_check();					//AE収束判定
-				
-				binarization(LineStartNonL,LineStopNonL); 	//２値化
+				binarization(LineStartNonL,LineStopNonL); 		//２値化
 		
-				WhiteLineWide(LineStartNonL,LineStopNonL);	//白ラインの測定
+				WhiteLineWide(LineStartNonL,LineStopNonL);		//白ラインの測定
 			
 				break;
 		}
@@ -230,33 +202,14 @@ void main(void)
 		
 				
 		#ifdef PRINT
-			print_cnt++;
+			cnt1000++;
 			
-			if(print_cnt > 10){
-				
-				if(print_cnt2 == 0){
-					//for(i = LineStart; i <= LineStop; i++)printf("%d",BinarizationData[i]);
-					for(i = LineStart; i <= LineStop; i+=2)printf("%d",(char)BinarizationData[i]);
-					
-					Center_PBuf = Center;
-					Wide_PBuf = Wide;
-					Lsensor_PBuf = Lsensor;
-					Rsensor_PBuf = Rsensor;
-					Max_PBuf = Max;
-					Min_PBuf = Min;
-					EXPOSURE_timer_PBuf= EXPOSURE_timer;
-					AE_fin_fag_PBuf = AE_fin_fag;
-				
-				}else{
-					printf("Center = %d Wide = %d Lsensor = %d Rsensor = %d ",Center_PBuf,Wide_PBuf,Lsensor_PBuf,Rsensor_PBuf);
-				
-					printf("Max = %d Min = %d time = %d AE_fin = %d ",Max_PBuf,Min_PBuf,EXPOSURE_timer_PBuf,AE_fin_fag_PBuf);
-				
-					printf("\n");
-				}
-				print_cnt=0;
-				print_cnt2++;
-				if(print_cnt2 > 1)print_cnt2 = 0;
+			if(cnt1000 > 500){
+				//for(i = LineStart; i <= LineStop; i++)printf("%d",BinarizationData[i]);
+				for(i = LineStart; i <= LineStop; i+=2)printf("%d",BinarizationData[i]);
+				//printf("Max = %d Min = %d Center = %d Wide = %d Lsensor = %d Rsensor = %d time = %d mode = %d",Max,Min,Center,Wide,Lsensor,Rsensor,EXPOSURE_timer,mode);
+				printf("\n");
+				cnt1000=0;
 			}
 		#endif
     }
@@ -367,7 +320,6 @@ void CMT_init(void)
 /* 引数　 なし                                                          */
 /* 戻り値 なし　　　　　                                                */
 /************************************************************************/
-/*
 void expose( void )
 {
 	unsigned long i;
@@ -376,65 +328,19 @@ void expose( void )
 	//if( Wide != 0 && White <= 60){//黒でなく白でもない
 	if( Wide == 0 || White >= 70){//黒or白
 		EXPOSURE_cnt++;
-		if(EXPOSURE_cnt > 100)EXPOSURE_cnt = 100;
-	}else{
-		EXPOSURE_cnt = 0;
-	}
-		
-	if(EXPOSURE_cnt < 5){
-		if(AE_fin_fag == 1 ||  Wide == 0){//明るさが目標値に近い || 黒  //黒の時に露光量を変化させすぎるとラインの復帰ができなくなる
-			
-			if(-50 < sa && sa < 50){
-				//EXPOSURE_timer += (long)sa * 1;
-			}else{
-				
-				if((long)EXPOSURE_timer + (long)sa * 10 < 0)EXPOSURE_timer = 0; //オーバーフロー対策　
-				else EXPOSURE_timer += (long)sa * 10;
-			}
-			
-		}else{
-			if((long)EXPOSURE_timer + (long)sa * 20 < 0)EXPOSURE_timer = 0; //オーバーフロー対策　
-			else EXPOSURE_timer += (long)sa * 20;//早く目標値に近づけたいので変化量を大きくする
-		
-		}
-	}
-		
-	
-	if( EXPOSURE_timer > 100000) EXPOSURE_timer = 100000;
-	else if( EXPOSURE_timer <= 1000 ) EXPOSURE_timer = 1000;
-
-	for(i=0;i<EXPOSURE_timer;i++);
-
-}
-*/
-
-void expose( void )
-{
-	unsigned long i;
-	int sa = Line_Max - Max;
-	
-	//if( Wide != 0 && White <= 60){//黒でなく白でもない
-	if( Wide == 0 || White >= 45){//黒or白
-		EXPOSURE_cnt++;
-		if(EXPOSURE_cnt > 100)EXPOSURE_cnt = 100;
 	}else{
 		EXPOSURE_cnt = 0;
 	}
 	
-	if(EXPOSURE_cnt < 2 &&  Wide != 0 ){
+	if(EXPOSURE_cnt < 2){
 		//if(-20 < sa && sa < 20)EXPOSURE_timer += (long)(sa*5);
 		//else 
-		
-		//オーバーフロー対策 かつ　急激には変化しないようにする（急激な変化＝真っ黒or真っ白かも）
-		if(sa > 100) sa = 100;
-		if(sa < -100) sa = -100;
-		
-		EXPOSURE_timer += (long)sa * 10;
+		EXPOSURE_timer += (long)(sa*10);
 	}	
 		
 	
-	if( EXPOSURE_timer > 100000) EXPOSURE_timer = 100000;
-	else if( EXPOSURE_timer <= 1000 ) EXPOSURE_timer = 1000;
+	if( EXPOSURE_timer > 1000000000) EXPOSURE_timer = 1000000000;
+	else if( EXPOSURE_timer <= 0 ) EXPOSURE_timer = 0;
 
 	for(i=0;i<EXPOSURE_timer;i++);
 
@@ -456,8 +362,8 @@ void expose2( void )
 	}else{
 		EXPOSURE_timer += 100;
 	}
-	if( EXPOSURE_timer > 100000) EXPOSURE_timer = 100000;
-	else if( EXPOSURE_timer <= 1000 ) EXPOSURE_timer = 1000;
+	if( EXPOSURE_timer > 1000000000) EXPOSURE_timer = 1000000000;
+	else if( EXPOSURE_timer <= 0 ) EXPOSURE_timer = 0;
 	
 	for(i=0;i<EXPOSURE_timer;i++);
 
@@ -532,18 +438,6 @@ int get_ad(void)
 	return S12AD.ADDR0;	
 }
 /************************************************************************/
-/* AE収束判定                                                            */
-/************************************************************************/
-void AE_check(){
-	
-	if(((-Line_Max_Core < (Line_Max - Max)) && ((Line_Max - Max) < Line_Max_Core))){
-		AE_fin_fag = 1;
-	}else{
-		AE_fin_fag = 0;
-	}
-}
-
-/************************************************************************/
 /* ２値化                                                               */
 /************************************************************************/
 void binarization(int linestart, int linestop)
@@ -563,35 +457,11 @@ void binarization(int linestart, int linestop)
 	
 	/* 黒は０　白は１にする */
 	White = 0;					/* 白の数を０にする */
-
-	/*
-	if(Max - Min > 50){//白黒の差がある程度あるなら２直化できる
-		for(i = linestart ; i <= linestop; i++) {
-			if(  ImageData[i] > Ave ){	
-				White++;			
-				BinarizationData[i] = 1;
-			}else{
-				BinarizationData[i] = 0;
-			}	
-		}
-	}else{//白黒の差が無い＝真っ白 or 真っ黒
-		if( Max > Line_Max - 400 ){//真っ白
-			White = 127;
-			for(i = linestart ; i <= linestop; i++) {
-				BinarizationData[i] = 1;
-			}
-		}else{//真っ黒
-			for(i = linestart ; i <= linestop; i++) {
-				BinarizationData[i] = 0;
-			}
-		}
-	}
-*/	
 	
-	if( Max > Line_Max - 500 ){//320 -150  250 黒はだいたい140くらい
-		// 白が一直線のとき 
+	if( Max > Line_Max - 400 ){//320 -150  250
+		/* 白が一直線のとき */
 		//if(Min > Line_Max - 80 ){//260
-		if(Max - Min < 30){ //端のほうが暗いのでほぼ来ないパターン
+		if(Max - Min < 130){
 			White = 127;
 			for(i = linestart ; i <= linestop; i++) {
 				BinarizationData[i] = 1;
@@ -606,13 +476,12 @@ void binarization(int linestart, int linestop)
 				}	
 			}
 		}
-	// 黒が一面のとき 
+	/* 黒が一面のとき */
 	}else{
 		for(i = linestart ; i <= linestop; i++) {
 			BinarizationData[i] = 0;
 		}
 	}
-	
 
 	//範囲外は黒に
 	for(i = 0; i < linestart; i++){
