@@ -72,7 +72,7 @@ void WhiteLineWide(int,int);
 unsigned long   cnt1000 =  0;
 
 /* カメラ関連 */
-unsigned long	EXPOSURE_timer = 3000;	/* 露光時間	20000				*/
+long	  	EXPOSURE_timer = 3000;	/* 露光時間	20000				*/
 int		ImageData[130];			/* カメラの値				*/
 int 		BinarizationData[130];	/* ２値化					*/
 
@@ -326,21 +326,23 @@ void expose( void )
 	int sa = Line_Max - Max;
 	
 	//if( Wide != 0 && White <= 60){//黒でなく白でもない
-	if( Wide == 0 || White >= 70){//黒or白
+	if( Wide == 0 || White >= 50){//黒or白
 		EXPOSURE_cnt++;
 	}else{
 		EXPOSURE_cnt = 0;
 	}
 	
 	if(EXPOSURE_cnt < 2){
-		//if(-20 < sa && sa < 20)EXPOSURE_timer += (long)(sa*5);
-		//else 
-		EXPOSURE_timer += (long)(sa*10);
+		if(-20 < sa && sa < 20){
+			//誤差なので変更しない
+		}else{ 
+			EXPOSURE_timer += (long)(sa*5);
+		}
 	}	
 		
 	
-	if( EXPOSURE_timer > 1000000000) EXPOSURE_timer = 1000000000;
-	else if( EXPOSURE_timer <= 0 ) EXPOSURE_timer = 0;
+	if( EXPOSURE_timer > 3000000) EXPOSURE_timer = 3000000;
+	else if( EXPOSURE_timer <= 500 ) EXPOSURE_timer = 500;
 
 	for(i=0;i<EXPOSURE_timer;i++);
 
@@ -362,7 +364,7 @@ void expose2( void )
 	}else{
 		EXPOSURE_timer += 100;
 	}
-	if( EXPOSURE_timer > 1000000000) EXPOSURE_timer = 1000000000;
+	if( EXPOSURE_timer > 3000000) EXPOSURE_timer = 3000000;
 	else if( EXPOSURE_timer <= 0 ) EXPOSURE_timer = 0;
 	
 	for(i=0;i<EXPOSURE_timer;i++);
