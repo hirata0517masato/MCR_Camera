@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			125	  	/* ハンドル最大位置 115           */
 
-#define 	MAXTIME 			1250	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
+#define 	MAXTIME 			1400	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
 
 
 /*======================================*/
@@ -191,8 +191,8 @@ unsigned char   types_dipsw;            /* ディップスイッチ値保存       */
 
 /*	パラメータ	*/
 //オフセット
-int  		Center_offset_MAX = 10;		/*カーブ時カメラセンターを移動＝寄せる 最小値 0 最大値	5			*/
-int  		Center_offset_Angle = -4;	/*この値につき１ＩＮ側に寄せる	正：IN　負：OUT		*/
+int  		Center_offset_MAX = 14;		/*カーブ時カメラセンターを移動＝寄せる 最小値 0 最大値	5			*/
+int  		Center_offset_Angle = -3;	/*この値につき１ＩＮ側に寄せる	正：IN　負：OUT		*/
 
 
 int			KASOKU = 15;	
@@ -206,13 +206,13 @@ int			MOTOR_out_base	=		 95;		//カーブ前半用　外側モーター用パラメーター
 int		    TOPSPEED	=		50;		//直線 44
 
 //前半
-int			SPEED_DOWN	=		8;		//角度によりTOPSPEEDを減速 カーブ前半
-int			MOTOR_out_R	=		 1;		//外側モーター用パラメーター -2
-int			MOTOR_in_F	=		 2;		//内側モーター用パラメーター 2	1
-int			MOTOR_in_R	=		 -2;		//内側モーター用パラメーター -2
+int			SPEED_DOWN	=		6;		//角度によりTOPSPEEDを減速 カーブ前半
+int			MOTOR_out_R	=		 -2;		//外側モーター用パラメーター -2
+int			MOTOR_in_F	=		 1;		//内側モーター用パラメーター 2	1
+int			MOTOR_in_R	=		 -3;		//内側モーター用パラメーター -2
 	
 //後半
-int			SPEED_DOWN_N=		11;		//角度によりTOPSPEEDを減速  カーブ後半
+int			SPEED_DOWN_N=		10;		//角度によりTOPSPEEDを減速  カーブ後半
 int			MOTOR_out_R_N=		5;		//外側モーター用パラメーター 後半
 int			MOTOR_in_F_N=		6;		//内側モーター用パラメーター　後半
 int			MOTOR_in_R_N=		3;		//内側モーター用パラメーター　後半
@@ -302,7 +302,7 @@ int 		C_short_len_boost = 600;  //再生走行　距離短い時用
 int			C_short_len =		625;	//この距離未満はショート、以上はロング
 
 int			date_f_brake_c	=	500;	//再生走行時のブレーキ使用可能距離(mm) クランク用
-int			date_f_shortcat_c=	240;	//再生走行時のショートカット距離(mm) クランク用 210
+int			date_f_shortcat_c=	250;	//再生走行時のショートカット距離(mm) クランク用 210
 
 char		c_cut_master  	 =	  1;	//再生走行時であっても 0= 再生しない 1= 再生する				
 int			c_cut_encoder	 =	540;  	//この距離未満の場合は再生しない
@@ -311,15 +311,21 @@ int			c_cut_encoder	 =	540;  	//この距離未満の場合は再生しない
 
 
 //ハーフ 
-int		    H_TOPSPEED	=		50;		//ハーフ（侵入）37 壁なし 47 46
-int		    H_TOPSPEED2	=		44;		//ハーフ(斜め)  31 壁なし 45
+#define HWall 							//壁ありの時に有効化すること
+
+int		    H_TOPSPEED	=		50;		//ハーフ（侵入）
+int		    H_TOPSPEED2	=		44;		//ハーフ(斜め)  
 int		    H_TOPSPEED2_S=		60;		//ハーフ(斜め)  ショートカット用
 int			date_f_brake_h	=	500;	//再生走行時のブレーキ使用可能距離(mm)　ハーフ用 
 int			date_f_shortcat_h=	350;		//再生走行時のショートカット距離(mm)　ハーフ用
 
 int			date_f_plus_h	=	700;		//再生走行時の直後のストレート距離補正(mm)　ハーフ用  
-char		h_cut 			 =	  1;	//再生走行時であっても 0= 再生しない 1= 再生する 
 
+#ifdef  HWall
+char		h_cut 			 =	  0;	//壁ありの時はショートカットしない
+#else
+char		h_cut 			 =	  1;	//再生走行時であっても 0= 再生しない 1= 再生する
+#endif
 ///////////////////////////////////
 
 #define			BRAKE_MAX			-100	//ブレーキの最大パワー 
@@ -503,7 +509,7 @@ void main( void )
 	}
 	
 	//脱線チェック
-	if(pattern < 100){
+	if(10 <= pattern && pattern < 100){
 		if(((check_wideline()) || (iEncoder10 < 3) || (mode != 1 && Wide == 0 && Center == 0  && pattern != 53 && pattern != 63 && pattern != 31 && pattern != 41 && pattern != 32 && pattern != 42)) && (pattern >= 10) && (pattern != 70)){
 			out_cnt ++;		
 		}else{
@@ -1833,8 +1839,8 @@ void main( void )
 				
 			}else if((lEncoderTotal-sp) >= 150){
 				
-				if(i < 45)iSetAngle = 90;
-				else iSetAngle = 80;
+				if(i < 45)iSetAngle = 100;
+				else iSetAngle = 90;
 				
 				motor2_f( 85,   5 );         
         		motor2_r( 15,   0 );
@@ -1842,7 +1848,7 @@ void main( void )
 			}else if((lEncoderTotal-sp) >= 100){
 				
 				if(i < 30)iSetAngle = 80;
-				else iSetAngle = 50;
+				else iSetAngle = 60;
 				
 				motor2_f( 85,   30 );         
         		motor2_r( 25,   0 );
@@ -2022,15 +2028,15 @@ void main( void )
 			
 				
 			}else if((lEncoderTotal-sp) >= 150){
-				if(i > -45)iSetAngle = -90;
-				else iSetAngle = -80;
+				if(i > -45)iSetAngle = -100;
+				else iSetAngle = -90;
 				
 				motor2_f( 5,   85 );         
         		motor2_r( 0,   15 );
 				
 			}else if((lEncoderTotal-sp) >= 100){
 				if(i > -30)iSetAngle = -80;
-				else iSetAngle = -50;
+				else iSetAngle = -60;
 				
 				motor2_f( 30,   85 );         
         		motor2_r( 0,   25 );
@@ -2258,8 +2264,13 @@ void main( void )
 		mode = 2;//右無視
 		
 		if(date_f_mode == 0 || h_cut == 0){
-        	//iSetAngle = -45;//-48 -47 壁なし
-			iSetAngle = -40;//
+
+#ifdef HWall  //壁あり    	
+			iSetAngle = -65;
+#else //壁無し
+			iSetAngle = -45;
+#endif
+
 		}else{
 			iSetAngle = -15;
 		}
@@ -2274,8 +2285,16 @@ void main( void )
 				motor_f( x, x );
            		motor_r( x, x );
        		}else{
+
+#ifdef HWall  //壁あり    	
            		motor_f( 0, 100 );
-           		motor_r( 50, 50 );
+           		motor_r( 40, 40 );
+#else //壁無し
+
+           		motor_f( 0, 100 );
+           		motor_r( 60, 60 );
+#endif
+
 			}
 		}else{
 			if( iEncoder10 >= H_TOPSPEED2_S ) {          /* エンコーダによりスピード制御 */
@@ -2290,7 +2309,7 @@ void main( void )
 			}
 		}
          
-		if( (date_f_mode == 0 && (lEncoderTotal - sp) >= 250 ) || (date_f_mode != 0 && (lEncoderTotal - sp) >= 350 )) {  
+		if( ((date_f_mode == 0 || h_cut == 0) && (lEncoderTotal - sp) >= 250 ) || (date_f_mode != 0 && (lEncoderTotal - sp) >= 350 )) {  
         if((-50 < Center)&&(Center < -15) && Wide != 0 ) {    /* 曲げ終わりチェック           */
 		//	if(Center < -30) {    /* 曲げ終わりチェック           */
 		
@@ -2307,8 +2326,13 @@ void main( void )
 	case 54:
 		
 		if(date_f_mode == 0 || h_cut == 0){
-		//	iSetAngle = 5;//5 7
-			iSetAngle = -15;//5 7 -20
+			
+#ifdef HWall  //壁あり    	
+			iSetAngle = -15;
+#else //壁無し
+			iSetAngle = -15;
+#endif
+
 		}else{
 			iSetAngle = -5;//5 7
 		}
@@ -2322,8 +2346,16 @@ void main( void )
 				motor_f( x, x );
            		motor_r( x, x );
        		}else{
+
+#ifdef HWall  //壁あり    	
            		motor_f( 100, 100 );
            		motor_r( 90,  50 );
+#else //壁無し
+           		motor_f( 100, 100 );
+           		motor_r( 90,  50 );
+#endif
+
+
 			}
 		}else{
 			if( iEncoder10 >= H_TOPSPEED2_S ) {          /* エンコーダによりスピード制御 */
@@ -2357,8 +2389,13 @@ void main( void )
 	case 55://安定するまで
 	
 		if(date_f_mode == 0 || h_cut == 0){
-			//iSetAngle = 25;//40 37
-			iSetAngle = 30;//40 37
+
+#ifdef HWall  //壁あり    	
+			iSetAngle = 30;
+#else //壁無し
+			iSetAngle = 30;
+#endif
+
 		}else{
 			iSetAngle = 29;//40 37
 		}
@@ -2373,8 +2410,16 @@ void main( void )
 				motor_f( x, x );
            		motor_r( x, x );
        		}else{
+
+#ifdef HWall  //壁あり    	
            		motor_f( 100, 50 );
            		motor_r( 90, 0 );
+#else //壁無し
+
+           		motor_f( 100, 50 );
+           		motor_r( 90, 0 );
+#endif
+
 			}
 		}else{
 			if( iEncoder10 >= H_TOPSPEED2_S ) {          /* エンコーダによりスピード制御 */
@@ -2515,8 +2560,12 @@ void main( void )
 		mode = 3;//左無視
 		
 		if(date_f_mode == 0 || h_cut == 0){
-       		//iSetAngle = 50;//48 47
-			iSetAngle = 55;//48 47 50
+ 
+#ifdef HWall  //壁あり    	
+			iSetAngle = 65;
+#else //壁無し
+			iSetAngle = 55;
+#endif			
 		}else{
 			iSetAngle = 15;//48 47
 		}
@@ -2531,8 +2580,14 @@ void main( void )
 				motor_f( x, x );
     	       	motor_r( x, x );
        		}else{
-           		motor_f( 100, 0 );
+#ifdef HWall  //壁あり    	
+				motor_f( 100, 0 );
+           		motor_r( 40, 40 );
+#else //壁無し
+				motor_f( 100, 0 );
            		motor_r( 60, 60 );
+#endif	
+
 			}
 		}else{
 			if( iEncoder10 >= H_TOPSPEED2_S ) {          /* エンコーダによりスピード制御 */
@@ -2547,7 +2602,7 @@ void main( void )
 			}
 		}
                 
-		if( (date_f_mode == 0 && (lEncoderTotal - sp) >= 250 ) || (date_f_mode != 0 && (lEncoderTotal - sp) >= 350 )) {             
+		if( ((date_f_mode == 0 || h_cut == 0) && (lEncoderTotal - sp) >= 250 ) || (date_f_mode != 0 && (lEncoderTotal - sp) >= 350 )) {             
         if((20 < Center)&&(Center < 50) && Wide != 0) {    /* 曲げ終わりチェック           */
 		//if( 30 < Center) {    /* 曲げ終わりチェック           */
 		
@@ -2565,7 +2620,13 @@ void main( void )
 	case 64:
 
 		if(date_f_mode == 0 || h_cut == 0){
+			
+#ifdef HWall  //壁あり    	
 			iSetAngle = 20;//-3
+#else //壁無し
+			iSetAngle = 20;//-3
+#endif
+			
 		}else{
 			iSetAngle = 5;//-3
 		}
@@ -2580,8 +2641,15 @@ void main( void )
 				motor_f( x, x );
            		motor_r( x, x );
        		}else{
-           		motor_f( 100, 100 );
+
+#ifdef HWall  //壁あり    	
+				motor_f( 100, 100 );
            		motor_r( 50, 90 );
+#else //壁無し
+				motor_f( 100, 100 );
+           		motor_r( 50, 90 );
+#endif
+           		
 			}
 		}else{
 			if( iEncoder10 >= H_TOPSPEED2_S ) {          /* エンコーダによりスピード制御 */
@@ -2613,7 +2681,13 @@ void main( void )
 	case 65://安定するまで
 	
 		if(date_f_mode == 0 || h_cut == 0){
-			iSetAngle = -20;//-40 -35
+
+#ifdef HWall  //壁あり    	
+			iSetAngle = -20;
+#else //壁無し
+			iSetAngle = -20;
+#endif
+
 		}else{
 			iSetAngle = -30;//-40 -35
 		}
@@ -2627,8 +2701,15 @@ void main( void )
 				motor_f( x, x );
            		motor_r( x, x );
        		}else{
-           		motor_f( 50, 100 );
+
+#ifdef HWall  //壁あり    	
+				motor_f( 50, 100 );
            		motor_r( 0, 90 );
+#else //壁無し
+				motor_f( 50, 100 );
+           		motor_r( 0, 90 );
+#endif
+
 			}
 		}else{
 			if( iEncoder10 >= H_TOPSPEED2_S ) {          /* エンコーダによりスピード制御 */
