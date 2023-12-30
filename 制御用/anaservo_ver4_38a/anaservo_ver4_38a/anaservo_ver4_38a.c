@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			125	  	/* ハンドル最大位置 115           */
 
-#define 	MAXTIME 			1050	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
+#define 	MAXTIME 			1300	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
 
 
 /*======================================*/
@@ -91,6 +91,7 @@ unsigned long   cnt5 = 0;               /* 坂センサーチェック用         */
 unsigned long   cnt6 = 0;               /* 脱線チェック用(エンコーダ)   */
 unsigned long   cnt7 = 0;               /* 直線とカーブのカウント用   */
 unsigned long   cnt8 = 0;               /* カーブ加速用のカウント用   */
+unsigned long   cnt9 = 0;               /* 直線のカウント用   */
 char 			run = 0;				/* 1 = 走行中					*/
 char			mode = 0;				/* 0 = 通常 1 = 坂	2 = 右無視 3 = 左無視	*/
 char			flag2 = 0;				/* 偶数 = 無視しない 奇数 = 無視する*/
@@ -191,7 +192,7 @@ unsigned char   types_dipsw;            /* ディップスイッチ値保存       */
 
 /*	パラメータ	*/
 //オフセット
-int  		Center_offset_MAX = 12;		/*カーブ時カメラセンターを移動＝寄せる 最小値 0 最大値	5			*/
+int  		Center_offset_MAX = 12;		/*カーブ時カメラセンターを移動＝寄せる 最小値 0 	*/
 int  		Center_offset_Angle = -3;	/*この値につき１ＩＮ側に寄せる	正：IN　負：OUT		*/
 
 
@@ -231,7 +232,8 @@ int			OUT_M_DOWN	=		2;		//カーブ外寄りブレーキ用倍率
 #define		Cu_BRAKE			-10	//カーブ進入時のブレーキ
 
 #define		Cu_N_time			200	//Cu_N_time ms カーブを走行すると後半になる 	
-#define		Cu_N_time_safe		200	//この時間未満の直線ならカーブ後半を維持する
+//#define		Cu_N_time_safe		80	//この時間未満の直線直後ならカーブ後半を維持する //S字で加速したいときに有効かする
+
 //坂
 int			S_flag = 2;				//坂道　遇数回を　1 = 無視しない  2 = 無視する
 int			saka_max	  =		  1;	//認識可能な坂の数
@@ -242,7 +244,7 @@ int			saka_max	  =		  1;	//認識可能な坂の数
 #define		KASA_Encoder4  	0	//坂上終わり  
 #define		KASA_Encoder5  	0	//下り終わり 通常にもどる 
 
-#define		KASA_Encoder4_2  2500	//坂上終わり(最後の坂道)2500
+#define		KASA_Encoder4_2  2500	//坂上終わり(最後の坂道)2500 
 #define		KASA_Encoder5_2  3200	//坂上終わり(最後の坂道)3200
 
 //斜面(上り)
@@ -290,7 +292,7 @@ int			saka_max	  =		  1;	//認識可能な坂の数
 #define			OUT_M_DOWN5			2		//カーブ外寄りブレーキ用倍率(坂）
 
 //クランク
-int		    C_TOPSPEED	=		27;		//クランク(入)  25 33
+int		    C_TOPSPEED	=		28;		//クランク(入)  25 33
 int		    C_TOPSPEED2	=		50;		//クランク(出)	40
 
 int 		C_TOPSPEED4 = 		47;		//再生走行時のブレーキ前
@@ -311,7 +313,7 @@ int			c_cut_encoder	 =	540;  	//この距離未満の場合は再生しない
 
 
 //ハーフ 
-#define HWall 							//壁ありの時に有効化すること
+//#define HWall 							//壁ありの時に有効化すること
 
 #ifdef  HWall //壁あり
 int		    H_TOPSPEED	=		45;		//ハーフ（侵入）
@@ -322,7 +324,7 @@ int		    H_TOPSPEED2	=		44;		//ハーフ(斜め)
 #endif
   
 int		    H_TOPSPEED2_S=		60;		//ハーフ(斜め)  ショートカット用
-int			date_f_brake_h	=	500;	//再生走行時のブレーキ使用可能距離(mm)　ハーフ用 
+int			date_f_brake_h	=	700;	//再生走行時のブレーキ使用可能距離(mm)　ハーフ用 
 int			date_f_shortcat_h=	350;		//再生走行時のショートカット距離(mm)　ハーフ用
 
 int			date_f_plus_h	=	700;		//再生走行時の直後のストレート距離補正(mm)　ハーフ用  
@@ -596,7 +598,7 @@ void main( void )
 				}
 				
 		
-
+			
 			/*	
 					//31：右クランク 41：左クランク 53:左ハーフ 63:右ハーフ
 					//クランク　金具　近い：200　遠い：450
@@ -649,6 +651,7 @@ void main( void )
 					j++;
 				}
 		
+	
 				
 				/*
 					//31：右クランク 41：左クランク 53:左ハーフ 63:右ハーフ
@@ -728,6 +731,7 @@ void main( void )
             cnt1 = 0;
 			cnt2 = 0;
 			cnt7 = 0;
+			cnt9 = 0;
 			run = 1;//走行開始
 			lEncoderTotal = 0; 
 			lEncoderTotal2 = 0; 
@@ -923,7 +927,8 @@ void main( void )
 		
 		if(-15 < i && i < 15){
 			//if(angle_check() == 2 && ( (flag2%2 == 1) || ((lEncoderTotal-sp2) >= 1000) && ((lEncoderTotal-sp) >= 1000) )){//坂センサーチェック sp=クランク終了位置
-			if(angle_check() == 2 && ( ((lEncoderTotal-sp2) >= 2000) && ((lEncoderTotal-sp) >= 1000) )){//坂センサーチェック sp=クランク終了位置
+			//if(angle_check() == 2 && ( ((lEncoderTotal-sp2) >= 600) && ((lEncoderTotal-sp) >= 1000) )){//坂センサーチェック sp=クランク終了位置
+			if(angle_check() == 2 &&  (((lEncoderTotal-sp2) >= 600) || ((flag2%2 == 1) && ((lEncoderTotal-sp2) >= 300))) && ((lEncoderTotal-sp) >= 1000) ){//坂センサーチェック sp=クランク終了位置
 				cnt5++;
 			}else{
 				cnt5 = 0;
@@ -1140,15 +1145,18 @@ void main( void )
 				}
 				Cu_flag = 1;
 				
-			/*	if((lEncoderTotal - sp3) < 500 && (lEncoderTotal-sp) >= 1000){//直線距離が短かった && クランク、ハーフ直後は無し
+#ifdef Cu_N_time_safe
+				if(cnt9 <= Cu_N_time_safe && (lEncoderTotal-sp) >= 1000){//直線距離が短かった && クランク、ハーフ直後は無し
 					cnt8 += Cu_N_time;//強制的にカーブ後半へ	
 				}
-			*/
+#endif
+			
 			}
 			
 			sp3 = lEncoderTotal;//カーブ終了位置用
+			cnt9 = 0;
 				
-			if(cnt7 <= Cu_BRAKE_time && (lEncoderTotal-sp) >= 200 && (lEncoderTotal-sp2) >= 100){
+			if(cnt7 <= Cu_BRAKE_time && (lEncoderTotal-sp) >= 200 && (lEncoderTotal-sp2) >= 100){//カーブ進入時のブレーキ
 				
 				servoPwmOut( iServoPwm * 2 );
 				
@@ -1290,16 +1298,18 @@ void main( void )
 				}
 				
 				Cu_flag = 1;
-				
-			/*	if((lEncoderTotal - sp3) < 500 && (lEncoderTotal-sp) >= 1000){//直線距離が短かった && クランク、ハーフ直後は無し
+
+#ifdef Cu_N_time_safe			
+				if(cnt9 <= Cu_N_time_safe && (lEncoderTotal-sp) >= 1000){//直線距離が短かった && クランク、ハーフ直後は無し
 					cnt8 += Cu_N_time;//強制的にカーブ後半へ	
 				}
-			*/
+#endif			
 			}
 			
 			sp3 = lEncoderTotal;//カーブ終了位置用
+			cnt9 = 0;
 			
-			if(cnt7 <= Cu_BRAKE_time && (lEncoderTotal-sp) >= 200 && (lEncoderTotal-sp2) >= 100){
+			if(cnt7 <= Cu_BRAKE_time && (lEncoderTotal-sp) >= 200 && (lEncoderTotal-sp2) >= 100){//カーブ進入時のブレーキ
 				
 				servoPwmOut( iServoPwm * 2);
 				
@@ -1426,13 +1436,13 @@ void main( void )
 						
 			if((Cu_flag == 1)&&(mode == 0)){//カーブから直線へ && 坂中ではない
 			
-				if(cnt7 >= 60){//あまりカーブを走っていない時はフリーにしないように
+				if(cnt7 >= 60){//カーブを一定時間走っていたら＝あまりカーブを走っていない時（後輪滑り後）はフリーにしたくない
 					cnt7 = 0;
 				}
 				Cu_flag = 0;
 			}
 			
-			if(cnt7 <= Cu_FREE_time && (lEncoderTotal-sp) >= 700){//クランク、ハーフからの復帰直後
+			if(cnt7 <= Cu_FREE_time && (lEncoderTotal-sp) >= 700){//カーブ終わりから一定時間内　＆＆　クランク、ハーフからの復帰直後ではない
 				
 				if(mode == 0 &&  Center < -10) {//車体左寄り
 				
@@ -2622,7 +2632,7 @@ void main( void )
 		if(date_f_mode == 0 || h_cut == 0){
  
 #ifdef HWall  //壁あり    	
-			iSetAngle = 65;
+			iSetAngle = 68;
 #else //壁無し
 			iSetAngle = 55;
 #endif			
@@ -3457,6 +3467,11 @@ void intTRB( void )
 	cnt3++;
 	cnt7++;
 	cnt8++;
+	if( pattern == 11){//通常トレースのみ有効
+		cnt9++;
+	}else{
+		cnt9 = 0;	
+	}
 	
 	/* microSD間欠書き込み処理(1msごとに実行)   */
 	microSDProcess();
