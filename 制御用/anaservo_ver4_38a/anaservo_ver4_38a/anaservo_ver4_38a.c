@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			125	  	/* ハンドル最大位置 115           */
 
-#define 	MAXTIME 			1300	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
+#define 	MAXTIME 			1100	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
 
 
 /*======================================*/
@@ -192,7 +192,7 @@ unsigned char   types_dipsw;            /* ディップスイッチ値保存       */
 
 /*	パラメータ	*/
 //オフセット
-int  		Center_offset_MAX = 12;		/*カーブ時カメラセンターを移動＝寄せる 最小値 0 	*/
+int  		Center_offset_MAX = 5;		/*カーブ時カメラセンターを移動＝寄せる 最小値 0 	*/
 int  		Center_offset_Angle = -3;	/*この値につき１ＩＮ側に寄せる	正：IN　負：OUT		*/
 
 
@@ -200,7 +200,9 @@ int			KASOKU = 15;
 
 //通常
 
-int			MOTOR_out_base	=		 95;		//カーブ前半用　外側モーター用パラメーター 
+#define		MOTOR_OUT_BASE			100		//カーブ前半用　外側モーター用パラメーター 
+#define		MOTOR_OUT_BASE_CH		95		//カーブ前半用　外側モーター用パラメーター クランク、ハーフの直後
+		
 
 //////////////////////////////////////////// 0:禁止 1と-1は同じ
 
@@ -228,8 +230,8 @@ int			OUT_M_DOWN	=		2;		//カーブ外寄りブレーキ用倍率
 #define		Cu_FREE_time  		15		//カーブ終了時の後輪フリーの時間(msec）
 
 #define		Cu_BRAKE_time  		5		//カーブ進入時のブレーキ時間 (msec)
-#define		Cu_BRAKE_SP 		43		//カーブ進入時にこの速度以上ならブレーキ
-#define		Cu_BRAKE			-10	//カーブ進入時のブレーキ
+#define		Cu_BRAKE_SP 		45		//カーブ進入時にこの速度以上ならブレーキ
+#define		Cu_BRAKE			0	//カーブ進入時のブレーキ
 
 #define		Cu_N_time			200	//Cu_N_time ms カーブを走行すると後半になる 	
 //#define		Cu_N_time_safe		80	//この時間未満の直線直後ならカーブ後半を維持する //S字で加速したいときに有効かする
@@ -290,6 +292,20 @@ int			saka_max	  =		  1;	//認識可能な坂の数
 
 #define			S_para5				2		//S字きりかえし用パラメータ(坂）
 #define			OUT_M_DOWN5			2		//カーブ外寄りブレーキ用倍率(坂）
+
+
+//クランク、ハーフ直後の設定値	カーブのパラメータ変更がクランク、ハーフに影響しないようにするため
+#define		    TOPSPEED_CH_Len		600		//クランク、ハーフ直後のこの距離未満は以下の設定値で走る
+
+#define		    TOPSPEED_CH			50		//直線
+#define			SPEED_DOWN_CH		 8		//角度によりTOPSPEEDを減速  カーブ前半
+#define			SPEED_DOWN_CH_N		 14		//角度によりTOPSPEEDを減速  カーブ後半
+#define			MOTOR_out_CH_R		 1		//外側モーター用パラメーター
+#define			MOTOR_in_CH_F		 3		//内側モーター用パラメーター
+#define			MOTOR_in_CH_R		-2		//内側モーター用パラメーター
+
+#define			S_para_CH			1		//S字きりかえし用パラメータ
+#define			OUT_M_DOWN_CH		2		//カーブ外寄りブレーキ用倍率
 
 //クランク
 int		    C_TOPSPEED	=		28;		//クランク(入)  25 33
@@ -361,7 +377,7 @@ int			motor2_in_F;
 int			motor2_in_R;
 int			s_para;
 int			out_m_down;
-
+int			MOTOR_out_base = MOTOR_OUT_BASE;
 
 /************************************************************************/
 /* メインプログラム                                                     */
@@ -807,6 +823,10 @@ void main( void )
 */
 	case 10://スタート直後
 	
+		if(lEncoderTotal > 50){
+			motor_mode_f( FREE, FREE );
+			motor_mode_r( FREE, FREE );
+		}
 		
 		if(Center < -10)Center = -10;
 		if(Center > 10)Center = 10;
@@ -844,6 +864,7 @@ void main( void )
 		if(lEncoderTotal > 700){
 			
 			mode = 0;//元に戻す
+			
 			pattern = 11;
 			cnt8 = 0;
 		}
@@ -1126,6 +1147,30 @@ void main( void )
 			servoPwmOut( iServoPwm );	
 		}
 		
+		if(lEncoderTotal > 1000 && (lEncoderTotal-sp) < TOPSPEED_CH_Len ){//クランク、ハーフ直後は設定値を変える
+			MOTOR_out_base = MOTOR_OUT_BASE_CH;
+			
+			TOPSPEED = TOPSPEED_CH;
+			SPEED_DOWN = SPEED_DOWN_CH;
+			SPEED_DOWN_N = SPEED_DOWN_CH_N;
+			MOTOR_out_R = MOTOR_out_CH_R;
+			MOTOR_in_F = MOTOR_in_CH_F;
+			MOTOR_in_R = MOTOR_in_CH_R;
+			S_para = S_para_CH;
+			OUT_M_DOWN = OUT_M_DOWN_CH;
+				
+		}else if(mode != 1){//坂中の設定が上書きされないようにする
+			MOTOR_out_base = MOTOR_OUT_BASE;
+			
+			TOPSPEED = topspeed;
+			SPEED_DOWN = speed_down;
+			SPEED_DOWN_N = speed_down_n;
+			MOTOR_out_R = motor2_out_R;
+			MOTOR_in_F = motor2_in_F;
+			MOTOR_in_R = motor2_in_R;
+			S_para = s_para;
+			OUT_M_DOWN = out_m_down;
+		}
 		
         if( i > 12 ){//ハンドル右
 		
