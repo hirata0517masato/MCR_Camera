@@ -224,7 +224,7 @@ int			MOTOR_in_R_N=		3;		//内側モーター用パラメーター　後半	3	3
 int			S_para		=		1;		//S字きりかえし用パラメータ
 int			OUT_M_DOWN	=		2;		//カーブ外寄りブレーキ用倍率
 
-#define		date_f_brake		150	//再生走行時 通常走行と同様の速度制限をする距離 400
+#define		date_f_brake		350	//再生走行時 通常走行と同様の速度制限をする距離 400
 #define		date_f_brake2		80	//再生走行時　残り距離/date_f_brake2 だけ速度上限を上げる 数値を大きくした方が遅くなる(0にはしないこと）
 
 #define		Cu_FREE_time  		15		//カーブ終了時の後輪フリーの時間(msec）
@@ -1898,8 +1898,8 @@ void main( void )
 				
 			if(0 < Center  && (lEncoderTotal-sp) >= 150  || (Wide != 0 && -6 < Center  && (lEncoderTotal-sp) >= 200)){
 			
-				iSetAngle = -25;
-				motor2_f( 0,   80 );         
+				iSetAngle = -35;
+				motor2_f( 0,   90 );         
         		motor2_r( 0,   0 ); 
 		
 			}else if((lEncoderTotal-sp) >= 350){
@@ -2092,8 +2092,8 @@ void main( void )
 			
   
 			if((Center < 0 && (lEncoderTotal-sp) >= 150) || (Wide != 0 && Center < 6 && (lEncoderTotal-sp) >= 200)){
-				iSetAngle = -25;
-				motor2_f( 80,   0 );         
+				iSetAngle = 35;
+				motor2_f( 90,   0 );         
         		motor2_r( 0,   0 ); 
 		
 			}else if((lEncoderTotal-sp) >= 350){
