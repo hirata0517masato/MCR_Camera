@@ -320,7 +320,7 @@ int 		C_short_len_boost = 600;  //再生走行　距離短い時用
 int			C_short_len =		625;	//この距離未満はショート、以上はロング
 
 int			date_f_brake_c	=	500;	//再生走行時のブレーキ使用可能距離(mm) クランク用
-int			date_f_shortcat_c=	270;	//再生走行時のショートカット距離(mm) クランク用 210
+int			date_f_shortcat_c=	250;	//再生走行時のショートカット距離(mm) クランク用 210
 
 char		c_cut_master  	 =	  1;	//再生走行時であっても 0= 再生しない 1= 再生する				
 int			c_cut_encoder	 =	540;  	//この距離未満の場合は再生しない
@@ -1898,8 +1898,8 @@ void main( void )
 				
 			if(0 < Center  && (lEncoderTotal-sp) >= 150  || (Wide != 0 && -6 < Center  && (lEncoderTotal-sp) >= 200)){
 			
-				iSetAngle = -35;
-				motor2_f( 0,   90 );         
+				iSetAngle = -15;
+				motor2_f( 0,   50 );         
         		motor2_r( 0,   0 ); 
 		
 			}else if((lEncoderTotal-sp) >= 350){
@@ -2092,8 +2092,8 @@ void main( void )
 			
   
 			if((Center < 0 && (lEncoderTotal-sp) >= 150) || (Wide != 0 && Center < 6 && (lEncoderTotal-sp) >= 200)){
-				iSetAngle = 35;
-				motor2_f( 90,   0 );         
+				iSetAngle = 15;
+				motor2_f( 50,   0 );         
         		motor2_r( 0,   0 ); 
 		
 			}else if((lEncoderTotal-sp) >= 350){
