@@ -192,7 +192,7 @@ unsigned char   types_dipsw;            /* ディップスイッチ値保存       */
 
 /*	パラメータ	*/
 //オフセット
-int  		Center_offset_MAX = 5;		/*カーブ時カメラセンターを移動＝寄せる 最小値 0 	*/
+int  		Center_offset_MAX = 10;		/*カーブ時カメラセンターを移動＝寄せる 最小値 0 	*/
 int  		Center_offset_Angle = -3;	/*この値につき１ＩＮ側に寄せる	正：IN　負：OUT		*/
 
 
@@ -216,9 +216,9 @@ int			MOTOR_in_R	=		 -2;		//内側モーター用パラメーター -2	-3
 	
 //後半
 int			SPEED_DOWN_N=		14;		//角度によりTOPSPEEDを減速  カーブ後半 11 10
-int			MOTOR_out_R_N=		4;		//外側モーター用パラメーター 後半	5	5
+int			MOTOR_out_R_N=		3;		//外側モーター用パラメーター 後半	5	5
 int			MOTOR_in_F_N=		9;		//内側モーター用パラメーター　後半	6	6
-int			MOTOR_in_R_N=		3;		//内側モーター用パラメーター　後半	3	3
+int			MOTOR_in_R_N=		2;		//内側モーター用パラメーター　後半	3	3
 
 
 int			S_para		=		1;		//S字きりかえし用パラメータ
@@ -312,14 +312,14 @@ int		    C_TOPSPEED	=		28;		//クランク(入)  25 33
 int		    C_TOPSPEED2	=		50;		//クランク(出)	40
 
 int 		C_TOPSPEED4 = 		47;		//再生走行時のブレーキ前
-int		    C_TOPSPEED3	=		43;		//クランク(入)  25 33 再生走行用
+int		    C_TOPSPEED3	=		43;		//再生走行用クランク(入)  25 33 
 int 		C_TOPSPEED5 = 		36;		//再生走行時のブレーキ前 距離短い時用
 
 int 		C_short_len_boost = 600;  //再生走行　距離短い時用
 
 int			C_short_len =		625;	//この距離未満はショート、以上はロング
 
-int			date_f_brake_c	=	500;	//再生走行時のブレーキ使用可能距離(mm) クランク用
+int			date_f_brake_c	=	540;	//再生走行時のブレーキ使用可能距離(mm) クランク用
 int			date_f_shortcat_c=	250;	//再生走行時のショートカット距離(mm) クランク用 210
 
 char		c_cut_master  	 =	  1;	//再生走行時であっても 0= 再生しない 1= 再生する				
@@ -1898,8 +1898,8 @@ void main( void )
 				
 			if(0 < Center  && (lEncoderTotal-sp) >= 150  || (Wide != 0 && -6 < Center  && (lEncoderTotal-sp) >= 200)){
 			
-				iSetAngle = -15;
-				motor2_f( 0,   50 );         
+				iSetAngle = -25;
+				motor2_f( 0,   80 );         
         		motor2_r( 0,   0 ); 
 		
 			}else if((lEncoderTotal-sp) >= 350){
@@ -2092,8 +2092,8 @@ void main( void )
 			
   
 			if((Center < 0 && (lEncoderTotal-sp) >= 150) || (Wide != 0 && Center < 6 && (lEncoderTotal-sp) >= 200)){
-				iSetAngle = 15;
-				motor2_f( 50,   0 );         
+				iSetAngle = 25;
+				motor2_f( 80,   0 );         
         		motor2_r( 0,   0 ); 
 		
 			}else if((lEncoderTotal-sp) >= 350){
