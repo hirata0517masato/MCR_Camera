@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			125	  	/* ハンドル最大位置 115           */
 
-#define 	MAXTIME 			1100	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
+#define 	MAXTIME 			1250	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
 
 
 /*======================================*/
@@ -192,7 +192,7 @@ unsigned char   types_dipsw;            /* ディップスイッチ値保存       */
 
 /*	パラメータ	*/
 //オフセット
-int  		Center_offset_MAX = 10;		/*カーブ時カメラセンターを移動＝寄せる 最小値 0 	*/
+int  		Center_offset_MAX = 5;		/*カーブ時カメラセンターを移動＝寄せる 最小値 0 	*/
 int  		Center_offset_Angle = -3;	/*この値につき１ＩＮ側に寄せる	正：IN　負：OUT		*/
 
 
@@ -209,16 +209,16 @@ int			KASOKU = 15;
 int		    TOPSPEED	=		50;		//直線 
 
 //前半
-int			SPEED_DOWN	=		8;		//角度によりTOPSPEEDを減速 カーブ前半 8 6
+int			SPEED_DOWN	=		7;		//角度によりTOPSPEEDを減速 カーブ前半 8 6
 int			MOTOR_out_R	=		 1;		//外側モーター用パラメーター 1	-2
 int			MOTOR_in_F	=		 3;		//内側モーター用パラメーター 	2 	1
 int			MOTOR_in_R	=		 -2;		//内側モーター用パラメーター -2	-3
 	
 //後半
-int			SPEED_DOWN_N=		14;		//角度によりTOPSPEEDを減速  カーブ後半 11 10
-int			MOTOR_out_R_N=		3;		//外側モーター用パラメーター 後半	5	5
+int			SPEED_DOWN_N=		16;		//角度によりTOPSPEEDを減速  カーブ後半 11 10
+int			MOTOR_out_R_N=		4;		//外側モーター用パラメーター 後半	5	5
 int			MOTOR_in_F_N=		9;		//内側モーター用パラメーター　後半	6	6
-int			MOTOR_in_R_N=		2;		//内側モーター用パラメーター　後半	3	3
+int			MOTOR_in_R_N=		3;		//内側モーター用パラメーター　後半	3	3
 
 
 int			S_para		=		1;		//S字きりかえし用パラメータ
@@ -243,14 +243,14 @@ int			saka_max	  =		  1;	//認識可能な坂の数
 #define 	KASA_Encoder2  	650	//上り途中 終わり
 #define 	KASA_Encoder3  	1200	//上り終わり 
 
-#define		KASA_Encoder4  	0	//坂上終わり  
-#define		KASA_Encoder5  	0	//下り終わり 通常にもどる 
+#define		KASA_Encoder4  	2500	//坂上終わり  
+#define		KASA_Encoder5  	3200	//下り終わり 通常にもどる 
 
 #define		KASA_Encoder4_2  2500	//坂上終わり(最後の坂道)2500 
 #define		KASA_Encoder5_2  3200	//坂上終わり(最後の坂道)3200
 
 //斜面(上り)
-#define		    TOPSPEED2			45		//直線(坂）30 33
+#define		    TOPSPEED2			48		//直線(坂）30 33
 #define			SPEED_DOWN2			10		//角度によりTOPSPEEDを減速(坂）カーブ前半
 #define			SPEED_DOWN2_N		10		//角度によりTOPSPEEDを減速  カーブ後半
 #define			MOTOR_out2_R		100	//外側モーター用パラメーター(坂）
@@ -261,7 +261,7 @@ int			saka_max	  =		  1;	//認識可能な坂の数
 #define			OUT_M_DOWN2			2		//カーブ外寄りブレーキ用倍率(坂）
 
 //斜面(上り,頂上付近　飛び跳ね防止)
-#define		    TOPSPEED3			30		//直線(坂）30 33
+#define		    TOPSPEED3			33		//直線(坂）30 33
 #define			SPEED_DOWN3			6		//角度によりTOPSPEEDを減速(坂）カーブ前半
 #define			SPEED_DOWN3_N		6		//角度によりTOPSPEEDを減速  カーブ後半
 #define			MOTOR_out3_R		-1	//外側モーター用パラメーター(坂）
@@ -613,7 +613,6 @@ void main( void )
 					j++;
 				}
 				
-		
 			
 			/*	
 					//31：右クランク 41：左クランク 53:左ハーフ 63:右ハーフ
@@ -667,7 +666,7 @@ void main( void )
 					j++;
 				}
 		
-	
+		
 				
 				/*
 					//31：右クランク 41：左クランク 53:左ハーフ 63:右ハーフ
@@ -945,7 +944,7 @@ void main( void )
 		}
 		
 		
-		
+//if(flag2 == 0){//２回目は絶対に検出しない　一時的な対策。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。		
 		if(-15 < i && i < 15){
 			//if(angle_check() == 2 && ( (flag2%2 == 1) || ((lEncoderTotal-sp2) >= 1000) && ((lEncoderTotal-sp) >= 1000) )){//坂センサーチェック sp=クランク終了位置
 			//if(angle_check() == 2 && ( ((lEncoderTotal-sp2) >= 600) && ((lEncoderTotal-sp) >= 1000) )){//坂センサーチェック sp=クランク終了位置
@@ -955,7 +954,7 @@ void main( void )
 				cnt5 = 0;
 			}
 		}
-		
+//}		
 		if(-25 < i && i < 25){
 			if(mode == 0){//坂中でなければ
 				if(lEncoderTotal > 200 && (sp2 == 0 || (lEncoderTotal-sp2) >= 1500) && (sp == 0 || (lEncoderTotal-sp) >= 150) && (sp3 == 0 || (lEncoderTotal-sp3) >= 0)){//ゲートに反応しないように && 坂終了から少しの間は無視 && クランク、ハーフ終了後少し無視 && カーブ直後は無視
@@ -1052,6 +1051,7 @@ void main( void )
 
 				}
 				flag2++;
+				//flag2 = 1;/////////////////////////////////////////////////////////////////////////////坂キャンセル対策
 				cnt5 = 0;
 				
 				sp2 = lEncoderTotal;//チャタリング防止
@@ -1061,7 +1061,7 @@ void main( void )
 		}else if(mode == 1){//坂
 
 			if(((saka_max > 0) && ((lEncoderTotal-sp2) >= KASA_Encoder5)) || 
-				((saka_max == 0) && ((lEncoderTotal-sp2) >= KASA_Encoder5_2))  ){//通常に戻す
+				((saka_max <= 0) && ((lEncoderTotal-sp2) >= KASA_Encoder5_2))  ){//通常に戻す
 			
 				mode = 0;
 				
@@ -1077,7 +1077,7 @@ void main( void )
 				OUT_M_DOWN = out_m_down;
 				
 			}else if(((saka_max > 0) && ((lEncoderTotal-sp2) >= KASA_Encoder4)) || 
-				((saka_max == 0) && ((lEncoderTotal-sp2) >= KASA_Encoder4_2))  ){// 下り開始
+				((saka_max <= 0) && ((lEncoderTotal-sp2) >= KASA_Encoder4_2))  ){// 下り開始
 				
 				TOPSPEED = TOPSPEED5;
 				SPEED_DOWN = SPEED_DOWN5;
@@ -1147,29 +1147,31 @@ void main( void )
 			servoPwmOut( iServoPwm );	
 		}
 		
-		if(lEncoderTotal > 1000 && (lEncoderTotal-sp) < TOPSPEED_CH_Len ){//クランク、ハーフ直後は設定値を変える
-			MOTOR_out_base = MOTOR_OUT_BASE_CH;
+		if(mode != 1){//坂中の設定が上書きされないようにする
+			if(lEncoderTotal > 1000 && (lEncoderTotal-sp) < TOPSPEED_CH_Len ){//クランク、ハーフ直後は設定値を変える
+				MOTOR_out_base = MOTOR_OUT_BASE_CH;
 			
-			TOPSPEED = TOPSPEED_CH;
-			SPEED_DOWN = SPEED_DOWN_CH;
-			SPEED_DOWN_N = SPEED_DOWN_CH_N;
-			MOTOR_out_R = MOTOR_out_CH_R;
-			MOTOR_in_F = MOTOR_in_CH_F;
-			MOTOR_in_R = MOTOR_in_CH_R;
-			S_para = S_para_CH;
-			OUT_M_DOWN = OUT_M_DOWN_CH;
+				TOPSPEED = TOPSPEED_CH;
+				SPEED_DOWN = SPEED_DOWN_CH;
+				SPEED_DOWN_N = SPEED_DOWN_CH_N;
+				MOTOR_out_R = MOTOR_out_CH_R;
+				MOTOR_in_F = MOTOR_in_CH_F;
+				MOTOR_in_R = MOTOR_in_CH_R;
+				S_para = S_para_CH;
+				OUT_M_DOWN = OUT_M_DOWN_CH;
 				
-		}else if(mode != 1){//坂中の設定が上書きされないようにする
-			MOTOR_out_base = MOTOR_OUT_BASE;
+			}else{
+				MOTOR_out_base = MOTOR_OUT_BASE;
 			
-			TOPSPEED = topspeed;
-			SPEED_DOWN = speed_down;
-			SPEED_DOWN_N = speed_down_n;
-			MOTOR_out_R = motor2_out_R;
-			MOTOR_in_F = motor2_in_F;
-			MOTOR_in_R = motor2_in_R;
-			S_para = s_para;
-			OUT_M_DOWN = out_m_down;
+				TOPSPEED = topspeed;
+				SPEED_DOWN = speed_down;
+				SPEED_DOWN_N = speed_down_n;
+				MOTOR_out_R = motor2_out_R;
+				MOTOR_in_F = motor2_in_F;
+				MOTOR_in_R = motor2_in_R;
+				S_para = s_para;
+				OUT_M_DOWN = out_m_down;
+			}
 		}
 		
         if( i > 12 ){//ハンドル右
@@ -4430,8 +4432,8 @@ void get_angle_x(){
 /**************************************************************************/
 int angle_check(){
 
-	if(230 < angle_y && angle_y < 350){
-		if(angle_x <= 100)return 2;//上 170
+	if(200 < angle_y && angle_y < 400){
+		if(angle_x <= 170)return 2;//上 170
 		if(angle_x > 440)return 0;//下
 	}
 	return 1;//変化無し
