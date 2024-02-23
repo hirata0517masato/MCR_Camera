@@ -3500,7 +3500,7 @@ void intTRB( void )
 	int k;
 	//static unsigned int EncoderMod = 0;
 	//static int iEncoder5_old = 0; 
-	static unsigned int iEncoder1_buf[10] = {0}; 
+	static int iEncoder1_buf[10] = {0}; 
 	//static unsigned long  SEncoderTotal3 = 0;          /* 積算値保存用                 */
 	int iEncoder_buf = 0; 
 	int a;
@@ -3539,8 +3539,8 @@ void intTRB( void )
 	////////////////////////////////////////////////////////
 	
 	//33*3.14  // 1パルス*1.03 = 1mm  //1回転 100パルス
-	i = trg >> 1;
-    iEncoder1_buf[iTimer10] = (i - uEncoderBuff);
+	i = trg ;
+    iEncoder1_buf[iTimer10] = (i - uEncoderBuff)/2;
 	lEncoderTotal += iEncoder1_buf[iTimer10];
     uEncoderBuff = i;
 	
