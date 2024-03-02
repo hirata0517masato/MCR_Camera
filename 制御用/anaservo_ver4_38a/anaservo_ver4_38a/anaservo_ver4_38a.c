@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			125	  	/* ハンドル最大位置 115           */
 
-#define 	MAXTIME 			1250	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
+#define 	MAXTIME 			1100 //1100	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
 
 
 /*======================================*/
@@ -192,15 +192,15 @@ unsigned char   types_dipsw;            /* ディップスイッチ値保存       */
 
 /*	パラメータ	*/
 //オフセット
-int  		Center_offset_MAX = 5;		/*カーブ時カメラセンターを移動＝寄せる 最小値 0 	*/
+int  		Center_offset_MAX = 10;		/*カーブ時カメラセンターを移動＝寄せる 最小値 0 	*/
 int  		Center_offset_Angle = -3;	/*この値につき１ＩＮ側に寄せる	正：IN　負：OUT		*/
 
 
-int			KASOKU = 15;	
+int			KASOKU = 20;	
 
 //通常
 
-#define		MOTOR_OUT_BASE			100		//カーブ前半用　外側モーター用パラメーター 
+#define		MOTOR_OUT_BASE			95		//カーブ前半用　外側モーター用パラメーター 
 #define		MOTOR_OUT_BASE_CH		95		//カーブ前半用　外側モーター用パラメーター クランク、ハーフの直後
 		
 
@@ -215,10 +215,10 @@ int			MOTOR_in_F	=		 3;		//内側モーター用パラメーター 	2 	1
 int			MOTOR_in_R	=		 -2;		//内側モーター用パラメーター -2	-3
 	
 //後半
-int			SPEED_DOWN_N=		16;		//角度によりTOPSPEEDを減速  カーブ後半 11 10
-int			MOTOR_out_R_N=		4;		//外側モーター用パラメーター 後半	5	5
-int			MOTOR_in_F_N=		9;		//内側モーター用パラメーター　後半	6	6
-int			MOTOR_in_R_N=		3;		//内側モーター用パラメーター　後半	3	3
+int			SPEED_DOWN_N=		10;		//角度によりTOPSPEEDを減速  カーブ後半 11 10
+int			MOTOR_out_R_N=		3;		//外側モーター用パラメーター 後半	5	5
+int			MOTOR_in_F_N=		5;		//内側モーター用パラメーター　後半	6	6
+int			MOTOR_in_R_N=		1;		//内側モーター用パラメーター　後半	3	3
 
 
 int			S_para		=		1;		//S字きりかえし用パラメータ
@@ -231,7 +231,7 @@ int			OUT_M_DOWN	=		2;		//カーブ外寄りブレーキ用倍率
 
 #define		Cu_BRAKE_time  		5		//カーブ進入時のブレーキ時間 (msec)
 #define		Cu_BRAKE_SP 		45		//カーブ進入時にこの速度以上ならブレーキ
-#define		Cu_BRAKE			0	//カーブ進入時のブレーキ
+#define		Cu_BRAKE			-50	//カーブ進入時のブレーキ
 
 #define		Cu_N_time			200	//Cu_N_time ms カーブを走行すると後半になる 	
 //#define		Cu_N_time_safe		80	//この時間未満の直線直後ならカーブ後半を維持する //S字で加速したいときに有効かする
@@ -239,8 +239,8 @@ int			OUT_M_DOWN	=		2;		//カーブ外寄りブレーキ用倍率
 //坂
 int			S_flag = 2;				//坂道　遇数回を　1 = 無視しない  2 = 無視する
 int			saka_max	  =		  1;	//認識可能な坂の数
-#define 	KASA_Encoder1  	150	//坂開始
-#define 	KASA_Encoder2  	650	//上り途中 終わり
+#define 	KASA_Encoder1  	50	//坂開始
+#define 	KASA_Encoder2  	400	//上り途中 終わり
 #define 	KASA_Encoder3  	1200	//上り終わり 
 
 #define		KASA_Encoder4  	2500	//坂上終わり  
@@ -250,7 +250,7 @@ int			saka_max	  =		  1;	//認識可能な坂の数
 #define		KASA_Encoder5_2  3200	//坂上終わり(最後の坂道)3200
 
 //斜面(上り)
-#define		    TOPSPEED2			48		//直線(坂）30 33
+#define		    TOPSPEED2			40		//直線(坂）30 33
 #define			SPEED_DOWN2			10		//角度によりTOPSPEEDを減速(坂）カーブ前半
 #define			SPEED_DOWN2_N		10		//角度によりTOPSPEEDを減速  カーブ後半
 #define			MOTOR_out2_R		100	//外側モーター用パラメーター(坂）
@@ -261,7 +261,7 @@ int			saka_max	  =		  1;	//認識可能な坂の数
 #define			OUT_M_DOWN2			2		//カーブ外寄りブレーキ用倍率(坂）
 
 //斜面(上り,頂上付近　飛び跳ね防止)
-#define		    TOPSPEED3			33		//直線(坂）30 33
+#define		    TOPSPEED3			28		//直線(坂）30 33
 #define			SPEED_DOWN3			6		//角度によりTOPSPEEDを減速(坂）カーブ前半
 #define			SPEED_DOWN3_N		6		//角度によりTOPSPEEDを減速  カーブ後半
 #define			MOTOR_out3_R		-1	//外側モーター用パラメーター(坂）
@@ -298,7 +298,7 @@ int			saka_max	  =		  1;	//認識可能な坂の数
 #define		    TOPSPEED_CH_Len		600		//クランク、ハーフ直後のこの距離未満は以下の設定値で走る
 
 #define		    TOPSPEED_CH			50		//直線
-#define			SPEED_DOWN_CH		 8		//角度によりTOPSPEEDを減速  カーブ前半
+#define			SPEED_DOWN_CH		 6		//角度によりTOPSPEEDを減速  カーブ前半
 #define			SPEED_DOWN_CH_N		 14		//角度によりTOPSPEEDを減速  カーブ後半
 #define			MOTOR_out_CH_R		 1		//外側モーター用パラメーター
 #define			MOTOR_in_CH_F		 3		//内側モーター用パラメーター
@@ -308,7 +308,7 @@ int			saka_max	  =		  1;	//認識可能な坂の数
 #define			OUT_M_DOWN_CH		2		//カーブ外寄りブレーキ用倍率
 
 //クランク
-int		    C_TOPSPEED	=		28;		//クランク(入)  25 33
+int		    C_TOPSPEED	=		29;		//クランク(入)  25 33
 int		    C_TOPSPEED2	=		50;		//クランク(出)	40
 
 int 		C_TOPSPEED4 = 		47;		//再生走行時のブレーキ前
@@ -339,7 +339,7 @@ int		    H_TOPSPEED	=		50;		//ハーフ（侵入）
 int		    H_TOPSPEED2	=		44;		//ハーフ(斜め)
 #endif
   
-int		    H_TOPSPEED2_S=		60;		//ハーフ(斜め)  ショートカット用
+int		    H_TOPSPEED2_S=		50;		//ハーフ(斜め)  ショートカット用
 int			date_f_brake_h	=	700;	//再生走行時のブレーキ使用可能距離(mm)　ハーフ用 
 int			date_f_shortcat_h=	350;		//再生走行時のショートカット距離(mm)　ハーフ用
 
@@ -1215,14 +1215,14 @@ void main( void )
 				
 			}else if(cnt8 <= Cu_N_time && iEncoder10 >= (TOPSPEED -(i / SPEED_DOWN)) && (lEncoderTotal-sp) >= 200) {// エンコーダによりスピード制御  カーブ前半
 			
-				x=((TOPSPEED -(i / SPEED_DOWN))-iEncoder10)*2;	
-				r = x;
-				f = x;
+				x = ((TOPSPEED -(i / SPEED_DOWN))-iEncoder10)*2;	
+				r = ((TOPSPEED -(i / SPEED_DOWN))-iEncoder10)*5;
+				f = ((TOPSPEED -(i / SPEED_DOWN))-iEncoder10)*5;
 				
 				//if(x < BRAKE_MAX) x = BRAKE_MAX;
 				if(x < -5) x = -5;
-				if(r < -15) r = -15;
-				if(f < -10) f = -10;
+				if(r < -25) r = -25;
+				if(f < -20) f = -20;
 				
 				motor_f( x, r );
             	motor_r( f, r );			
@@ -1280,7 +1280,7 @@ void main( void )
 					
         	}else{
 				
-				if((cnt8 <= Cu_N_time) || (mode == 1) || (i > 80) ){//カーブ前半 || 坂モード || 曲げすぎ || 
+				if((cnt8 <= Cu_N_time) || (mode == 1) || (i > 90) ){//カーブ前半 || 坂モード || 曲げすぎ || 
 					if(MOTOR_in_F > 0)f= (MOTOR_out_base - (i / MOTOR_in_F));
 					else f= (MOTOR_out_base - (i * -MOTOR_in_F));
 				
@@ -1368,13 +1368,13 @@ void main( void )
 				
 			}else if(cnt8 <= Cu_N_time &&  iEncoder10 >= (TOPSPEED -(-i / SPEED_DOWN)) && (lEncoderTotal-sp) >= 200 ) {  // エンコーダによりスピード制御 カーブ前半
 			
-				x=((TOPSPEED -(-i / SPEED_DOWN))-iEncoder10)*2;
-				r = x;
-				f = x;		
+				x = ((TOPSPEED -(-i / SPEED_DOWN))-iEncoder10)*2;
+				r = ((TOPSPEED -(-i / SPEED_DOWN))-iEncoder10)*5;
+				f = ((TOPSPEED -(-i / SPEED_DOWN))-iEncoder10)*5;		
 				//if(x < BRAKE_MAX) x = BRAKE_MAX;
 				if(x < -5) x = -5;
-				if(r < -15) r = -15;
-				if(f < -10) f = -10;
+				if(r < -25) r = -25;
+				if(f < -20) f = -20;
 				
 				motor_f( r, x );
             	motor_r( r, f );
@@ -1430,7 +1430,7 @@ void main( void )
 					
         	}else{
 				
-				if((cnt8 <= Cu_N_time) || (mode == 1) || (i < -80) ){//カーブ前半 || 坂モード || 大曲
+				if((cnt8 <= Cu_N_time) || (mode == 1) || (i < -90) ){//カーブ前半 || 坂モード || 大曲
 					if(MOTOR_in_F >0)f = (MOTOR_out_base - (-i / MOTOR_in_F));
 					else f = (MOTOR_out_base - (-i * -MOTOR_in_F)); 
 				
@@ -1879,8 +1879,8 @@ void main( void )
 				
 				}else iSetAngle = 115;
 			
-				motor_f( 0, -100 );          /* この部分は「角度計算(4WD時).xls」 85 -40*/
-        		motor_r( -100, -100 );          /* で計算                        */
+				motor_f( 0, -20 );          /* この部分は「角度計算(4WD時).xls」 85 -40*/
+        		motor_r( -20, -20 );          /* で計算                        */
 			
 			}else{//long
 				if((lEncoderTotal-sp) >= 200){
@@ -1889,8 +1889,8 @@ void main( void )
 				
 				}else iSetAngle = 95;
 			
-				motor_f( 95, -45 );          /* この部分は「角度計算(4WD時).xls」 85 -40*/
-        		motor_r( -40, -40 );          /* で計算                        */
+				motor_f( 85,  10 );          /* この部分は「角度計算(4WD時).xls」 85 -40*/
+        		motor_r( -10,  -10 );          /* で計算                        */
 			}
 			
 		
@@ -2074,8 +2074,8 @@ void main( void )
 				
 				}else iSetAngle = -115;
 			
-				motor_f( -100, 0 );          /* この部分は「角度計算(4WD時).xls」*/
-        		motor_r( -100, -100 );          /* で計算                        */
+				motor_f( -20, 0 );          /* この部分は「角度計算(4WD時).xls」*/
+        		motor_r( -20, -20 );          /* で計算                        */
 				
 			}else{//long
 				
@@ -2086,8 +2086,8 @@ void main( void )
 				
 				}else iSetAngle = -95;
 			
-				motor_f(  -45, 95 );          /* この部分は「角度計算(4WD時).xls」*/
-        		motor_r(  -40, -40 );          /* で計算                        */
+				motor_f(  10, 85 );          /* この部分は「角度計算(4WD時).xls」*/
+        		motor_r(  -10, -10 );          /* で計算                        */
 			}
 		}else{
 			mode = 1;//見る範囲を狭く
@@ -4190,7 +4190,7 @@ unsigned char check_crossline( void )
 	//cam_in();//値の取得
 	
 	ret = 0;
-	if( (Wide > 70) || ((Wide >= 50) && (-18 < Center ) && (Center < 18))  || ((Wide >= 44) && (Center > -12) && (Center < 12))){
+	if( (Wide > 70) || ((Wide >= 50) && (-18 < Center ) && (Center < 18))  || ((Wide >= 44) && (Center > -12) && (Center < 12)) || ((Wide >= 40) && (Center > -3) && (Center < 3)) ){
 	
 		ret = 1;			/* クロスライン発見 */
 	}
@@ -4378,7 +4378,7 @@ int camera(int center, int wide){
 	
 	int start = 17,end = 111,i,led = 0,cnt = 1;
 	// (end - start)/7 = 13
-	int led_bit[8] = {999,42,52,62,999,66,76,86};//4は不調
+	int led_bit[8] = {999,48,55,59,999,69,74,81};//4は不調
 	
 	center += 64;
 	wide /= 2;
