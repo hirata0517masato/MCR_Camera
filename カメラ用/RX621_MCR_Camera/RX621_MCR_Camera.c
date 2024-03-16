@@ -50,10 +50,10 @@ void WhiteLineWide(int,int);
 
 //AD0 /* CN3-9 P40 */
 
-#define		Line_Max	760		/* ライン白色MAX値の設定 */
+#define		Line_Max	760		/* ライン白色MAX値の設定 */ 
 
-#define 	LineStart 	27		/* カメラで見る範囲(通常モード) */
-#define 	LineStop  	100
+#define 	LineStart 	35		/* カメラで見る範囲(通常モード) */
+#define 	LineStop  	92
 
 #define 	LineStartSaka 	50		/* カメラで見る範囲(坂モード) */
 #define 	LineStopSaka  	77
@@ -72,7 +72,7 @@ void WhiteLineWide(int,int);
 unsigned long   cnt1000 =  0;
 
 /* カメラ関連 */
-long	  	EXPOSURE_timer = 3000;	/* 露光時間	20000				*/
+long	  	EXPOSURE_timer = 15000;	/* 露光時間	20000				*/
 int		ImageData[130];			/* カメラの値				*/
 int 		BinarizationData[130];	/* ２値化					*/
 
@@ -207,7 +207,7 @@ void main(void)
 			if(cnt1000 > 500){
 				//for(i = LineStart; i <= LineStop; i++)printf("%d",BinarizationData[i]);
 				for(i = LineStart; i <= LineStop; i+=2)printf("%d",BinarizationData[i]);
-				//printf("Max = %d Min = %d Center = %d Wide = %d Lsensor = %d Rsensor = %d time = %d mode = %d",Max,Min,Center,Wide,Lsensor,Rsensor,EXPOSURE_timer,mode);
+				printf("Max = %d Min = %d Center = %d Wide = %d Lsensor = %d Rsensor = %d time = %d mode = %d",Max,Min,Center,Wide,Lsensor,Rsensor,EXPOSURE_timer,mode);
 				printf("\n");
 				cnt1000=0;
 			}
@@ -332,17 +332,17 @@ void expose( void )
 		EXPOSURE_cnt = 0;
 	}
 	
-	if(EXPOSURE_cnt < 2){
+	if(EXPOSURE_cnt < 1){
 		if(-20 < sa && sa < 20){
 			//誤差なので変更しない
 		}else{ 
-			EXPOSURE_timer += (long)(sa*5);
+			EXPOSURE_timer += (long)(sa*4);
 		}
 	}	
 		
 	
-	if( EXPOSURE_timer > 3000000) EXPOSURE_timer = 3000000;
-	else if( EXPOSURE_timer <= 500 ) EXPOSURE_timer = 500;
+	if( EXPOSURE_timer > 100000) EXPOSURE_timer = 100000;
+	else if( EXPOSURE_timer <= 1000 ) EXPOSURE_timer = 1000;
 
 	for(i=0;i<EXPOSURE_timer;i++);
 
@@ -364,7 +364,7 @@ void expose2( void )
 	}else{
 		EXPOSURE_timer += 100;
 	}
-	if( EXPOSURE_timer > 3000000) EXPOSURE_timer = 3000000;
+	if( EXPOSURE_timer > 100000) EXPOSURE_timer = 100000;
 	else if( EXPOSURE_timer <= 0 ) EXPOSURE_timer = 0;
 	
 	for(i=0;i<EXPOSURE_timer;i++);
@@ -462,8 +462,8 @@ void binarization(int linestart, int linestop)
 	
 	if( Max > Line_Max - 400 ){//320 -150  250
 		/* 白が一直線のとき */
-		//if(Min > Line_Max - 80 ){//260
-		if(Max - Min < 130){
+		if(Min > 290 ){//260
+		//if(Max - Min < 130){//130
 			White = 127;
 			for(i = linestart ; i <= linestop; i++) {
 				BinarizationData[i] = 1;
