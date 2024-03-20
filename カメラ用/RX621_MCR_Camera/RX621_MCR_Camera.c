@@ -25,6 +25,7 @@ void CMT_init(void);
 
 void cam_out(void);
 void ImageCapture(int,int);
+void ImageCapture2(int,int);
 int  get_ad( void );
 void expose( void );
 void expose2( void );
@@ -50,7 +51,7 @@ void WhiteLineWide(int,int);
 
 //AD0 /* CN3-9 P40 */
 
-#define		Line_Max	760		/* ライン白色MAX値の設定 */ 
+#define		Line_Max	700		/* ライン白色MAX値の設定 */ 
 
 #define 	LineStart 	35		/* カメラで見る範囲(通常モード) */
 #define 	LineStop  	92
@@ -74,6 +75,7 @@ unsigned long   cnt1000 =  0;
 /* カメラ関連 */
 long	  	EXPOSURE_timer = 15000;	/* 露光時間	20000				*/
 int		ImageData[130];			/* カメラの値				*/
+int		ImageData_buf[130];			/* カメラの値				*/
 int 		BinarizationData[130];	/* ２値化					*/
 
 int		Max = 0,Min,Ave;	/*カメラ読み取り最大値、最小値、平均値*/
@@ -132,7 +134,7 @@ void main(void)
 		
 		expose2();				//露光時間（全白、全黒でも時間変更)
 		
-		ImageCapture(LineStart,LineStop);			//イメージキャプチャー
+		ImageCapture2(LineStart,LineStop);			//イメージキャプチャー
 		
 		binarization(LineStart,LineStop); 		//２値化
 		
@@ -326,17 +328,22 @@ void expose( void )
 	int sa = Line_Max - Max;
 	
 	//if( Wide != 0 && White <= 60){//黒でなく白でもない
-	if( Wide == 0 || White >= 50){//黒or白
+	if( Wide == 0 || White >= 35){//黒or白
 		EXPOSURE_cnt++;
 	}else{
 		EXPOSURE_cnt = 0;
 	}
 	
 	if(EXPOSURE_cnt < 1){
-		if(-20 < sa && sa < 20){
+		if(-10 < sa && sa < 10){
 			//誤差なので変更しない
 		}else{ 
-			EXPOSURE_timer += (long)(sa*4);
+			//EXPOSURE_timer += (long)(sa*4);
+			if(Line_Max - Max < 0){
+				EXPOSURE_timer -= 50;
+			}else{
+				EXPOSURE_timer += 50;
+			}
 		}
 	}	
 		
@@ -391,6 +398,9 @@ void ImageCapture(int linestart, int linestop){
 	}
 	for(i = LineStart; i < linestart; i++) {		
 		TAOS_CLK_HIGH;	
+		if(ImageData_buf[i] + 200 > ImageData[i]){
+			ImageData_buf[i] = ImageData[i];
+		}
 		ImageData[i] = get_ad();
 		TAOS_CLK_LOW;
 	}
@@ -398,6 +408,9 @@ void ImageCapture(int linestart, int linestop){
 	for(i = linestart; i <= linestop; i++) {				
 		 
 		TAOS_CLK_HIGH;
+		if(ImageData_buf[i] + 200 > ImageData[i]){
+			ImageData_buf[i] = ImageData[i];
+		}
 		ImageData[i] = get_ad();	// inputs data from camera (one pixel each time through loop) 
 		TAOS_CLK_LOW;
 		
@@ -411,7 +424,63 @@ void ImageCapture(int linestart, int linestop){
 	}
 	
 	for(i = linestop+1; i <= LineStop; i++) {		
+		TAOS_CLK_HIGH;
+		if(ImageData_buf[i] + 200 > ImageData[i]){
+			ImageData_buf[i] = ImageData[i];
+		}
+		ImageData[i] = get_ad();
+		TAOS_CLK_LOW;
+	}
+	for(i = LineStop+1; i < 128; i++) {		
+		TAOS_CLK_HIGH;		
+		TAOS_CLK_LOW;
+	}
+	
+	TAOS_CLK_HIGH;
+	TAOS_CLK_LOW;
+}
+/////////////////////////////////////前回の値を毎回更新する版
+void ImageCapture2(int linestart, int linestop){	 
+	
+	unsigned char i;
+
+	Max = 0,Min = 4096;
+
+	TAOS_SI_HIGH;
+	TAOS_CLK_HIGH;
+	TAOS_SI_LOW;
+	ImageData[0] = 0;
+	TAOS_CLK_LOW;
+	for(i = 1; i < LineStart; i++) {		
+		TAOS_CLK_HIGH;		
+		TAOS_CLK_LOW;
+	}
+	for(i = LineStart; i < linestart; i++) {		
 		TAOS_CLK_HIGH;	
+		ImageData_buf[i] = ImageData[i];
+		ImageData[i] = get_ad();
+		TAOS_CLK_LOW;
+	}
+	
+	for(i = linestart; i <= linestop; i++) {				
+		 
+		TAOS_CLK_HIGH;
+		ImageData_buf[i] = ImageData[i];
+		ImageData[i] = get_ad();	// inputs data from camera (one pixel each time through loop) 
+		TAOS_CLK_LOW;
+		
+		if(Max < ImageData[i]){
+			Max = ImageData[i];
+		}			
+		if(Min > ImageData[i]){
+			Min = ImageData[i];
+		}
+		
+	}
+	
+	for(i = linestop+1; i <= LineStop; i++) {		
+		TAOS_CLK_HIGH;
+		ImageData_buf[i] = ImageData[i];
 		ImageData[i] = get_ad();
 		TAOS_CLK_LOW;
 	}
@@ -460,17 +529,17 @@ void binarization(int linestart, int linestop)
 	/* 黒は０　白は１にする */
 	White = 0;					/* 白の数を０にする */
 	
-	if( Max > Line_Max - 400 ){//320 -150  250
+	if( Max > Line_Max - 300 ){//320 -150  250
 		/* 白が一直線のとき */
-		if(Min > 290 ){//260
-		//if(Max - Min < 130){//130
+		//if(Min > 290 ){//260  <-急に明るくなるとサチる
+		if(Max - Min < 150 || (  (Max < Line_Max + 200) && ( Min > 290))  ){//130 <-真っ白のときの明暗さで調整する
 			White = 127;
 			for(i = linestart ; i <= linestop; i++) {
 				BinarizationData[i] = 1;
 			}
 		}else{		
 			for(i = linestart ; i <= linestop; i++) {
-				if(  ImageData[i] > Ave ){	
+				if(  ImageData[i] > Ave || ( (Max < Line_Max + 200) && (ImageData_buf[i] + 200 < ImageData[i]))){ //閾値以上　|| 前回から急激に変化した	
 					White++;			
 					BinarizationData[i] = 1;
 				}else{
