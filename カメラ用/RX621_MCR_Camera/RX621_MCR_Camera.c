@@ -51,7 +51,7 @@ void WhiteLineWide(int,int);
 
 //AD0 /* CN3-9 P40 */
 
-#define		Line_Max	700		/* ライン白色MAX値の設定 */ 
+#define		Line_Max	760		/* ライン白色MAX値の設定 */ 
 
 #define 	LineStart 	35		/* カメラで見る範囲(通常モード) */
 #define 	LineStop  	92
@@ -532,14 +532,17 @@ void binarization(int linestart, int linestop)
 	if( Max > Line_Max - 300 ){//320 -150  250
 		/* 白が一直線のとき */
 		//if(Min > 290 ){//260  <-急に明るくなるとサチる
-		if(Max - Min < 150 || (  (Max < Line_Max + 200) && ( Min > 290))  ){//130 <-真っ白のときの明暗さで調整する
+		//if(Max - Min < 150 || (  (Max < Line_Max + 200) && ( Min > 290))  ){//130 <-真っ白のときの明暗さで調整する
+		if(Max - Min < 130){//130 <-真っ白のときの明暗さで調整する
+		
 			White = 127;
 			for(i = linestart ; i <= linestop; i++) {
 				BinarizationData[i] = 1;
 			}
 		}else{		
 			for(i = linestart ; i <= linestop; i++) {
-				if(  ImageData[i] > Ave || ( (Max < Line_Max + 200) && (ImageData_buf[i] + 200 < ImageData[i]))){ //閾値以上　|| 前回から急激に変化した	
+				//if(  ImageData[i] > Ave || ( (Max < Line_Max + 200) && (ImageData_buf[i] + 200 < ImageData[i]))){ //閾値以上　|| 前回から急激に変化した	
+				if( ImageData[i] > Ave ){ //閾値以上	
 					White++;			
 					BinarizationData[i] = 1;
 				}else{
@@ -614,7 +617,7 @@ void WhiteLineWide(int linestart, int linestop)
 			
 			
 		//ライン細すぎ || ( 前回、黒又は白一色ではない && ハーフラインなどではない &&  (急にラインが移動した))
-		if((((mode == 1) && (Wide < 4)) || ((mode != 1) && (Wide < 6))) || ((Center_lasttime != 64) && (White < 20) && (((Center - Center_lasttime) > 15) || ((Center - Center_lasttime) < -15)))){
+		if((((mode == 1) && (Wide < 4)) || ((mode != 1) && (Wide < 7))) || ((Center_lasttime != 64) && (White < 20) && (((Center - Center_lasttime) > 15) || ((Center - Center_lasttime) < -15)))){
 					
 			if(Center_lasttime < 60){
 						
