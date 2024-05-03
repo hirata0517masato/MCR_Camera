@@ -520,10 +520,11 @@ void binarization(int linestart, int linestop)
 	//if(mode == 1) Ave = Min + 130;
 	//else Ave = ((Max + Min) >> 1) - 50;
 	//else{
-		a  = ((Max + Min) >> 1);
+		/*a  = ((Max + Min) >> 1);
 		Ave = ((a+Min) >> 1);
 		Ave = ((a+Ave) >> 1);
-		//Ave  = ((Max + Min) >> 1);
+		*/
+		Ave  = ((Max + Min) >> 1);
 	//}
 	
 	/* 黒は０　白は１にする */
@@ -617,7 +618,7 @@ void WhiteLineWide(int linestart, int linestop)
 			
 			
 		//ライン細すぎ || ( 前回、黒又は白一色ではない && ハーフラインなどではない &&  (急にラインが移動した))
-		if((((mode == 1) && (Wide < 4)) || ((mode != 1) && (Wide < 7))) || ((Center_lasttime != 64) && (White < 20) && (((Center - Center_lasttime) > 15) || ((Center - Center_lasttime) < -15)))){
+		if((((mode == 1) && (Wide < 4)) || ((mode != 1) && (Wide < 4))) || ((Center_lasttime != 64) && (White < 20) && (((Center - Center_lasttime) > 15) || ((Center - Center_lasttime) < -15)))){
 					
 			if(Center_lasttime < 60){
 						
