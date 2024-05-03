@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			125	  	/* ハンドル最大位置 115           */
 
-#define 	MAXTIME 			1100 //1100	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
+#define 	MAXTIME 			950 //1100	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
 
 
 /*======================================*/
@@ -198,7 +198,7 @@ int  		Center_offset_MAX = 5;		/*カーブ時カメラセンターを移動＝寄せる 最小値 0 	
 int  		Center_offset_Angle = -3;	/*この値につき１ＩＮ側に寄せる	正：IN　負：OUT		*/
 
 
-int			KASOKU = 50;
+int			KASOKU = 15;
 
 //通常
 
@@ -212,23 +212,23 @@ int			KASOKU = 50;
 int		    TOPSPEED	=		50;		//直線 
 
 //前半
-int			SPEED_DOWN	=		8;		//角度によりTOPSPEEDを減速 カーブ前半 8 6
+int			SPEED_DOWN	=		6;		//角度によりTOPSPEEDを減速 カーブ前半 8 6
 int			MOTOR_out_R	=		 2;		//外側モーター用パラメーター 1	-2
 int			MOTOR_in_F	=		 5;		//内側モーター用パラメーター 	2 	1
 int			MOTOR_in_R	=		 1;		//内側モーター用パラメーター -2	-3
 	
 //後半
-int			SPEED_DOWN_N=		10;		//角度によりTOPSPEEDを減速  カーブ後半 11 10
-int			MOTOR_out_R_N=		5;		//外側モーター用パラメーター 後半	5	5
-int			MOTOR_in_F_N=		11;		//内側モーター用パラメーター　後半	6	6
-int			MOTOR_in_R_N=		4;		//内側モーター用パラメーター　後半	3	3
+int			SPEED_DOWN_N=		11;		//角度によりTOPSPEEDを減速  カーブ後半 11 10
+int			MOTOR_out_R_N=		4;		//外側モーター用パラメーター 後半	5	5
+int			MOTOR_in_F_N=		8;		//内側モーター用パラメーター　後半	6	6
+int			MOTOR_in_R_N=		3;		//内側モーター用パラメーター　後半	3	3
 
 
 int			S_para		=		1;		//S字きりかえし用パラメータ
 int			OUT_M_DOWN	=		2;		//カーブ外寄りブレーキ用倍率
 
-#define		date_f_brake		500	//再生走行時 通常走行と同様の速度制限をする距離 400
-#define		date_f_brake2		85	//再生走行時　残り距離/date_f_brake2 だけ速度上限を上げる 数値を大きくした方が遅くなる(0にはしないこと）
+#define		date_f_brake		400	//再生走行時 通常走行と同様の速度制限をする距離 400
+#define		date_f_brake2		70	//再生走行時　残り距離/date_f_brake2 だけ速度上限を上げる 数値を大きくした方が遅くなる(0にはしないこと）
 
 #define		Cu_FREE_time  		15		//カーブ終了時の後輪フリーの時間(msec）
 
@@ -253,8 +253,8 @@ int			saka_max	  =		  1;	//認識可能な坂の数
 #define		KASA_Encoder4  	2500	//坂上終わり  
 #define		KASA_Encoder5  	3200	//下り終わり 通常にもどる 
 
-#define		KASA_Encoder4_2  2500	//坂上終わり(最後の坂道)2500 
-#define		KASA_Encoder5_2  3200	//下り終わり 通常にもどる(最後の坂道)3200
+#define		KASA_Encoder4_2  3000	//坂上終わり(最後の坂道)2500 
+#define		KASA_Encoder5_2  3700	//下り終わり 通常にもどる(最後の坂道)3200
 
 //斜面(上り)
 #define		    TOPSPEED2			40		//直線(坂）30 33
@@ -282,9 +282,9 @@ int			saka_max	  =		  1;	//認識可能な坂の数
 #define		    TOPSPEED4			50		//直線(坂上）30 33
 #define			SPEED_DOWN4			6		//角度によりTOPSPEEDを減速(坂上）カーブ前半
 #define			SPEED_DOWN4_N		6		//角度によりTOPSPEEDを減速  カーブ後半
-#define			MOTOR_out4_R		2		//外側モーター用パラメーター(坂上)
+#define			MOTOR_out4_R		1		//外側モーター用パラメーター(坂上)
 #define			MOTOR_in4_F			4		//内側モーター用パラメーター(坂上）
-#define			MOTOR_in4_R			1		//内側モーター用パラメーター(坂上）
+#define			MOTOR_in4_R			-2		//内側モーター用パラメーター(坂上）
 
 #define			S_para4				2		//S字きりかえし用パラメータ(坂上）
 #define			OUT_M_DOWN4			4		//カーブ外寄りブレーキ用倍率(坂上）
@@ -293,9 +293,9 @@ int			saka_max	  =		  1;	//認識可能な坂の数
 #define		    TOPSPEED5			50		//直線(坂）30 33
 #define			SPEED_DOWN5			8		//角度によりTOPSPEEDを減速(坂）カーブ前半
 #define			SPEED_DOWN5_N		9		//角度によりTOPSPEEDを減速  カーブ後半
-#define			MOTOR_out5_R		10	//外側モーター用パラメーター(坂）
-#define			MOTOR_in5_F			10		//内側モーター用パラメーター(坂）
-#define			MOTOR_in5_R			10		//内側モーター用パラメーター(坂）
+#define			MOTOR_out5_R		1	//外側モーター用パラメーター(坂）
+#define			MOTOR_in5_F			4		//内側モーター用パラメーター(坂）
+#define			MOTOR_in5_R			-2		//内側モーター用パラメーター(坂）
 
 #define			S_para5				2		//S字きりかえし用パラメータ(坂）
 #define			OUT_M_DOWN5			2		//カーブ外寄りブレーキ用倍率(坂）
@@ -316,7 +316,7 @@ int			saka_max	  =		  1;	//認識可能な坂の数
 #define			OUT_M_DOWN_CH		2		//カーブ外寄りブレーキ用倍率
 
 //クランク
-int		    C_TOPSPEED	=		30;		//クランク(入)  25 33
+int		    C_TOPSPEED	=		28;		//クランク(入)  25 33
 int		    C_TOPSPEED2	=		50;		//クランク(出)	40
 
 int 		C_TOPSPEED4 = 		47;		//再生走行時のブレーキ前
@@ -1226,8 +1226,8 @@ void main( void )
 					f = ((TOPSPEED -(i / SPEED_DOWN))-iEncoder10)*20;
 				
 					//if(x < BRAKE_MAX) x = BRAKE_MAX;
-					if(x < 0) x = 0;
-					if(r < -50) r = -50;
+					if(x < -10) x = -10;
+					if(r < -80) r = -80;
 					if(f < -25) f = -25;
 				}else{
 					x = ((TOPSPEED -(i / SPEED_DOWN))-iEncoder10)*2;	
@@ -1235,9 +1235,9 @@ void main( void )
 					f = ((TOPSPEED -(i / SPEED_DOWN))-iEncoder10)*2;
 				
 					//if(x < BRAKE_MAX) x = BRAKE_MAX;
-					if(x < 0) x = 0;
-					if(r < -10) r = -10;
-					if(f < -5) f = -5;	
+					if(x < -5) x = -5;
+					if(r < -25) r = -25;
+					if(f < -15) f = -15;	
 				}
 				motor_f( x, f );
             	motor_r( r, r );			
@@ -1295,7 +1295,7 @@ void main( void )
 */					
         	}else{
 				
-				if((cnt8 <= Cu_N_time) || (mode == 1) || (i > 95) ){//カーブ前半 || 坂モード || 曲げすぎ || 
+				if((cnt8 <= Cu_N_time) || (mode == 1) || (i > 85) ){//カーブ前半 || 坂モード || 曲げすぎ || 
 					if(MOTOR_in_F > 0)f= (MOTOR_out_base - (i / MOTOR_in_F));
 					else f= (MOTOR_out_base - (i * -MOTOR_in_F));
 				
@@ -1307,8 +1307,8 @@ void main( void )
 					else or = (MOTOR_out_base - (i * -MOTOR_out_R));
 					
 					if(f < 0) f = 0;
-					if(r < -5) r = -5;
-					if(or < -5) or = -5;
+					if(r < -10) r = -10;
+					if(or < 0) or = 0;
 					if(f > MOTOR_out_base) f = MOTOR_out_base;
 					if(r > MOTOR_out_base) r = MOTOR_out_base;
 					if(or > MOTOR_out_base) or = MOTOR_out_base;
@@ -1391,8 +1391,8 @@ void main( void )
 					f = ((TOPSPEED -(-i / SPEED_DOWN))-iEncoder10)*20;
 							
 					//if(x < BRAKE_MAX) x = BRAKE_MAX;
-					if(x < 0) x = 0;
-					if(r < -50) r = -50;
+					if(x < -10) x = -10;
+					if(r < -80) r = -80;
 					if(f < -25) f = -25;
 				}else{
 					x = ((TOPSPEED -(-i / SPEED_DOWN))-iEncoder10)*2;
@@ -1400,9 +1400,9 @@ void main( void )
 					f = ((TOPSPEED -(-i / SPEED_DOWN))-iEncoder10)*2;
 							
 					//if(x < BRAKE_MAX) x = BRAKE_MAX;
-					if(x < 0) x = 0;
-					if(r < -10) r = -10;
-					if(f < -5) f = -5;
+					if(x < -5) x = -5;
+					if(r < -25) r = -25;
+					if(f < -15) f = -15;
 				}	
 				motor_f( f, x );
             	motor_r( r, r );
@@ -1458,7 +1458,7 @@ void main( void )
 */					
         	}else{
 				
-				if((cnt8 <= Cu_N_time) || (mode == 1) || (i < -95) ){//カーブ前半 || 坂モード || 大曲
+				if((cnt8 <= Cu_N_time) || (mode == 1) || (i < -85) ){//カーブ前半 || 坂モード || 大曲
 					if(MOTOR_in_F >0)f = (MOTOR_out_base - (-i / MOTOR_in_F));
 					else f = (MOTOR_out_base - (-i * -MOTOR_in_F)); 
 				
@@ -1469,8 +1469,8 @@ void main( void )
 					else or = (MOTOR_out_base - (-i * -MOTOR_out_R));
 					
 					if(f < 0) f = 0;
-					if(r < -5) r = -5;
-					if(or < -5) or = -5;
+					if(r < -10) r = -10;
+					if(or < 0) or = 0;
 					if(f > MOTOR_out_base) f = MOTOR_out_base;
 					if(r > MOTOR_out_base) r = MOTOR_out_base;
 					if(or > MOTOR_out_base) or = MOTOR_out_base;
@@ -1932,7 +1932,7 @@ void main( void )
 				}else iSetAngle = 110;
 			
 				motor_f( 0, 0 );  //0,-5        /* この部分は「角度計算(4WD時).xls」 85 -40*/
-        		motor_r( -10, -10 );          /* で計算                        */
+        		motor_r( -15, -15 );          /* で計算                        */
 			
 			}else{//long
 				if((lEncoderTotal-sp) >= 200){
@@ -2127,7 +2127,7 @@ void main( void )
 				}else iSetAngle = -110;
 			
 				motor_f( 0, 0 );          /* この部分は「角度計算(4WD時).xls」*/
-        		motor_r( -10, -10 );          /* で計算                        */
+        		motor_r( -15, -15 );          /* で計算                        */
 				
 			}else{//long
 				
@@ -3614,11 +3614,13 @@ void intTRB( void )
 	
 	////////////////////////////////////////////////////////
 	
+
 	//33*3.14  // 1パルス*1.03 = 1mm  //1回転 100パルス
-	i = trg ;
-    iEncoder1_buf[iTimer10] = (i - uEncoderBuff)/2;
+	i = trg;
+	iEncoder1_buf[iTimer10] = (i - uEncoderBuff)/2;
 	lEncoderTotal += iEncoder1_buf[iTimer10];
-    uEncoderBuff = i;
+	if(lEncoderTotal < 0)lEncoderTotal = 0;
+	uEncoderBuff = i;
 	
 	iEncoder_buf = 0;
 	for(k = 0; k < 10; k++)iEncoder_buf += iEncoder1_buf[k];
