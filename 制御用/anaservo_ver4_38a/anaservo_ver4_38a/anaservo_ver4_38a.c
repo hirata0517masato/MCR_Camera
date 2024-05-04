@@ -134,6 +134,7 @@ signed char 	date_f_buff[32] ={0};
 int			 	date_f_buff_int[16] ={0};
 int				date_f_num = 0;
 int				Cu_Angle	=		20;		//カーブ判定に使用 正数限定
+int				Cu_Angle_saka	=	45;		//カーブ判定に使用 正数限定 坂用
 signed char 	date_f_buff_ch[32] ={0};
 int			 	date_f_buff_ch_int[32] ={0};//偶数＝パターン　奇数＝距離
 int				date_f_num_ch = 0;
@@ -351,7 +352,7 @@ int		    H_TOPSPEED2_S=		50;		//ハーフ(斜め)  ショートカット用
 int			date_f_brake_h	=	700;	//再生走行時のブレーキ使用可能距離(mm)　ハーフ用 
 int			date_f_shortcat_h=	350;		//再生走行時のショートカット距離(mm)　ハーフ用
 
-int			date_f_plus_h	=	700;		//再生走行時の直後のストレート距離補正(mm)　ハーフ用  
+int			date_f_plus_h	=	300;		//再生走行時の直後のストレート距離補正(mm)　ハーフ用  
 
 #ifdef  HWall
 char		h_cut 			 =	  0;	//壁ありの時はショートカットしない
@@ -3255,7 +3256,7 @@ int date_f_make(int pattern, int angle, int encoder, int rmode){
 	
 	switch(pattern){
 		case -1:
-			if(	Encoder >= 500){//この距離以下は無視（滑り？）
+			//if(	Encoder >= 500){//この距離以下は無視（滑り？）
 				if(mode == 0){//S
 					if(Encoder > 1000){//この距離以下は無効
 						date_f_buff_int[buff_num_int] += Encoder;
@@ -3270,13 +3271,13 @@ int date_f_make(int pattern, int angle, int encoder, int rmode){
 					Encoder =0;
 					mode = 5;//F
 				}
-			}
+		//	}
 			break;
 		case 10:
 		case 11:
-		if(	Encoder >= 500){//この距離以下は無視（滑り？）
+		//if(	Encoder >= 500){//この距離以下は無視（滑り？）
 			if(mode == 0){//S
-				if(((rmode == 0 ) && (angle < -Cu_Angle)) || ((rmode != 0 ) && (angle < -(Cu_Angle + 10)))){
+				if(((rmode == 0 ) && (angle < -Cu_Angle)) || ((rmode != 0 ) && (angle < -(Cu_Angle_saka)))){
 					if(Encoder > 1000){//この距離以下は無効
 						date_f_buff_int[buff_num_int] += Encoder;
 						buff_num_int++;
@@ -3291,7 +3292,7 @@ int date_f_make(int pattern, int angle, int encoder, int rmode){
 						
 					mode = 1;//L
 						
-				}else if(((rmode == 0) &&(Cu_Angle < angle)) || ((rmode != 0) &&(Cu_Angle < angle+10))){
+				}else if(((rmode == 0) &&(Cu_Angle < angle)) || ((rmode != 0) &&(Cu_Angle_saka < angle))){
 					if(Encoder > 1000){//この距離以下は無効
 						date_f_buff_int[buff_num_int] += Encoder;
 						buff_num_int++;
@@ -3307,27 +3308,28 @@ int date_f_make(int pattern, int angle, int encoder, int rmode){
 					mode = 2;//R
 				}
 			}else if(mode == 1){//Lカーブ
-				if(((rmode == 0) && (-Cu_Angle < angle)) || ((rmode != 0) && (-(Cu_Angle+10) < angle)) ){
-				
+				//if(((rmode == 0) && (-Cu_Angle < angle)) || ((rmode != 0) && (-(Cu_Angle_saka) < angle)) ){
+				if(-Cu_Angle < angle){
 					Encoder =0;
-						
+											
 					mode = 0;//S
 				}
 			}else if(mode == 2){//Rカーブ
-				if(((rmode ==0) && (angle < Cu_Angle) || ((rmode !=0) && (angle < Cu_Angle+10)))){
+				//if(((rmode ==0) && (angle < Cu_Angle) || ((rmode !=0) && (angle < Cu_Angle_saka)))){
+				if(angle < Cu_Angle){
 				
 					Encoder =0;
 						
 					mode = 0;//S
 				}
 			}else{
-				if(((rmode == 0) &&(-Cu_Angle < angle && angle < Cu_Angle)) || ((rmode != 0) &&(-(Cu_Angle+10) < angle && angle < Cu_Angle+10))){
+				if(((rmode == 0) &&(-Cu_Angle < angle && angle < Cu_Angle)) || ((rmode != 0) &&(-(Cu_Angle_saka) < angle && angle < Cu_Angle_saka))){
 					Encoder =0;
 					mode = 0;//S
 				}
 			}
 
-		}
+		//}
 		break;
 
 		case 21:
@@ -3412,6 +3414,12 @@ int date_f_make(int pattern, int angle, int encoder, int rmode){
 			}
 			mode = 1;//L
 			break;
+		
+		case 55:
+			Encoder =0;
+			mode = 0;//S
+			break;
+			
 		case 63:
 			if(mode != 2){//R
 				//このときのEncoderが曲がるまでの距離
@@ -3426,6 +3434,11 @@ int date_f_make(int pattern, int angle, int encoder, int rmode){
 			}
 			mode = 2;//R
 			break;
+		
+		case 65:
+			Encoder =0;
+			mode = 0;//S
+			break;	
 			
 		default:
 			break;
@@ -3675,7 +3688,7 @@ void intTRB( void )
 		if(date_f_mode != 0 && ( msdFlag == 1 || msdFlag == 2 )){//再生走行モード
 			a = getServoAngle();
 			//直線 
-			if((pattern == 11 || pattern == 10) && (((mode == 0) &&(-Cu_Angle < a && a < Cu_Angle)) || ((mode != 0) &&(-(Cu_Angle+10) < a && a < Cu_Angle+10)) ) ){
+			if((pattern == 11 || pattern == 10) && (((mode == 0) &&(-Cu_Angle < a && a < Cu_Angle)) || ((mode != 0) &&(-(Cu_Angle_saka) < a && a < Cu_Angle_saka)) ) ){
 				SEncoderTotal += iEncoder5;//距離計測
 				
 				if(flag56 == 1){//ハーフ後の距離補正
@@ -3725,12 +3738,14 @@ void intTRB( void )
 				}
 				
 			}else{//カーブ or クランク,ハーフ曲がり中 
-				 SEncoderTotal = 0;
-				 if(flag == 1){
+			
+				SEncoderTotal = 0;
+				
+				if(flag == 1){
 					 flag = 0;
 					 if(date_f_num < 15)date_f_num++;//次の直線待ち状態
 					 if(date_f_buff_int[date_f_num] ==0 || date_f_num == 15)flag20 = 99;//記録済み直線終了
-				 }
+				}
 			}
 		
 			if(flag20 == 99){//記録済み直線終了
