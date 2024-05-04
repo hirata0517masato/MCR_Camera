@@ -246,15 +246,15 @@ int			OUT_M_DOWN	=		2;		//カーブ外寄りブレーキ用倍率
 //坂
 int			S_flag = 2;				//坂道　遇数回を　1 = 無視しない  2 = 無視する
 int			saka_max	  =		  1;	//認識可能な坂の数
-#define 	KASA_Encoder1  	50	//坂開始
-#define 	KASA_Encoder2  	300	//上り途中 終わり
+#define 	KASA_Encoder1  	150	//坂開始	50
+#define 	KASA_Encoder2  	500	//上り途中 終わり 300
 #define 	KASA_Encoder3  	1300	//上り終わり 
 
 #define		KASA_Encoder4  	2500	//坂上終わり  
 #define		KASA_Encoder5  	3200	//下り終わり 通常にもどる 
 
 #define		KASA_Encoder4_2  3000	//坂上終わり(最後の坂道)2500 
-#define		KASA_Encoder5_2  3700	//下り終わり 通常にもどる(最後の坂道)3200
+#define		KASA_Encoder5_2  3200	//下り終わり 通常にもどる(最後の坂道)3200
 
 //斜面(上り)
 #define		    TOPSPEED2			40		//直線(坂）30 33
@@ -268,7 +268,7 @@ int			saka_max	  =		  1;	//認識可能な坂の数
 #define			OUT_M_DOWN2			2		//カーブ外寄りブレーキ用倍率(坂）
 
 //斜面(上り,頂上付近　飛び跳ね防止)
-#define		    TOPSPEED3			27		//直線(坂）30 33
+#define		    TOPSPEED3			30		//直線(坂）30 33
 #define			SPEED_DOWN3			6		//角度によりTOPSPEEDを減速(坂）カーブ前半
 #define			SPEED_DOWN3_N		6		//角度によりTOPSPEEDを減速  カーブ後半
 #define			MOTOR_out3_R		2	//外側モーター用パラメーター(坂）
@@ -1586,9 +1586,14 @@ void main( void )
 				motor_r(100 , 100 );
 	*/
 			}else{
-				motor_f(100 , 100 );
-           		motor_r(100 , 100 );
 				
+				if((mode == 1) && ((lEncoderTotal-sp2) >= KASA_Encoder2) && ((lEncoderTotal-sp2) < KASA_Encoder3)){//坂頂上付近のとき
+					motor_f(100 , 100 );
+           			motor_r(0 , 0 );		//飛び跳ね軽減のため後輪はフリー
+				}else{
+					motor_f(100 , 100 );
+           			motor_r(100 , 100 );
+				}	
 			}
 		}       
         break;
