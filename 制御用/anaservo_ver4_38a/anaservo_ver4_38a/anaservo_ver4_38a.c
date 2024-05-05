@@ -195,9 +195,10 @@ unsigned char   types_dipsw;            /* ディップスイッチ値保存       */
 
 /*	パラメータ	*/
 //オフセット
-int  		Center_offset_MAX = 5;		/*カーブ時カメラセンターを移動＝寄せる 最小値 0 	*/
+int  		Center_offset_MAX = 10;		/*カーブ時カメラセンターを移動＝寄せる 最小値 0 	*/
 int  		Center_offset_Angle = -3;	/*この値につき１ＩＮ側に寄せる	正：IN　負：OUT		*/
 
+int 		Cu_Max_Angle = 90;		//カーブの最大角度　この値以上は曲げない
 
 int			KASOKU = 15;
 
@@ -1147,7 +1148,23 @@ void main( void )
 			if(((lEncoderTotal-sp2) >= KASA_Encoder1) && (lEncoderTotal-sp2) <= KASA_Encoder2)servoPwmOut( iServoPwm /2);
 			else servoPwmOut( iServoPwm );
 		}else{
-			servoPwmOut( iServoPwm );	
+			if(lEncoderTotal > 1000 && (lEncoderTotal-sp) < TOPSPEED_CH_Len ){//クランク、ハーフ直後はカーブの最大角度は設定しない
+				servoPwmOut( iServoPwm );
+				
+			}else{
+				if(Cu_Max_Angle < i && (Center + Center_offset) > 0){ //カーブの最大角度を超えている
+					iSetAngle = Cu_Max_Angle;
+					servoPwmOut( iServoPwm2 );
+				
+				}else if( i < -Cu_Max_Angle && (Center + Center_offset) < 0){//カーブの最大角度を超えている
+				
+					iSetAngle = -Cu_Max_Angle;
+					servoPwmOut( iServoPwm2 );
+					
+				}else{
+					servoPwmOut( iServoPwm );
+				}
+			}
 		}
 		
 		if(mode != 1){//坂中の設定が上書きされないようにする
@@ -1177,10 +1194,10 @@ void main( void )
 			}
 		}
 		
-        if( (mode != 1 && i > 9) || (mode == 1 && i > 12) ){//ハンドル右
+        if(  i > 12 ){//ハンドル右
 		
 			if(mode != 1){
-				Center_offset = (i-9) / Center_offset_Angle ;//カーブで寄せる
+				Center_offset = (i-12) / Center_offset_Angle ;//カーブで寄せる
 				if(Center_offset > Center_offset_MAX )Center_offset = Center_offset_MAX;
 				if(Center_offset < -Center_offset_MAX )Center_offset = -Center_offset_MAX;
 			}else{
@@ -1342,11 +1359,11 @@ void main( void )
 							
 			}
 			 		 	 
-		}else if( (mode != 1 && i < -9) || (mode == 1 && i < -12) ){//ハンドル左
+		}else if( i < -12 ){//ハンドル左
 			
 		
 			if(mode != 1){
-				Center_offset = (i-9) / Center_offset_Angle ;//カーブで寄せる
+				Center_offset = (i+12) / Center_offset_Angle ;//カーブで寄せる
 				if(Center_offset > Center_offset_MAX )Center_offset = Center_offset_MAX;
 				if(Center_offset < -Center_offset_MAX )Center_offset = -Center_offset_MAX;
 			}else{
