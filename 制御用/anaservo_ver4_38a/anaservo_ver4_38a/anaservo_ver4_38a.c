@@ -1976,8 +1976,10 @@ void main( void )
 			if(0 < Center  && (lEncoderTotal-sp) >= 150  || (Wide != 0 && -6 < Center  && (lEncoderTotal-sp) >= 200)){
 			
 				iSetAngle = -25;
-				motor2_f( 0,   40 );  //0 80    
+				motor2_f( -10,   50 );  //0 80    
         		motor2_r( 0,   0 );   //0 0
+				
+				sp += 2; //Žè‘O‚Å‹È‚ª‚è‚·‚¬‚Ä‚¢‚é‚½‚ß‹——£‚ð­‚µ‚Ì‚Î‚·
 		
 			}else if((lEncoderTotal-sp) >= 350){
 				
@@ -2171,9 +2173,11 @@ void main( void )
 			if((Center < 0 && (lEncoderTotal-sp) >= 150) || (Wide != 0 && Center < 6 && (lEncoderTotal-sp) >= 200)){
 				iSetAngle = 25;
 
-				motor2_f( 40,   0 );  //80 0       
+				motor2_f( 50,   -10 );  //80 0       
         		motor2_r( 0,   0 );  //0 0
 		
+				sp += 2; //Žè‘O‚Å‹È‚ª‚è‚·‚¬‚Ä‚¢‚é‚½‚ß‹——£‚ð­‚µ‚Ì‚Î‚·
+				
 			}else if((lEncoderTotal-sp) >= 350){
 				iSetAngle = -100;
 
