@@ -103,6 +103,7 @@ char			Cu_flag = 0;			//0 = 直線, 1 = カーブ
 char			gate = 0;
 char			c_short_mode = 0; //クランク　0:long 1:short
 char			c_cut;	//0= 再生しない 1= 再生する 編集無意味
+char			c_cut_in_flag = 0;		//クランクショートカット時にINに入りすぎた時のフラグ
 
 /* microSD関連変数 */
 signed char     msdBuff[ 512 ];         /* 一時保存バッファ             */
@@ -1749,6 +1750,7 @@ void main( void )
 				
           		pattern = 31;//右クランク
 				date_f_num_ch++;
+				c_cut_in_flag = 0;
 			
 				Center_offset = 0;
 				
@@ -1793,6 +1795,7 @@ void main( void )
 				
           		pattern = 41;//左クランク
 				date_f_num_ch++;
+				c_cut_in_flag = 0;
 			
 				Center_offset = 0;
 				
@@ -1972,6 +1975,9 @@ void main( void )
 		}else{
 			mode = 1;//見る範囲を狭く
 				
+			if(0 == Center && Wide == 0){
+				c_cut_in_flag = 0;	
+			}
 				
 			if(0 < Center  && (lEncoderTotal-sp) >= 150  || (Wide != 0 && -6 < Center  && (lEncoderTotal-sp) >= 200)){
 			
@@ -1980,6 +1986,8 @@ void main( void )
         		motor2_r( 0,   0 );   //0 0
 				
 				sp += 2; //手前で曲がりすぎているため距離を少しのばす
+				
+				c_cut_in_flag = 1;
 		
 			}else if((lEncoderTotal-sp) >= 350){
 				
@@ -2032,7 +2040,7 @@ void main( void )
 		servoPwmOut( iServoPwm2 );          /* 振りが弱いときは大きくする       */
         
 		//180 -15 < 25
-        if((( c_cut == 0 || date_f_mode == 0) && (lEncoderTotal-sp) >= 150) || ((c_cut == 1 && date_f_mode != 0) && (lEncoderTotal-sp) >= 240)){
+        if((( c_cut == 0 || date_f_mode == 0) && (lEncoderTotal-sp) >= 150) || ((c_cut == 1 && date_f_mode != 0) && (lEncoderTotal-sp) >= 240 && c_cut_in_flag ==0)  ){
 			if(Wide != 0){
 			//if (((20 < Center)&&(Center < 40)) || ((-15 < Center)&&(Center < 15))) {    /* 曲げ終わりチェック           */
 			if ( (( c_cut == 0 || date_f_mode == 0) && 15 < Center && Center < 30 && (Wide != 0 && Wide < 30) ) 
@@ -2169,7 +2177,10 @@ void main( void )
 		}else{
 			mode = 1;//見る範囲を狭く
 			
-  	
+  			if(0 == Center && Wide == 0){
+				c_cut_in_flag = 0;	
+			}
+			 
 			if((Center < 0 && (lEncoderTotal-sp) >= 150) || (Wide != 0 && Center < 6 && (lEncoderTotal-sp) >= 200)){
 				iSetAngle = 25;
 
@@ -2177,6 +2188,8 @@ void main( void )
         		motor2_r( 0,   0 );  //0 0
 		
 				sp += 2; //手前で曲がりすぎているため距離を少しのばす
+				
+				c_cut_in_flag = 1;
 				
 			}else if((lEncoderTotal-sp) >= 350){
 				iSetAngle = -100;
@@ -2223,7 +2236,7 @@ void main( void )
 		
 		servoPwmOut( iServoPwm2 );        /* 振りが弱いときは大きくする       */
         
-		if(((c_cut == 0 || date_f_mode == 0) && (lEncoderTotal-sp) >= 150) || ((c_cut == 1 && date_f_mode != 0) && (lEncoderTotal-sp) >= 240)){
+		if(((c_cut == 0 || date_f_mode == 0) && (lEncoderTotal-sp) >= 150) || ((c_cut == 1 && date_f_mode != 0) && (lEncoderTotal-sp) >= 240 && c_cut_in_flag == 0) ){
 			if(Wide != 0){ 
 			//if( ((-40 < Center)&&(Center < -20)) || ((-15 < Center)&&(Center < 15))) {    /* 曲げ終わりチェック           */
 	 		if(( (c_cut == 0 || date_f_mode == 0) && -30 < Center && Center < -15 && (Wide != 0 && Wide < 30)) 
