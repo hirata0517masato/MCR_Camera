@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			125	  	/* ハンドル最大位置 115           */
 
-#define 	MAXTIME 			950 //1100	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
+#define 	MAXTIME 			1100 //1100	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
 
 
 /*======================================*/
@@ -196,16 +196,16 @@ unsigned char   types_dipsw;            /* ディップスイッチ値保存       */
 
 /*	パラメータ	*/
 //オフセット
-int  		Center_offset_MAX = 10;		/*カーブ時カメラセンターを移動＝寄せる 最小値 0 	*/
+int  		Center_offset_MAX = 5;		/*カーブ時カメラセンターを移動＝寄せる 最小値 0 	*/
 int  		Center_offset_Angle = -3;	/*この値につき１ＩＮ側に寄せる	正：IN　負：OUT		*/
 
-int 		Cu_Max_Angle = 90;		//カーブの最大角度　この値以上は曲げない
+int 		Cu_Max_Angle = 100;		//カーブの最大角度　この値以上は曲げない
 
 int			KASOKU = 15;
 
 //通常
 
-#define		MOTOR_OUT_BASE			80		//カーブ前半用　外側モーター用パラメーター 
+#define		MOTOR_OUT_BASE			90		//カーブ前半用　外側モーター用パラメーター 
 #define		MOTOR_OUT_BASE_CH		75		//カーブ前半用　外側モーター用パラメーター クランク、ハーフの直後
 
 #define		MOTOR_OUT_BASE_N		100		//カーブ後半用　外側モーター用パラメーター 
@@ -216,22 +216,22 @@ int		    TOPSPEED	=		50;		//直線
 
 //前半
 int			SPEED_DOWN	=		6;		//角度によりTOPSPEEDを減速 カーブ前半 8 6
-int			MOTOR_out_R	=		 2;		//外側モーター用パラメーター 1	-2
-int			MOTOR_in_F	=		 5;		//内側モーター用パラメーター 	2 	1
+int			MOTOR_out_R	=		 3;		//外側モーター用パラメーター 1	-2
+int			MOTOR_in_F	=		 6;		//内側モーター用パラメーター 	2 	1
 int			MOTOR_in_R	=		 1;		//内側モーター用パラメーター -2	-3
 	
 //後半
-int			SPEED_DOWN_N=		11;		//角度によりTOPSPEEDを減速  カーブ後半 11 10
-int			MOTOR_out_R_N=		4;		//外側モーター用パラメーター 後半	5	5
-int			MOTOR_in_F_N=		8;		//内側モーター用パラメーター　後半	6	6
-int			MOTOR_in_R_N=		3;		//内側モーター用パラメーター　後半	3	3
+int			SPEED_DOWN_N=		12;		//角度によりTOPSPEEDを減速  カーブ後半 11 10
+int			MOTOR_out_R_N=		6;		//外側モーター用パラメーター 後半	5	5
+int			MOTOR_in_F_N=		10;		//内側モーター用パラメーター　後半	6	6
+int			MOTOR_in_R_N=		5;		//内側モーター用パラメーター　後半	3	3
 
 
 int			S_para		=		1;		//S字きりかえし用パラメータ
 int			OUT_M_DOWN	=		2;		//カーブ外寄りブレーキ用倍率
 
-#define		date_f_brake		400	//再生走行時 通常走行と同様の速度制限をする距離 400
-#define		date_f_brake2		70	//再生走行時　残り距離/date_f_brake2 だけ速度上限を上げる 数値を大きくした方が遅くなる(0にはしないこと）
+#define		date_f_brake		300	//再生走行時 通常走行と同様の速度制限をする距離 400
+#define		date_f_brake2		50	//再生走行時　残り距離/date_f_brake2 だけ速度上限を上げる 数値を大きくした方が遅くなる(0にはしないこと）
 
 #define		Cu_FREE_time  		15		//カーブ終了時の後輪フリーの時間(msec）
 
@@ -243,24 +243,25 @@ int			OUT_M_DOWN	=		2;		//カーブ外寄りブレーキ用倍率
 
 
 #define		Cu_N_time			200	//Cu_N_time ms カーブを走行すると後半になる 	
-//#define		Cu_N_time_safe		80	//この時間未満の直線直後ならカーブ後半を維持する //S字で加速したいときに有効かする
+//「使うな」#define		Cu_N_time_safe		80	//この時間未満の直線直後ならカーブ後半を維持する //S字で加速したいときに有効かする  「使うな」
 #define		Cu_BRAKE_N			50	//カーブ前半中のブレーキの前半時間
 
 //坂
 int			S_flag = 2;				//坂道　遇数回を　1 = 無視しない  2 = 無視する
 int			saka_max	  =		  1;	//認識可能な坂の数
-#define 	KASA_Encoder1  	150	//坂開始	50
-#define 	KASA_Encoder2  	500	//上り途中 終わり 300
-#define 	KASA_Encoder3  	1300	//上り終わり 
+#define 	KASA_Encoder1  	100	//坂開始	50
+#define 	KASA_Encoder2  	400	//上り途中 終わり 300
+#define 	KASA_Encoder3  	1500	//上り終わり 
 
 #define		KASA_Encoder4  	2500	//坂上終わり  
 #define		KASA_Encoder5  	3200	//下り終わり 通常にもどる 
 
-#define		KASA_Encoder4_2  3000	//坂上終わり(最後の坂道)2500 
-#define		KASA_Encoder5_2  3200	//下り終わり 通常にもどる(最後の坂道)3200
+#define		KASA_Encoder4_2  3000	//坂上終わり(最後の坂道)2500 3000
+#define		KASA_Encoder5_2  3500	//下り終わり 通常にもどる(最後の坂道)32
+
 
 //斜面(上り)
-#define		    TOPSPEED2			40		//直線(坂）30 33
+#define		    TOPSPEED2			44		//直線(坂）30 33
 #define			SPEED_DOWN2			10		//角度によりTOPSPEEDを減速(坂）カーブ前半
 #define			SPEED_DOWN2_N		10		//角度によりTOPSPEEDを減速  カーブ後半
 #define			MOTOR_out2_R		10 		//外側モーター用パラメーター(坂）
@@ -271,7 +272,7 @@ int			saka_max	  =		  1;	//認識可能な坂の数
 #define			OUT_M_DOWN2			2		//カーブ外寄りブレーキ用倍率(坂）
 
 //斜面(上り,頂上付近　飛び跳ね防止)
-#define		    TOPSPEED3			30		//直線(坂）30 33
+#define		    TOPSPEED3			31		//直線(坂）30 33
 #define			SPEED_DOWN3			6		//角度によりTOPSPEEDを減速(坂）カーブ前半
 #define			SPEED_DOWN3_N		6		//角度によりTOPSPEEDを減速  カーブ後半
 #define			MOTOR_out3_R		2	//外側モーター用パラメーター(坂）
@@ -350,7 +351,7 @@ int		    H_TOPSPEED	=		50;		//ハーフ（侵入）
 int		    H_TOPSPEED2	=		45;		//ハーフ(斜め) ブレーキがかからないように値を高くする
 #endif
   
-int		    H_TOPSPEED2_S=		50;		//ハーフ(斜め)  ショートカット用
+int		    H_TOPSPEED2_S=		60;		//ハーフ(斜め)  ショートカット用
 int			date_f_brake_h	=	700;	//再生走行時のブレーキ使用可能距離(mm)　ハーフ用 
 int			date_f_shortcat_h=	350;		//再生走行時のショートカット距離(mm)　ハーフ用
 
@@ -623,8 +624,7 @@ void main( void )
 					date_f_buff_ch_int[j] = (int)(date_f_buff_ch[i+1])*100 + (int)date_f_buff_ch[i+2];
 					j++;
 				}
-				
-				
+
 			/*	
 					//31：右クランク 41：左クランク 53:左ハーフ 63:右ハーフ
 					//クランク　金具　近い：200　遠い：450
@@ -1314,7 +1314,7 @@ void main( void )
 */					
         	}else{
 				
-				if((cnt8 <= Cu_N_time) || (mode == 1) || (i > 85) ){//カーブ前半 || 坂モード || 曲げすぎ || 
+				if((cnt8 <= Cu_N_time) || (mode == 1) || (i > 95) ){//カーブ前半 || 坂モード || 曲げすぎ || 
 					if(MOTOR_in_F > 0)f= (MOTOR_out_base - (i / MOTOR_in_F));
 					else f= (MOTOR_out_base - (i * -MOTOR_in_F));
 				
@@ -1477,7 +1477,7 @@ void main( void )
 */					
         	}else{
 				
-				if((cnt8 <= Cu_N_time) || (mode == 1) || (i < -85) ){//カーブ前半 || 坂モード || 大曲
+				if((cnt8 <= Cu_N_time) || (mode == 1) || (i < -95) ){//カーブ前半 || 坂モード || 大曲
 					if(MOTOR_in_F >0)f = (MOTOR_out_base - (-i / MOTOR_in_F));
 					else f = (MOTOR_out_base - (-i * -MOTOR_in_F)); 
 				
@@ -1606,6 +1606,7 @@ void main( void )
 	*/
 			}else{
 				
+				//if((mode == 1) &&  (Wide == 0) && ((lEncoderTotal-sp2) >= KASA_Encoder2) && ((lEncoderTotal-sp2) < KASA_Encoder3)){//坂頂上付近のとき
 				if((mode == 1) && ((lEncoderTotal-sp2) >= KASA_Encoder2) && ((lEncoderTotal-sp2) < KASA_Encoder3)){//坂頂上付近のとき
 					motor_f(100 , 100 );
            			motor_r(0 , 0 );		//飛び跳ね軽減のため後輪はフリー
