@@ -1,14 +1,13 @@
 品質記録情報
-2024年5月3日 11:23:13
+2024年8月10日 13:21:44
 
 ------ ビルド開始(RX621_MCR_Camera, DefaultBuild) ------
 C:\Program Files (x86)\Renesas Electronics\CS+\CC\CC-RX\V3.05.00\Bin\ccrx.exe RX621_MCR_Camera.c -isa=rxv1 -fpu -lang=c -include=USBStack\CDC -include=USBStack -include=. -output=obj -obj_path=DefaultBuild -debug -g_line -optimize=0 -speed -nologo
-RX621_MCR_Camera.c(516):W0520177:Variable "a" was declared but never referenced
 C:\Program Files (x86)\Renesas Electronics\CS+\CC\CC-RX\V3.05.00\Bin\rlink.exe -subcommand=DefaultBuild\RX621_MCR_Camera.clnk
 W0561017:Paid license of CC-RX V3 is not found, and the evaluation period has expired. Please consider purchasing the product.
 W0561017:Paid license of CC-RX V3 is not found, and the evaluation period has expired. Please consider purchasing the product.
 Renesas Optimizing Linker Completed
------- ビルド終了(エラー:0個, 警告:3個)(RX621_MCR_Camera, DefaultBuild) ------
+------ ビルド終了(エラー:0個, 警告:2個)(RX621_MCR_Camera, DefaultBuild) ------
 
 --- CommandFile 1 ---
 DefaultBuild\RX621_MCR_Camera.clnk :
@@ -44,8 +43,8 @@ DefaultBuild\RX621_MCR_Camera.clnk :
 
 
 --- SHA1 hash value of output files ---
-C:\WorkSpace\RX621_MCR_Camera\DefaultBuild\RX621_MCR_Camera.abs: 39af3b64d3fbe39072b9ecda2bef4974aa40fed3
-C:\WorkSpace\RX621_MCR_Camera\DefaultBuild\RX621_MCR_Camera.mot: 9516aa6186aa35f7045755886b532f26e1199039
+C:\WorkSpace\RX621_MCR_Camera\DefaultBuild\RX621_MCR_Camera.abs: d269c5209c5b81f8e917561bd3a5f1f6023367d4
+C:\WorkSpace\RX621_MCR_Camera\DefaultBuild\RX621_MCR_Camera.mot: 7760cbe20e5155800e326d74e31a59b88f22c0b7
 
 
 --- システム情報 ---
@@ -71,11 +70,11 @@ C:\WorkSpace\RX621_MCR_Camera\DefaultBuild\RX621_MCR_Camera.mot: 9516aa6186aa35f
  C:\Program Files (x86)\Renesas Electronics\CS+\CC
 *メモリ使用量
  *プライベート・ワーキング・セット
-  283 MB
+  229 MB
  *GDIオブジェクト数
-  2015
+  2005
  *USERオブジェクト数
-  893
+  938
  *開いているファイル
   1 editors, 1 files, 21 KB
 
