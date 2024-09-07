@@ -199,7 +199,7 @@ unsigned char   types_dipsw;            /* ディップスイッチ値保存       */
 int  		Center_offset_MAX = 5;		/*カーブ時カメラセンターを移動＝寄せる 最小値 0 	*/
 int  		Center_offset_Angle = -3;	/*この値につき１ＩＮ側に寄せる	正：IN　負：OUT		*/
 
-int 		Cu_Max_Angle = 100;		//カーブの最大角度　この値以上は曲げない
+int 		Cu_Max_Angle = 200;		//カーブの最大角度　この値以上は曲げない
 
 int			KASOKU = 15;
 
@@ -216,7 +216,7 @@ int		    TOPSPEED	=		50;		//直線
 
 //前半
 int			SPEED_DOWN	=		6;		//角度によりTOPSPEEDを減速 カーブ前半 8 6
-int			MOTOR_out_R	=		 3;		//外側モーター用パラメーター 1	-2
+int			MOTOR_out_R	=		 2;		//外側モーター用パラメーター 1	-2
 int			MOTOR_in_F	=		 6;		//内側モーター用パラメーター 	2 	1
 int			MOTOR_in_R	=		 1;		//内側モーター用パラメーター -2	-3
 	
@@ -256,8 +256,8 @@ int			saka_max	  =		  1;	//認識可能な坂の数
 #define		KASA_Encoder4  	2500	//坂上終わり  
 #define		KASA_Encoder5  	3200	//下り終わり 通常にもどる 
 
-#define		KASA_Encoder4_2  3000	//坂上終わり(最後の坂道)2500 3000
-#define		KASA_Encoder5_2  3500	//下り終わり 通常にもどる(最後の坂道)32
+#define		KASA_Encoder4_2  2500	//坂上終わり(最後の坂道)2500 3000
+#define		KASA_Encoder5_2  3000	//下り終わり 通常にもどる(最後の坂道) 3000 3500
 
 
 //斜面(上り)
@@ -329,7 +329,9 @@ int 		C_TOPSPEED5 = 		36;		//再生走行時のブレーキ前 距離短い時用
 
 int 		C_short_len_boost = 600;  //再生走行　距離短い時用
 
-int			C_short_len =		625;	//この距離未満はショート、以上はロング
+int			C_short_len =		640;	//この距離未満はショート、以上はロング
+#define		C_TOPSPEED_SHORT	2		//(iEncoder10 > C_TOPSPEED + C_TOPSPEED_SHORT )のとき　＝減速できていない場合はショート
+#define		C_TOPSPEED_SHORT_NG	1		//(iEncoder10 < C_TOPSPEED - C_TOPSPEED_SHORT_NG )のとき　＝距離はショートでも速度が遅いときはロング
 
 int			date_f_brake_c	=	580;	//再生走行時のブレーキ使用可能距離(mm) クランク用
 int			date_f_shortcat_c=	280;	//再生走行時のショートカット距離(mm) クランク用 210
@@ -962,7 +964,10 @@ void main( void )
 //}		
 		if(-25 < i && i < 25){
 			if(mode == 0){//坂中でなければ
-				if(lEncoderTotal > 200 && (sp2 == 0 || (lEncoderTotal-sp2) >= 1500) && (sp == 0 || (lEncoderTotal-sp) >= 150) && (sp3 == 0 || (lEncoderTotal-sp3) >= 0)){//ゲートに反応しないように && 坂終了から少しの間は無視 && クランク、ハーフ終了後少し無視 && カーブ直後は無視
+				if(lEncoderTotal > 200 && (sp2 == 0 || (lEncoderTotal-sp2) >= 0) && (sp == 0 || (lEncoderTotal-sp) >= 50) && (sp3 == 0 || (lEncoderTotal-sp3) >= 0)){//ゲートに反応しないように && 坂終了から少しの間は無視 && クランク、ハーフ終了後少し無視 && カーブ直後は無視
+				
+				//if(lEncoderTotal > 200 && (sp2 == 0 || (lEncoderTotal-sp2) >= 1500) && (sp == 0 || (lEncoderTotal-sp) >= 150) && (sp3 == 0 || (lEncoderTotal-sp3) >= 0)){//ゲートに反応しないように && 坂終了から少しの間は無視 && クランク、ハーフ終了後少し無視 && カーブ直後は無視
+				
 				//if(lEncoderTotal > 200 ){//ゲートに反応しないように 
 				
 					if(date_f_mode == 0){
@@ -1743,8 +1748,13 @@ void main( void )
 					date_buff_ch_int[date_num_ch++] = lEncoderTotal - lEncoderTotal_ch;	
 				}
 				
-				if(C_short_len > lEncoderTotal - lEncoderTotal_ch){//距離が短いと減速ができていない可能性がある
-					c_short_mode = 1;
+				if((C_short_len > lEncoderTotal - lEncoderTotal_ch )|| (date_f_mode == 0 && (iEncoder10 > C_TOPSPEED + C_TOPSPEED_SHORT))){//距離が短いと減速ができていない可能性がある || 設定速度まで減速できていないとき
+					
+					if((date_f_mode == 0 )&& (iEncoder10 < C_TOPSPEED - C_TOPSPEED_SHORT_NG) ){//距離はショートでも進入速度が遅いのでロングとする
+						c_short_mode = 0;
+					}else{
+						c_short_mode = 1;	
+					}
 				}else{
 					c_short_mode = 0;
 				}
@@ -1788,8 +1798,12 @@ void main( void )
 					date_buff_ch_int[date_num_ch++] = lEncoderTotal - lEncoderTotal_ch;	
 				}
 				
-				if(C_short_len > lEncoderTotal - lEncoderTotal_ch){//距離が短いと減速ができていない可能性がある
-					c_short_mode = 1;
+				if((C_short_len > lEncoderTotal - lEncoderTotal_ch) || (date_f_mode == 0 && (iEncoder10 > C_TOPSPEED + C_TOPSPEED_SHORT))){//距離が短いと減速ができていない可能性がある || 設定速度まで減速できていないとき){//距離が短いと減速ができていない可能性がある
+					if((date_f_mode == 0) && (iEncoder10 < C_TOPSPEED - C_TOPSPEED_SHORT_NG) ){//距離はショートでも進入速度が遅いのでロングとする
+						c_short_mode = 0;
+					}else{
+						c_short_mode = 1;	
+					}
 				}else{
 					c_short_mode = 0;
 				}
@@ -2044,7 +2058,7 @@ void main( void )
         if((( c_cut == 0 || date_f_mode == 0) && (lEncoderTotal-sp) >= 150) || ((c_cut == 1 && date_f_mode != 0) && (lEncoderTotal-sp) >= 240 && c_cut_in_flag ==0)  ){
 			if(Wide != 0){
 			//if (((20 < Center)&&(Center < 40)) || ((-15 < Center)&&(Center < 15))) {    /* 曲げ終わりチェック           */
-			if ( (( c_cut == 0 || date_f_mode == 0) && 15 < Center && Center < 30 && (Wide != 0 && Wide < 30) ) 
+			if ( (( c_cut == 0 || date_f_mode == 0) && 20 < Center && Center < 35 && (Wide != 0 && Wide < 30) ) 
 				|| ((c_cut == 1 && date_f_mode != 0) && -20 < Center && Center < 0 && (Wide_old == 0 || Wide > Wide_old))
 				  || ((c_cut == 1 && date_f_mode != 0) && -25 < Center && Center < 25 && (Wide_old != 0) && (lEncoderTotal-sp) >= 750)) {    /* 曲げ終わりチェック           */
 				
@@ -2240,7 +2254,7 @@ void main( void )
 		if(((c_cut == 0 || date_f_mode == 0) && (lEncoderTotal-sp) >= 150) || ((c_cut == 1 && date_f_mode != 0) && (lEncoderTotal-sp) >= 240 && c_cut_in_flag == 0) ){
 			if(Wide != 0){ 
 			//if( ((-40 < Center)&&(Center < -20)) || ((-15 < Center)&&(Center < 15))) {    /* 曲げ終わりチェック           */
-	 		if(( (c_cut == 0 || date_f_mode == 0) && -30 < Center && Center < -15 && (Wide != 0 && Wide < 30)) 
+	 		if(( (c_cut == 0 || date_f_mode == 0) && -35 < Center && Center < -20 && (Wide != 0 && Wide < 30)) 
 				|| ( (c_cut == 1 && date_f_mode != 0) && 0 < Center && Center < 20 && (Wide_old == 0 || Wide < Wide_old)) 
 					|| ((c_cut == 1 && date_f_mode != 0) && -25 < Center && Center < 25 && (Wide_old != 0) && (lEncoderTotal-sp) >= 750)){    /* 曲げ終わりチェック           */
 	 	
@@ -2270,8 +2284,8 @@ void main( void )
     case 42:
 		/* 安定するまで (ショーカットは42には来ないよ)*/
 		if(c_short_mode == 1){//short
-			if((lEncoderTotal-sp) >= 110)iSetAngle = -100;
-			else iSetAngle = -105;
+			if((lEncoderTotal-sp) >= 110)iSetAngle = -90;
+			else iSetAngle = -95;
 		}else{//long
 			if((lEncoderTotal-sp) >= 100)iSetAngle = -90;
 			else iSetAngle = -95;
@@ -4323,7 +4337,7 @@ unsigned char check_crossline( void )
 	//cam_in();//値の取得
 //	saka_c_flag = 0;
 	ret = 0;
-	if( (Wide > 70) || ((Wide >= 40) && (-15 < Center ) && (Center < 15))   || ((Wide >= 32) && (Center > -5) && (Center < 5)) ){
+	if( (Wide > 70) || ((Wide >= 40) && (-15 < Center ) && (Center < 15))   || ((Wide >= 32) && (Center > -6) && (Center < 6)) ){
 	
 		ret = 1;			/* クロスライン発見 */
 /*		
@@ -4355,19 +4369,19 @@ unsigned char check_halfline( void )
 			
 		}
 	}else if(Wide > 34){
-		if(Center < -11){//センター左寄り
+		if(Center < -10){//センター左寄り
 			ret = 1;
 			
-		}else if(Center > 11){//センター右寄り
+		}else if(Center > 10){//センター右寄り
 			ret = 2;
 			
 		}
 		
-	}else if(Wide > 28){
-		if(Center < -8){//センター左寄り
+	}else if(Wide > 25){
+		if(Center < -7){//センター左寄り
 			ret = 1;
 			
-		}else if(Center > 8){//センター右寄り
+		}else if(Center > 7){//センター右寄り
 			ret = 2;
 			
 		}

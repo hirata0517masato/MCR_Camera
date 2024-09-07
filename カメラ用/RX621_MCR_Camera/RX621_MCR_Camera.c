@@ -60,9 +60,9 @@ void WhiteLineWide(int,int);
 #define 	LineStopSaka  	77
 
 #define 	LineStartNonR 	35		/* カメラで見る範囲(右無視) */
-#define 	LineStopNonR  	64
+#define 	LineStopNonR  	50
 
-#define 	LineStartNonL 	64		/* カメラで見る範囲(左無視) */
+#define 	LineStartNonL 	70		/* カメラで見る範囲(左無視) */
 #define 	LineStopNonL  	92
 
 
@@ -75,7 +75,7 @@ unsigned long   cnt1000 =  0;
 /* カメラ関連 */
 long	  	EXPOSURE_timer = 15000;	/* 露光時間	20000				*/
 int		ImageData[130];			/* カメラの値				*/
-int		ImageData_buf[130];			/* カメラの値				*/
+//int		ImageData_buf[130];			/* カメラの値				*/
 int 		BinarizationData[130];	/* ２値化					*/
 
 int		Max = 0,Min,Ave;	/*カメラ読み取り最大値、最小値、平均値*/
@@ -85,6 +85,9 @@ unsigned int 	Rsensor;				/* ラインの右端 */
 unsigned int 	Lsensor;				/* ラインの左端 */
 unsigned int 	Wide = 0;				/* ラインの幅 */
 int		Center = 0;				/* ラインの重心 */
+
+int CameraWideOffset = 0;	//見る範囲のオフセット
+int line_start,line_stop;	//見る範囲
 
 unsigned int 	Wide_old;				/* 過去の太いラインの幅 */
 int		Center_old;				/* 過去の太いラインの重心 */
@@ -155,6 +158,36 @@ void main(void)
 		switch(mode){
 			case 0://通常モード
 				expose();				//露光時間
+				/*
+				if(Wide != 0 && Wide < 20){
+					CameraWideOffset = Center -64;
+					
+					line_start = LineStart;
+					line_start += CameraWideOffset;
+					
+					line_stop =  LineStop;
+					line_stop += CameraWideOffset;
+					
+					if(line_start < 0){
+						line_stop -= line_start;
+						line_start = 0;
+					}
+					
+					if(127 < line_stop){
+						line_start -= line_stop-127;
+						line_stop = 127;
+					}
+					
+				}else{
+					line_start = LineStart;
+					line_stop =  LineStop;
+				}
+				ImageCapture(line_start,line_stop);			//イメージキャプチャー
+		
+				binarization(line_start,line_stop); 		//２値化
+		
+				WhiteLineWide(line_start,line_stop);		//白ラインの測定
+				*/
 				
 				ImageCapture(LineStart,LineStop);			//イメージキャプチャー
 		
@@ -167,6 +200,9 @@ void main(void)
 			case 1://坂モード
 				expose();				//露光時間
 				
+				line_start = LineStartSaka;
+				line_stop = LineStopSaka;
+				
 				ImageCapture(LineStartSaka,LineStopSaka);			//イメージキャプチャー
 		
 				binarization(LineStartSaka,LineStopSaka); 		//２値化
@@ -178,6 +214,9 @@ void main(void)
 			case 2://右無視
 				expose();				//露光時間
 				
+				line_start = LineStartNonR;
+				line_stop = LineStopNonR;
+				
 				ImageCapture(LineStartNonR,LineStopNonR);			//イメージキャプチャー
 		
 				binarization(LineStartNonR,LineStopNonR); 		//２値化
@@ -188,6 +227,9 @@ void main(void)
 				
 			case 3://左無視
 				expose();				//露光時間
+				
+				line_start = LineStartNonL;
+				line_stop = LineStopNonL;
 				
 				ImageCapture(LineStartNonL,LineStopNonL);			//イメージキャプチャー
 		
@@ -208,8 +250,9 @@ void main(void)
 			
 			if(cnt1000 > 500){
 				//for(i = LineStart; i <= LineStop; i++)printf("%d",BinarizationData[i]);
-				for(i = LineStart; i <= LineStop; i+=2)printf("%d",BinarizationData[i]);
-				printf("Max = %d Min = %d Center = %d Wide = %d Lsensor = %d Rsensor = %d time = %d mode = %d",Max,Min,Center,Wide,Lsensor,Rsensor,EXPOSURE_timer,mode);
+				//for(i = LineStart; i <= LineStop; i+=2)printf("%d",BinarizationData[i]);
+				for(i = 0; i <=127; i+=2)printf("%d",BinarizationData[i]);
+				printf("Max = %d Min = %d Center = %d Wide = %d Lsensor = %d Rsensor = %d time = %d mode = %d Start = %d Stop = %d",Max,Min,Center,Wide,Lsensor,Rsensor,EXPOSURE_timer,mode,line_start,line_stop);
 				printf("\n");
 				cnt1000=0;
 			}
@@ -334,16 +377,18 @@ void expose( void )
 		EXPOSURE_cnt = 0;
 	}
 	
-	if(EXPOSURE_cnt < 1){
+	if(EXPOSURE_cnt < 6){
 		if(-10 < sa && sa < 10){
 			//誤差なので変更しない
 		}else{ 
-			//EXPOSURE_timer += (long)(sa*4);
+			EXPOSURE_timer += max(min((long)(sa*4),400),-400) ;
+			/*
 			if(Line_Max - Max < 0){
 				EXPOSURE_timer -= 50;
 			}else{
 				EXPOSURE_timer += 50;
 			}
+			*/
 		}
 	}	
 		
@@ -398,9 +443,9 @@ void ImageCapture(int linestart, int linestop){
 	}
 	for(i = LineStart; i < linestart; i++) {		
 		TAOS_CLK_HIGH;	
-		if(ImageData_buf[i] + 200 > ImageData[i]){
+		/*if(ImageData_buf[i] + 200 > ImageData[i]){
 			ImageData_buf[i] = ImageData[i];
-		}
+		}*/
 		ImageData[i] = get_ad();
 		TAOS_CLK_LOW;
 	}
@@ -408,9 +453,9 @@ void ImageCapture(int linestart, int linestop){
 	for(i = linestart; i <= linestop; i++) {				
 		 
 		TAOS_CLK_HIGH;
-		if(ImageData_buf[i] + 200 > ImageData[i]){
+		/*if(ImageData_buf[i] + 200 > ImageData[i]){
 			ImageData_buf[i] = ImageData[i];
-		}
+		}*/
 		ImageData[i] = get_ad();	// inputs data from camera (one pixel each time through loop) 
 		TAOS_CLK_LOW;
 		
@@ -425,9 +470,9 @@ void ImageCapture(int linestart, int linestop){
 	
 	for(i = linestop+1; i <= LineStop; i++) {		
 		TAOS_CLK_HIGH;
-		if(ImageData_buf[i] + 200 > ImageData[i]){
+		/*if(ImageData_buf[i] + 200 > ImageData[i]){
 			ImageData_buf[i] = ImageData[i];
-		}
+		}*/
 		ImageData[i] = get_ad();
 		TAOS_CLK_LOW;
 	}
@@ -457,7 +502,7 @@ void ImageCapture2(int linestart, int linestop){
 	}
 	for(i = LineStart; i < linestart; i++) {		
 		TAOS_CLK_HIGH;	
-		ImageData_buf[i] = ImageData[i];
+	//	ImageData_buf[i] = ImageData[i];
 		ImageData[i] = get_ad();
 		TAOS_CLK_LOW;
 	}
@@ -465,7 +510,7 @@ void ImageCapture2(int linestart, int linestop){
 	for(i = linestart; i <= linestop; i++) {				
 		 
 		TAOS_CLK_HIGH;
-		ImageData_buf[i] = ImageData[i];
+	//	ImageData_buf[i] = ImageData[i];
 		ImageData[i] = get_ad();	// inputs data from camera (one pixel each time through loop) 
 		TAOS_CLK_LOW;
 		
@@ -480,7 +525,7 @@ void ImageCapture2(int linestart, int linestop){
 	
 	for(i = linestop+1; i <= LineStop; i++) {		
 		TAOS_CLK_HIGH;
-		ImageData_buf[i] = ImageData[i];
+	//	ImageData_buf[i] = ImageData[i];
 		ImageData[i] = get_ad();
 		TAOS_CLK_LOW;
 	}
