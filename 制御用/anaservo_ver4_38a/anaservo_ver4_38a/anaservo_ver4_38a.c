@@ -222,9 +222,9 @@ int			MOTOR_in_R	=		 1;		//内側モーター用パラメーター -2	-3
 	
 //後半
 int			SPEED_DOWN_N=		12;		//角度によりTOPSPEEDを減速  カーブ後半 11 10
-int			MOTOR_out_R_N=		6;		//外側モーター用パラメーター 後半	5	5
+int			MOTOR_out_R_N=		8;		//外側モーター用パラメーター 後半	5	5
 int			MOTOR_in_F_N=		10;		//内側モーター用パラメーター　後半	6	6
-int			MOTOR_in_R_N=		5;		//内側モーター用パラメーター　後半	3	3
+int			MOTOR_in_R_N=		7;		//内側モーター用パラメーター　後半	3	3
 
 
 int			S_para		=		1;		//S字きりかえし用パラメータ
@@ -325,7 +325,7 @@ int		    C_TOPSPEED2	=		50;		//クランク(出)	40
 
 int 		C_TOPSPEED4 = 		47;		//再生走行時のブレーキ前
 int		    C_TOPSPEED3	=		43;		//再生走行用クランク(入)  25 33 
-int 		C_TOPSPEED5 = 		36;		//再生走行時のブレーキ前 距離短い時用
+int 		C_TOPSPEED5 = 		39;		//再生走行時のブレーキ前 距離短い時用
 
 int 		C_short_len_boost = 600;  //再生走行　距離短い時用
 
@@ -1260,7 +1260,7 @@ void main( void )
 				
 					//if(x < BRAKE_MAX) x = BRAKE_MAX;
 					if(x < -5) x = -5;
-					if(r < -25) r = -25;
+					if(r < -15) r = -15;
 					if(f < -15) f = -15;	
 				}
 				motor_f( x, f );
@@ -1273,7 +1273,7 @@ void main( void )
 				f = x;
 				//if(x < BRAKE_MAX) x = BRAKE_MAX;
 				if(x < -5) x = -5;
-				if(r < -10) r = -10;
+				if(r < -5) r = -5;
 				if(f < -5) f = -5;
 				
 				motor_f( x, r );
@@ -1425,7 +1425,7 @@ void main( void )
 							
 					//if(x < BRAKE_MAX) x = BRAKE_MAX;
 					if(x < -5) x = -5;
-					if(r < -25) r = -25;
+					if(r < -15) r = -15;
 					if(f < -15) f = -15;
 				}	
 				motor_f( f, x );
@@ -1438,7 +1438,7 @@ void main( void )
 				f = x;	
 				//if(x < BRAKE_MAX) x = BRAKE_MAX;
 				if(x < -5) x = -5;
-				if(r < -10) r = -10;
+				if(r < -5) r = -5;
 				if(f < -5) f = -5;
 				
 				motor_f( r, x );
@@ -2008,7 +2008,7 @@ void main( void )
 				
 				iSetAngle = 100;
 				motor2_f( 40,   5 );  //85 5       
-        		motor2_r( 8,   -10 );  //25 0
+        		motor2_r( 8,   -5 );  //25 0
 				
 				
 			}else if((lEncoderTotal-sp) >= 250){
@@ -2210,7 +2210,7 @@ void main( void )
 				iSetAngle = -100;
 
 				motor2_f( 5,   40 ); //5 85        
-        		motor2_r( -10,   8 );  //0 25
+        		motor2_r( -5,   8 );  //0 25
 				
 			}else if((lEncoderTotal-sp) >= 250){
 				
