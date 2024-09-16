@@ -377,11 +377,11 @@ void expose( void )
 		EXPOSURE_cnt = 0;
 	}
 	
-	if(EXPOSURE_cnt < 6){
+	if(EXPOSURE_cnt < 10){
 		if(-10 < sa && sa < 10){
 			//誤差なので変更しない
 		}else{ 
-			EXPOSURE_timer += max(min((long)(sa*4),400),-400) ;
+			EXPOSURE_timer += max(min((long)(sa*4),500),-500) ;
 			/*
 			if(Line_Max - Max < 0){
 				EXPOSURE_timer -= 50;
@@ -393,7 +393,7 @@ void expose( void )
 	}	
 		
 	
-	if( EXPOSURE_timer > 100000) EXPOSURE_timer = 100000;
+	if( EXPOSURE_timer > 40000) EXPOSURE_timer = 40000;
 	else if( EXPOSURE_timer <= 1000 ) EXPOSURE_timer = 1000;
 
 	for(i=0;i<EXPOSURE_timer;i++);
@@ -598,8 +598,21 @@ void binarization(int linestart, int linestop)
 		}
 	/* 黒が一面のとき */
 	}else{
-		for(i = linestart ; i <= linestop; i++) {
-			BinarizationData[i] = 0;
+		if(Max - Min < 130){
+			for(i = linestart ; i <= linestop; i++) {
+				BinarizationData[i] = 0;
+			}
+		}else{
+			for(i = linestart ; i <= linestop; i++) {
+				//if(  ImageData[i] > Ave || ( (Max < Line_Max + 200) && (ImageData_buf[i] + 200 < ImageData[i]))){ //閾値以上　|| 前回から急激に変化した	
+				if( ImageData[i] > Ave ){ //閾値以上	
+					White++;			
+					BinarizationData[i] = 1;
+				}else{
+					BinarizationData[i] = 0;
+				}	
+			}
+			
 		}
 	}
 
