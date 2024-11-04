@@ -367,6 +367,7 @@ char		h_cut 			 =	  1;	//再生走行時であっても 0= 再生しない 1= 再生する
 ///////////////////////////////////
 
 #define			BRAKE_MAX			-100	//ブレーキの最大パワー 
+#define			BRAKE_MAX_R			-90	//ブレーキの最大パワー リア用
 
 
 int				kp = -18;//- 8  3 -16 -19 -23  -13
@@ -858,7 +859,7 @@ void main( void )
 		if( iEncoder10 >= (TOPSPEED -(i / SPEED_DOWN)) ) {// エンコーダによりスピード制御 
 			x=((TOPSPEED -(i / SPEED_DOWN))-iEncoder10)*2;
 				
-			if(x < BRAKE_MAX) x = BRAKE_MAX;
+	
 			motor_f( x, x );
             motor_r( x, x );
 	
@@ -1246,7 +1247,7 @@ void main( void )
 			
 				if(mode == 1 && (lEncoderTotal-sp2) <= KASA_Encoder3 - 300){//坂登り中のブレーキは全輪均等にする
 					x = (TOPSPEED -iEncoder10)*10;
-					if(x < BRAKE_MAX) x = BRAKE_MAX;
+				
 					r = x;
 					f = x;
 				}else if(cnt8 <= Cu_BRAKE_N && mode != 1){//ブレーキ前半 && 坂モードでなければ
@@ -1255,16 +1256,14 @@ void main( void )
 					r = ((TOPSPEED -(i / SPEED_DOWN))-iEncoder10)*40;
 					f = ((TOPSPEED -(i / SPEED_DOWN))-iEncoder10)*20;
 				
-					//if(x < BRAKE_MAX) x = BRAKE_MAX;
 					if(x < -10) x = -10;
-					if(r < -80) r = -80;
+					if(r < -70) r = -70;
 					if(f < -25) f = -25;
 				}else{
 					x = ((TOPSPEED -(i / SPEED_DOWN))-iEncoder10)*2;	
 					r = ((TOPSPEED -(i / SPEED_DOWN))-iEncoder10)*5;
 					f = ((TOPSPEED -(i / SPEED_DOWN))-iEncoder10)*2;
 				
-					//if(x < BRAKE_MAX) x = BRAKE_MAX;
 					if(x < -5) x = -5;
 					if(r < -15) r = -15;
 					if(f < -15) f = -15;	
@@ -1277,7 +1276,7 @@ void main( void )
 				x=((TOPSPEED -(i / SPEED_DOWN_N))-iEncoder10)*2;	
 				r = x;
 				f = x;
-				//if(x < BRAKE_MAX) x = BRAKE_MAX;
+
 				if(x < -5) x = -5;
 				if(r < -5) r = -5;
 				if(f < -5) f = -5;
@@ -1412,7 +1411,7 @@ void main( void )
 				
 				if(mode == 1 && (lEncoderTotal-sp2) <= KASA_Encoder3 - 300){//坂登り中のブレーキは全輪均等にする
 					x = (TOPSPEED -iEncoder10)*10;
-					if(x < BRAKE_MAX) x = BRAKE_MAX;
+	
 					r = x;
 					f = x;
 				}else if(cnt8 <= Cu_BRAKE_N && mode != 1){//ブレーキ前半 && 坂モードでなければ
@@ -1420,16 +1419,16 @@ void main( void )
 					r = ((TOPSPEED -(-i / SPEED_DOWN))-iEncoder10)*40;
 					f = ((TOPSPEED -(-i / SPEED_DOWN))-iEncoder10)*20;
 							
-					//if(x < BRAKE_MAX) x = BRAKE_MAX;
+		
 					if(x < -10) x = -10;
-					if(r < -80) r = -80;
+					if(r < -70) r = -70;
 					if(f < -25) f = -25;
 				}else{
 					x = ((TOPSPEED -(-i / SPEED_DOWN))-iEncoder10)*2;
 					r = ((TOPSPEED -(-i / SPEED_DOWN))-iEncoder10)*5;
 					f = ((TOPSPEED -(-i / SPEED_DOWN))-iEncoder10)*2;
 							
-					//if(x < BRAKE_MAX) x = BRAKE_MAX;
+
 					if(x < -5) x = -5;
 					if(r < -15) r = -15;
 					if(f < -15) f = -15;
@@ -1442,7 +1441,7 @@ void main( void )
 				x=((TOPSPEED -(-i / SPEED_DOWN_N))-iEncoder10)*2;
 				r = x;
 				f = x;	
-				//if(x < BRAKE_MAX) x = BRAKE_MAX;
+	
 				if(x < -5) x = -5;
 				if(r < -5) r = -5;
 				if(f < -5) f = -5;
@@ -1568,11 +1567,10 @@ void main( void )
 				
 				if(mode == 1){//坂
 					x=((TOPSPEED -(i / SPEED_DOWN))-iEncoder10)*10;
-				
-					if(x < BRAKE_MAX) x = BRAKE_MAX;
+					r=x;
 			
 					motor_f( x, x );
-            		motor_r( x, x );
+            		motor_r( r, r );
 				}else{
 					//通常ブレーキ
 					motor_f( 0, 0 );
@@ -1583,22 +1581,23 @@ void main( void )
 					 
 				//再生走行時　最終ブレーキ
 				x=((TOPSPEED -(i / SPEED_DOWN))-iEncoder10)*20;
-				
-				if(x < BRAKE_MAX) x = BRAKE_MAX;
+				r=((TOPSPEED -(i / SPEED_DOWN))-iEncoder10)*10;
 			
 				motor_f( x, x );
-            	motor_r( x, x );
+            	motor_r( r, r );
 					
 			//再生走行時　残り距離に応じて速度制限を変更する
 			}else if(mode == 0 && date_f_mode != 0 && (iEncoder10 >= max(TOPSPEED,TOPSPEED+(date_f_buff_int[date_f_num] - SEncoderTotal - date_f_brake)/date_f_brake2)) ) {// エンコーダによりスピード制御 
 				
 				//再生走行時　ブースト中
 				x=(max(TOPSPEED,(TOPSPEED+(date_f_buff_int[date_f_num] - SEncoderTotal - date_f_brake)/date_f_brake2)) -iEncoder10)*10;
+				r=(max(TOPSPEED,(TOPSPEED+(date_f_buff_int[date_f_num] - SEncoderTotal - date_f_brake)/date_f_brake2)) -iEncoder10)*5;
 				
-				if(x < -40) x = -40;
+				//if(x < -40) x = -40;
+				//r = x;
 				 
 				motor_f( x, x );
-            	motor_r( x, x );
+            	motor_r( r, r );
 			
 		
 			}else if(mode == 0 && Center < -10) {//車体左寄り
@@ -1658,21 +1657,15 @@ void main( void )
 			motor_mode_r( FREE, FREE );
 			
 			x=(C_TOPSPEED4-iEncoder10)*1;
-			if(x < BRAKE_MAX) x = BRAKE_MAX;
+	
 			motor_f( x, x );
             motor_r( x, x );
 			
 		//クランク　ブレーキ
         }else if( (date_f_mode == 0 && iEncoder10 >= C_TOPSPEED) || (date_f_mode != 0 && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_c )< (lEncoderTotal - lEncoderTotal_ch))&& iEncoder10 >= C_TOPSPEED)   ) {          // エンコーダによりスピード制御 
           
-			x=(C_TOPSPEED-iEncoder10)*10;
-			r = x;
-			
-			if(x < BRAKE_MAX) x = BRAKE_MAX;
-			
-			if(r < -50 && (c_cut == 0 || date_f_mode == 0)) r = -50;
-			else if(r < BRAKE_MAX) r = BRAKE_MAX;
-				
+			x = (C_TOPSPEED-iEncoder10)*2;
+			r = (C_TOPSPEED-iEncoder10)*1;
 			
 			motor_mode_f( BRAKE, BRAKE );
 			motor_mode_r( BRAKE, BRAKE );
@@ -1852,29 +1845,31 @@ void main( void )
 		if((date_f_mode != 0) && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_c )> (lEncoderTotal - lEncoderTotal_ch))&& iEncoder10 >= C_TOPSPEED4){
 			
 			x=(C_TOPSPEED4-iEncoder10)*2;
-			
-			if(x < BRAKE_MAX) x = BRAKE_MAX;
+			r=(C_TOPSPEED4-iEncoder10)*2;
 			
 			motor_mode_f( FREE, FREE );
 			motor_mode_r( FREE, FREE );
 				
 			motor_f( x, x );
-            motor_r( x, x );
+            motor_r( r, r );
 		
 		}else if( (date_f_buff_ch_int[date_f_num_ch] < C_short_len_boost) && 
 				( ((date_f_mode == 0) && iEncoder10 >= C_TOPSPEED) 
 				|| ((c_cut == 1 && date_f_mode != 0) && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_c )< (lEncoderTotal - lEncoderTotal_ch))&& iEncoder10 >= C_TOPSPEED5) 
 				|| ((c_cut == 0 && date_f_mode != 0) && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_c )< (lEncoderTotal - lEncoderTotal_ch))&& iEncoder10 >= C_TOPSPEED))   ) {          // エンコーダによりスピード制御 
    
+   				//距離短い時用
 				if(c_cut == 0 || date_f_mode == 0)x=(C_TOPSPEED -iEncoder10)*10;
 				else x=(C_TOPSPEED5 -iEncoder10)*30;
 			
-				r = x;
-				if(r < -100 && (c_cut == 0 || date_f_mode == 0)) r = -100;
-				else if(r < BRAKE_MAX) r = BRAKE_MAX;
+				if(c_cut == 0 || date_f_mode == 0)r=(C_TOPSPEED -iEncoder10)*10;
+				else r=(C_TOPSPEED5 -iEncoder10)*30;
 				
-				if(x < BRAKE_MAX) x = BRAKE_MAX;
-				
+			/*	if(i < -10 || 10 < i){//abs
+		
+					if(r < -30)r = -30;
+				}
+			 */
 				motor_mode_f( BRAKE, BRAKE );
 				motor_mode_r( BRAKE, BRAKE );
 				
@@ -1886,44 +1881,27 @@ void main( void )
  		}else if( ((date_f_mode == 0) && iEncoder10 >= C_TOPSPEED) 
 				|| ((c_cut == 1 && date_f_mode != 0) && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_c )< (lEncoderTotal - lEncoderTotal_ch))&& iEncoder10 >= C_TOPSPEED3) 
 				|| ((c_cut == 0 && date_f_mode != 0) && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_c )< (lEncoderTotal - lEncoderTotal_ch))&& iEncoder10 >= C_TOPSPEED)   ) {          // エンコーダによりスピード制御 
-            /* 
-			if((i < -20 || 20 < i) && 
-				((date_f_mode != 0 && ( date_f_buff_ch_int[date_f_num_ch-1] == 31 || date_f_buff_ch_int[date_f_num_ch-1] == 41) && (lEncoderTotal-sp) >= 300) 
-				|| (date_f_mode == 0))){//abs
-				//motor_f( 0, 0 );
-            	//motor_r( 0, 0 );
-				
-				if(c_cut == 0 || date_f_mode == 0)x=(C_TOPSPEED -iEncoder10)*20;
-				else x=(C_TOPSPEED3 -iEncoder10)*20;
+             
+		
+			//通常
+			if(c_cut == 0 || date_f_mode == 0)x=(C_TOPSPEED -iEncoder10)*10;
+			else x=(C_TOPSPEED3 -iEncoder10)*30;
 			
-				r = x;
-				if(r < -30) r = -30;
+			if(c_cut == 0 || date_f_mode == 0)r=(C_TOPSPEED -iEncoder10)*10;
+			else r=(C_TOPSPEED3 -iEncoder10)*30;
+		
+		/*		
+			if(i < -10 || 10 < i){//abs
+		
+				if(r < -30)r = -30;
+			}
+		*/	 
+			motor_mode_f( BRAKE, BRAKE );
+			motor_mode_r( BRAKE, BRAKE );
 				
-				if(x < BRAKE_MAX+20) x = BRAKE_MAX+20;
-				if(x < BRAKE_MAX) x = BRAKE_MAX;
-				
-				motor_mode_f( BRAKE, BRAKE );
-				motor_mode_r( BRAKE, BRAKE );
-				
-				motor_f( x, x );
-            	motor_r( r, r );
+			motor_f( x, x );
+            motor_r( r, r );
 			
-			}else{*/
-				if(c_cut == 0 || date_f_mode == 0)x=(C_TOPSPEED -iEncoder10)*10;
-				else x=(C_TOPSPEED3 -iEncoder10)*30;
-			
-				r = x;
-				if(r < -100 && (c_cut == 0 || date_f_mode == 0)) r = -100;
-				else if(r < BRAKE_MAX) r = BRAKE_MAX;
-				
-				if(x < BRAKE_MAX) x = BRAKE_MAX;
-				
-				motor_mode_f( BRAKE, BRAKE );
-				motor_mode_r( BRAKE, BRAKE );
-				
-				motor_f( x, x );
-            	motor_r( r, r );
-		//	}
 	
         }else{
 			
@@ -1988,8 +1966,8 @@ void main( void )
 				
 				}else iSetAngle = 95;
 			
-				motor_f( 75,  -5 );          /* この部分は「角度計算(4WD時).xls」 85 -40*/
-        		motor_r( -20,  -20 );          /* で計算                        */
+				motor_f( 85,  -5 );          /* この部分は「角度計算(4WD時).xls」 85 -40*/
+        		motor_r( -30,  -30 );          /* で計算                        */
 			}
 			
 		
@@ -2074,7 +2052,7 @@ void main( void )
 				sp = lEncoderTotal;
             	pattern = 32;
 				
-				mode = 0;//通常
+			//	mode = 0;//通常
 				motor_mode_f( FREE, FREE );
 				motor_mode_r( FREE, FREE );
 				
@@ -2094,6 +2072,10 @@ void main( void )
     case 32:
         /* 安定するまで (ショーカットは32には来ないよ)*/
 		
+		if((lEncoderTotal-sp) >= 50){ 
+			mode = 0;//見る範囲を元に戻す
+		}
+		
 		if(c_short_mode == 1){//short
         	if((lEncoderTotal-sp) >= 110)iSetAngle = 90;
 			else iSetAngle = 95;
@@ -2106,7 +2088,7 @@ void main( void )
 		if( iEncoder10 >= C_TOPSPEED2 ) {          /* エンコーダによりスピード制御 */
            
 			x=(C_TOPSPEED2-iEncoder10)*10;
-			if(x < BRAKE_MAX) x = BRAKE_MAX;
+
 			motor_f( x, x );
            	motor_r( x, x );
        	}else{
@@ -2122,7 +2104,7 @@ void main( void )
 		}
          
 		
-		if((lEncoderTotal-sp) >= 90){ 
+		if((lEncoderTotal-sp) >= 50){ 
 			if(Wide != 0){                       
         		if(((-15 < Center)&&(Center < 20) && getServoAngle() < 120) 
 					|| ((-5 < Center)&&(Center < 5) && getServoAngle() < 128)) {    /*  直線になるまで          */
@@ -2130,7 +2112,7 @@ void main( void )
             		iSensorPattern = 0;
             	
            			pattern = 33;
-				//	mode = 0;//通常
+					mode = 0;//通常
 					sp = lEncoderTotal;
         		}
 			}
@@ -2147,7 +2129,7 @@ void main( void )
 		if( iEncoder10 >= TOPSPEED ) {          // エンコーダによりスピード制御 
           
 			x=(TOPSPEED-iEncoder10)*10;
-			if(x < BRAKE_MAX) x = BRAKE_MAX;
+
 			motor_f( x, x );
            	motor_r( x, x );
        	}else{
@@ -2192,8 +2174,8 @@ void main( void )
 				
 				}else iSetAngle = -95;
 			
-				motor_f(  -5, 75 );          /* この部分は「角度計算(4WD時).xls」*/
-        		motor_r(  -20, -20 );          /* で計算                        */
+				motor_f(  -5, 85 );          /* この部分は「角度計算(4WD時).xls」*/
+        		motor_r(  -30, -30 );          /* で計算                        */
 			}
 		}else{
 			mode = 1;//見る範囲を狭く
@@ -2270,7 +2252,7 @@ void main( void )
             	sp = lEncoderTotal;
             	pattern = 42;
 				
-				mode = 0;//通常
+				//mode = 0;//通常
 				
 				motor_mode_f( FREE, FREE );
 				motor_mode_r( FREE, FREE );
@@ -2288,6 +2270,11 @@ void main( void )
         break;
 
     case 42:
+	
+		if((lEncoderTotal-sp) >= 50){ 
+			mode = 0;//見る範囲を元に戻す
+		}
+		
 		/* 安定するまで (ショーカットは42には来ないよ)*/
 		if(c_short_mode == 1){//short
 			if((lEncoderTotal-sp) >= 110)iSetAngle = -90;
@@ -2302,7 +2289,7 @@ void main( void )
 		if( iEncoder10 >= C_TOPSPEED2 ) {          /* エンコーダによりスピード制御 */
            
 			x=(C_TOPSPEED2-iEncoder10)*10;
-			if(x < BRAKE_MAX) x = BRAKE_MAX;
+
 			motor_f( x, x );
            	motor_r( x, x );
        	}else{
@@ -2325,7 +2312,7 @@ void main( void )
       			    iSensorPattern = 0;
             	
            			pattern = 43;
-				//	mode = 0;//通常
+					mode = 0;//通常
 					sp = lEncoderTotal;
         		}
 			}
@@ -2342,7 +2329,7 @@ void main( void )
 		if( iEncoder10 >= TOPSPEED ) {          // エンコーダによりスピード制御 
 			
 			x=(TOPSPEED-iEncoder10)*10;
-			if(x < BRAKE_MAX) x = BRAKE_MAX;
+	
 			motor_f( x, x );
            	motor_r( x, x );
        	}else{
@@ -2367,16 +2354,18 @@ void main( void )
 		if((date_f_mode != 0 && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_h )> (lEncoderTotal - lEncoderTotal_ch))&& iEncoder10 >= TOPSPEED)){
 			
 			x=(TOPSPEED-iEncoder10)*1;
-			if(x < BRAKE_MAX) x = BRAKE_MAX;
+			r=(TOPSPEED-iEncoder10)*1;
+		
 			motor_f( x, x );
-            motor_r( x, x );
+            motor_r( r, r );
 			
 		}else if( (date_f_mode == 0 && iEncoder10 >= H_TOPSPEED) || (date_f_mode != 0 && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_h )< (lEncoderTotal - lEncoderTotal_ch))&& iEncoder10 >= H_TOPSPEED)) {          // エンコーダによりスピード制御 
        
 			x=(H_TOPSPEED-iEncoder10)*15;
-			if(x < BRAKE_MAX) x = BRAKE_MAX;
+			r=(H_TOPSPEED-iEncoder10)*5;
+			
 			motor_f( x, x );
-           	motor_r( x, x );
+           	motor_r( r, r );
        	}else{
            	motor_f( 100, 100 );
            	motor_r( 100, 100 );
@@ -2418,16 +2407,19 @@ void main( void )
 		if((date_f_mode != 0 && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_h )> (lEncoderTotal - lEncoderTotal_ch))&& iEncoder10 >= TOPSPEED)){
 			
 			x=(TOPSPEED-iEncoder10)*1;
-			if(x < BRAKE_MAX) x = BRAKE_MAX;
+			r=(TOPSPEED-iEncoder10)*1;
+		
 			motor_f( x, x );
-            motor_r( x, x );
+            motor_r( r, r );
 			
 		}else if( (date_f_mode == 0 && iEncoder10 >= H_TOPSPEED) || (date_f_mode != 0 && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_h )< (lEncoderTotal - lEncoderTotal_ch))&& iEncoder10 >= H_TOPSPEED)) {          // エンコーダによりスピード制御 
     
-			x=(H_TOPSPEED -iEncoder10)*15;
-			if(x < BRAKE_MAX) x = BRAKE_MAX;
+			x=(H_TOPSPEED-iEncoder10)*15;
+			r=(H_TOPSPEED-iEncoder10)*5;
+			
 			motor_f( x, x );
-           	motor_r( x, x );
+           	motor_r( r, r );
+			
        	}else{
            	motor_f( 100, 100 );
            	motor_r( 100, 100 );
@@ -2493,7 +2485,6 @@ void main( void )
 			if( iEncoder10 >= H_TOPSPEED2 ) {          /* エンコーダによりスピード制御 */
            	
 				x=(H_TOPSPEED2-iEncoder10)*15;
-				if(x < BRAKE_MAX) x = BRAKE_MAX;
 				
 				motor_f( x, 10 );
            		motor_r( x, x );
@@ -2513,7 +2504,7 @@ void main( void )
 			if( iEncoder10 >= H_TOPSPEED2_S ) {          /* エンコーダによりスピード制御 */
            	
 				x=(H_TOPSPEED2_S-iEncoder10)*15;
-				if(x < BRAKE_MAX) x = BRAKE_MAX;
+		
 				motor_f( x, x );
            		motor_r( x, x );
        		}else{
@@ -2558,7 +2549,7 @@ void main( void )
 			if( iEncoder10 >= H_TOPSPEED2 ) {          /* エンコーダによりスピード制御 */
            	
 				x=(H_TOPSPEED2-iEncoder10)*15;
-				if(x < BRAKE_MAX) x = BRAKE_MAX;
+	
 				motor_f( x, x );
            		motor_r( x, x );
        		}else{
@@ -2577,7 +2568,7 @@ void main( void )
 			if( iEncoder10 >= H_TOPSPEED2_S ) {          /* エンコーダによりスピード制御 */
            	
 				x=(H_TOPSPEED2_S-iEncoder10)*15;
-				if(x < BRAKE_MAX) x = BRAKE_MAX;
+	
 				motor_f( x, x );
            		motor_r( x, x );
        		}else{
@@ -2629,7 +2620,7 @@ void main( void )
 			if( iEncoder10 >= H_TOPSPEED2 ) {          /* エンコーダによりスピード制御 */
            	
 				x=(H_TOPSPEED2-iEncoder10)*15;
-				if(x < BRAKE_MAX) x = BRAKE_MAX;
+		
 				motor_f( x, x );
            		motor_r( x, x );
        		}else{
@@ -2651,7 +2642,7 @@ void main( void )
 			if( iEncoder10 >= H_TOPSPEED2_S ) {          /* エンコーダによりスピード制御 */
            	
 				x=(H_TOPSPEED2_S-iEncoder10)*15;
-				if(x < BRAKE_MAX) x = BRAKE_MAX;
+
 				motor_f( x, x );
            		motor_r( x, x );
        		}else{
@@ -2689,16 +2680,18 @@ void main( void )
 		if((date_f_mode != 0 && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_h )> (lEncoderTotal - lEncoderTotal_ch))&& iEncoder10 >= TOPSPEED)){
 			
 			x=(TOPSPEED-iEncoder10)*1;
-			if(x < BRAKE_MAX) x = BRAKE_MAX;
+			r=(TOPSPEED-iEncoder10)*1;
+		
 			motor_f( x, x );
-            motor_r( x, x );
+            motor_r( r, r );
 			
 		}else if( (date_f_mode == 0 && iEncoder10 >= H_TOPSPEED) || (date_f_mode != 0 && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_h )< (lEncoderTotal - lEncoderTotal_ch))&& iEncoder10 >= H_TOPSPEED)) {          // エンコーダによりスピード制御 
     
 			x=(H_TOPSPEED-iEncoder10)*15;
-			if(x < BRAKE_MAX) x = BRAKE_MAX;
+			r=(H_TOPSPEED-iEncoder10)*5;
+			
 			motor_f( x, x );
-           	motor_r( x, x );
+           	motor_r( r, r );
        	}else{
            	motor_f( 100, 100 );
            	motor_r( 100, 100 );
@@ -2744,16 +2737,18 @@ void main( void )
 		if((date_f_mode != 0 && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_h )> (lEncoderTotal - lEncoderTotal_ch))&& iEncoder10 >= TOPSPEED)){
 			
 			x=(TOPSPEED-iEncoder10)*1;
-			if(x < BRAKE_MAX) x = BRAKE_MAX;
+			r=(TOPSPEED-iEncoder10)*1;
+	
 			motor_f( x, x );
-            motor_r( x, x );
+            motor_r( r, r );
 			
 		}else if( (date_f_mode == 0 && iEncoder10 >= H_TOPSPEED) || (date_f_mode != 0 && ((date_f_buff_ch_int[date_f_num_ch] - date_f_brake_h )< (lEncoderTotal - lEncoderTotal_ch))&& iEncoder10 >= H_TOPSPEED)) {          // エンコーダによりスピード制御 
     
 			x=(H_TOPSPEED-iEncoder10)*15;
-			if(x < BRAKE_MAX) x = BRAKE_MAX;
+			r=(H_TOPSPEED-iEncoder10)*5;
+		
 			motor_f( x, x );
-           	motor_r( x, x );
+           	motor_r( r, r );
        	}else{
            	motor_f( 100, 100 );
            	motor_r( 100, 100 );
@@ -2818,7 +2813,7 @@ void main( void )
 			if( iEncoder10 >= H_TOPSPEED2 ) {          /* エンコーダによりスピード制御 */
           
 				x=(H_TOPSPEED2-iEncoder10)*15;
-				if(x < BRAKE_MAX) x = BRAKE_MAX;
+			
 				motor_f( 10, x );
     	       	motor_r( x, x );
        		}else{
@@ -2835,7 +2830,7 @@ void main( void )
 			if( iEncoder10 >= H_TOPSPEED2_S ) {          /* エンコーダによりスピード制御 */
            	
 				x=(H_TOPSPEED2_S-iEncoder10)*15;
-				if(x < BRAKE_MAX) x = BRAKE_MAX;
+		
 				motor_f( x, x );
     	       	motor_r( x, x );
        		}else{
@@ -2881,7 +2876,7 @@ void main( void )
 			if( iEncoder10 >= H_TOPSPEED2 ) {          /* エンコーダによりスピード制御 */
           
 				x=(H_TOPSPEED2-iEncoder10)*15;
-				if(x < BRAKE_MAX) x = BRAKE_MAX;
+		
 				motor_f( x, x );
            		motor_r( x, x );
        		}else{
@@ -2899,7 +2894,7 @@ void main( void )
 			if( iEncoder10 >= H_TOPSPEED2_S ) {          /* エンコーダによりスピード制御 */
            	
 				x=(H_TOPSPEED2_S-iEncoder10)*15;
-				if(x < BRAKE_MAX) x = BRAKE_MAX;
+		
 				motor_f( x, x );
            		motor_r( x, x );
        		}else{
@@ -2952,7 +2947,7 @@ void main( void )
 			if( iEncoder10 >= H_TOPSPEED2 ) {          /* エンコーダによりスピード制御 */
            	
 				x=(H_TOPSPEED2-iEncoder10)*15;
-				if(x < BRAKE_MAX) x = BRAKE_MAX;
+
 				motor_f( x, x );
            		motor_r( x, x );
        		}else{
@@ -2974,7 +2969,7 @@ void main( void )
 			if( iEncoder10 >= H_TOPSPEED2_S ) {          /* エンコーダによりスピード制御 */
            
 				x=(H_TOPSPEED2_S-iEncoder10)*15;
-				if(x < BRAKE_MAX) x = BRAKE_MAX;
+				
 				motor_f( x, x );
            		motor_r( x, x );
        		}else{
@@ -3992,17 +3987,17 @@ void led_out( unsigned char led )
 /************************************************************************/
 void motor_r( int accele_l, int accele_r )
 {
+		
 	if(accele_l > 100){
 		accele_l = 100;
-	}else if(accele_l < -100){
-		accele_l = -100;
+	}else if(accele_l < BRAKE_MAX_R){
+		accele_l = BRAKE_MAX_R;
 	}
-	
 	
 	if(accele_r > 100){
 		accele_r = 100;
-	}else if(accele_r < -100){
-		accele_r = -100;
+	}else if(accele_r < BRAKE_MAX_R){
+		accele_r = BRAKE_MAX_R;
 	}
 	
 	
@@ -4061,15 +4056,15 @@ void motor_f( int accele_l, int accele_r )
 {
 	if(accele_l > 100){
 		accele_l = 100;
-	}else if(accele_l < -100){
-		accele_l = -100;
+	}else if(accele_l < BRAKE_MAX){
+		accele_l = BRAKE_MAX;
 	}
 	
 
 	if(accele_r > 100){
 		accele_r = 100;
-	}else if(accele_r < -100){
-		accele_r = -100;
+	}else if(accele_r < BRAKE_MAX){
+		accele_r = BRAKE_MAX;
 	}
 	
 	
@@ -4120,7 +4115,7 @@ void motor_f( int accele_l, int accele_r )
 void motor2_r( int accele_l, int accele_r )
 {
 	if(accele_l > 100)accele_l = 100;
-	else if(accele_l < -100)accele_l = -100;
+	else if(accele_l < BRAKE_MAX_R)accele_l = BRAKE_MAX_R;
 	
 	
 	if(accele_l == 0 || (RleftMotorBuff > 0 && accele_l < 0) || (RleftMotorBuff < 0 && accele_l > 0))accele_l = 0;
@@ -4129,7 +4124,7 @@ void motor2_r( int accele_l, int accele_r )
 	
 	
 	if(accele_r > 100)accele_r = 100;
-	else if(accele_r < -100)accele_r = -100;
+	else if(accele_r < BRAKE_MAX_R)accele_r = BRAKE_MAX_R;
 	
 	
 	if(accele_r == 0 || (RrightMotorBuff > 0 && accele_r < 0) || (RrightMotorBuff < 0 && accele_r > 0))accele_r = 0;
@@ -4180,7 +4175,7 @@ void motor2_r( int accele_l, int accele_r )
 void motor2_f( int accele_l, int accele_r )
 {
 	if(accele_l > 100)accele_l = 100;
-	else if(accele_l < -100)accele_l = -100;
+	else if(accele_l < BRAKE_MAX)accele_l = BRAKE_MAX;
 	
 	
 	if(accele_l == 0  || (FleftMotorBuff > 0 && accele_l < 0) || (FleftMotorBuff < 0 && accele_l > 0))accele_l = 0;
@@ -4189,7 +4184,7 @@ void motor2_f( int accele_l, int accele_r )
 	
 
 	if(accele_r > 100)accele_r = 100;
-	else if(accele_r < -100)accele_r = -100;
+	else if(accele_r < BRAKE_MAX)accele_r = BRAKE_MAX;
 	
 	
 	if(accele_r == 0 || (FrightMotorBuff > 0 && accele_r < 0) || (FrightMotorBuff < 0 && accele_r > 0))accele_r = 0;
@@ -4343,7 +4338,7 @@ unsigned char check_crossline( void )
 	//cam_in();//値の取得
 //	saka_c_flag = 0;
 	ret = 0;
-	if( (Wide > 60) || ((Wide >= 40) && (-10 < Center ) && (Center < 10))   || ((Wide >= 32) && (Center > -5) && (Center < 5)) ){
+	if( (Wide > 60) || ((Wide >= 40) && (-10 < Center ) && (Center < 10))   || ((Wide >= 35) && (Center > -5) && (Center < 5)) ){
 	
 		ret = 1;			/* クロスライン発見 */
 /*		
