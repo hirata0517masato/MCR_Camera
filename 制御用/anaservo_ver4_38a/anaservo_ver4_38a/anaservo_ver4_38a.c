@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			125	  	/* ハンドル最大位置 115           */
 
-#define 	MAXTIME 			1100 //1100	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
+#define 	MAXTIME 			1300 //1100	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
 
 
 /*======================================*/
@@ -221,8 +221,8 @@ int			MOTOR_in_F	=		 4;		//内側モーター用パラメーター 	2 	1
 int			MOTOR_in_R	=		 -2;		//内側モーター用パラメーター -2	-3
 	
 //後半
-int			SPEED_DOWN_N=		8;		//角度によりTOPSPEEDを減速  カーブ後半 11 10
-int			MOTOR_out_R_N=		7;		//外側モーター用パラメーター 後半	5	5
+int			SPEED_DOWN_N=		7;		//角度によりTOPSPEEDを減速  カーブ後半 11 10
+int			MOTOR_out_R_N=		5;		//外側モーター用パラメーター 後半	5	5
 int			MOTOR_in_F_N=		8;		//内側モーター用パラメーター　後半	6	6
 int			MOTOR_in_R_N=		6;		//内側モーター用パラメーター　後半	3	3
 
@@ -320,7 +320,7 @@ int			saka_max	  =		  1;	//認識可能な坂の数
 #define			OUT_M_DOWN_CH		2		//カーブ外寄りブレーキ用倍率
 
 //クランク
-int		    C_TOPSPEED	=		30;		//クランク(入)  25 33
+int		    C_TOPSPEED	=		28;		//クランク(入)  25 33
 int		    C_TOPSPEED2	=		50;		//クランク(出)	40
 
 int 		C_TOPSPEED4 = 		47;		//再生走行時のブレーキ前
@@ -333,10 +333,10 @@ int			C_short_len =		590;	//この距離未満はショート、以上はロング
 #define		C_TOPSPEED_SHORT	2		//(iEncoder10 > C_TOPSPEED + C_TOPSPEED_SHORT )のとき　＝減速できていない場合はショート
 #define		C_TOPSPEED_SHORT_NG	1		//(iEncoder10 < C_TOPSPEED - C_TOPSPEED_SHORT_NG )のとき　＝距離はショートでも速度が遅いときはロング
 
-int			date_f_brake_c	=	580;	//再生走行時のブレーキ使用可能距離(mm) クランク用
+int			date_f_brake_c	=	600;	//再生走行時のブレーキ使用可能距離(mm) クランク用
 int			date_f_shortcat_c=	260;	//再生走行時のショートカット距離(mm) クランク用 210
 
-char		c_cut_master  	 =	  1;	//再生走行時であっても 0= 再生しない 1= 再生する 			
+char		c_cut_master  	 =	  1;	//再生走行時であっても 0= 再生しない 1= 再生する 		
 int			c_cut_encoder	 =	540;  	//この距離未満の場合は再生しない
 
 
