@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			125	  	/* ハンドル最大位置 115           */
 
-#define 	MAXTIME 			1300 //1100	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
+#define 	MAXTIME 			1700 //1100	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
 
 
 /*======================================*/
@@ -334,7 +334,7 @@ int			C_short_len =		590;	//この距離未満はショート、以上はロング
 #define		C_TOPSPEED_SHORT_NG	1		//(iEncoder10 < C_TOPSPEED - C_TOPSPEED_SHORT_NG )のとき　＝距離はショートでも速度が遅いときはロング
 
 int			date_f_brake_c	=	600;	//再生走行時のブレーキ使用可能距離(mm) クランク用
-int			date_f_shortcat_c=	260;	//再生走行時のショートカット距離(mm) クランク用 210
+int			date_f_shortcat_c=	290;	//再生走行時のショートカット距離(mm) クランク用 210
 
 char		c_cut_master  	 =	  1;	//再生走行時であっても 0= 再生しない 1= 再生する 		
 int			c_cut_encoder	 =	540;  	//この距離未満の場合は再生しない
@@ -681,6 +681,7 @@ void main( void )
 					j++;
 				}
 		
+
 				
 				/*
 					//31：右クランク 41：左クランク 53:左ハーフ 63:右ハーフ
@@ -1951,13 +1952,13 @@ void main( void )
 		
 			if(c_short_mode == 1){//short
 				if((lEncoderTotal-sp) >= 130){
-					if(i < 95)iSetAngle = 120;
-					else iSetAngle = 105;
+					if(i < 95)iSetAngle = 125;
+					else iSetAngle = 110;
 				
-				}else iSetAngle = 100;
+				}else iSetAngle = 105;
 			
-				motor_f( 10, 10 );  //0,-5        /* この部分は「角度計算(4WD時).xls」 85 -40*/
-        		motor_r( -5, -5 );          /* で計算                        */
+				motor_f( 15, 0 );  //10,0        /* この部分は「角度計算(4WD時).xls」 85 -40*/
+        		motor_r( -35, -35 ); //-15.-15         /* で計算                        */
 			
 			}else{//long
 				if((lEncoderTotal-sp) >= 200){
@@ -2157,13 +2158,13 @@ void main( void )
 			if(c_short_mode == 1){//short
 				if((lEncoderTotal-sp) >= 130){
 				
-					if(i > -95)iSetAngle = -120;
-					else iSetAngle = -105;
+					if(i > -95)iSetAngle = -125;
+					else iSetAngle = -110;
 				
-				}else iSetAngle = -100;
+				}else iSetAngle = -105;
 			
-				motor_f( 10, 10 );          /* この部分は「角度計算(4WD時).xls」*/
-        		motor_r( -5, -5 );          /* で計算                        */
+				motor_f( 0, 15 );    //0,10      /* この部分は「角度計算(4WD時).xls」*/
+        		motor_r( -35, -35 );   //-15.-15       /* で計算                        */
 				
 			}else{//long
 				
