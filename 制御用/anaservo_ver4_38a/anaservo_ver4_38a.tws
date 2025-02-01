@@ -8,8 +8,10 @@
 [BREAKPOINTS]
 [OPEN_WORKSPACE_FILES]
 "C:\WorkSpace\anaservo_ver4_38a\anaservo_ver4_38a\anaservo_ver4_38a.c" 
+"C:\WorkSpace\anaservo_ver4_38a\anaservo_ver4_38a\microsd_lib.c" 
 [WORKSPACE_FILE_STATES]
 "C:\WorkSpace\anaservo_ver4_38a\anaservo_ver4_38a\anaservo_ver4_38a.c" -8 -31 1278 637 1 0 
+"C:\WorkSpace\anaservo_ver4_38a\anaservo_ver4_38a\microsd_lib.c" 78 78 1080 416 0 1 
 [LOADED_PROJECTS]
 "anaservo_ver4_38a" 
 [END]

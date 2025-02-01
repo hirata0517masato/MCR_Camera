@@ -8,7 +8,6 @@
 -total_size
 -input="C:\WorkSpace\anaservo_ver4_38a\anaservo_ver4_38a\Debug\anaservo_ver4_38a.obj"
 -input="C:\WorkSpace\anaservo_ver4_38a\anaservo_ver4_38a\Debug\data_flash_lib.obj"
--input="C:\WorkSpace\anaservo_ver4_38a\anaservo_ver4_38a\Debug\i2c_eeprom_lib.obj"
 -input="C:\WorkSpace\anaservo_ver4_38a\anaservo_ver4_38a\Debug\microsd_lib.obj"
 -input="C:\WorkSpace\anaservo_ver4_38a\anaservo_ver4_38a\Debug\printf_lib.obj"
 -input="C:\WorkSpace\anaservo_ver4_38a\anaservo_ver4_38a\Debug\startup.obj"

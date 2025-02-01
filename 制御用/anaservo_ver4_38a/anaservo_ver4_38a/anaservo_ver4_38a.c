@@ -257,7 +257,7 @@ int			saka_max	  =		  1;	//認識可能な坂の数
 #define		KASA_Encoder5  	3200	//下り終わり 通常にもどる 
 
 #define		KASA_Encoder4_2  2500	//坂上終わり(最後の坂道)2500 3000
-#define		KASA_Encoder5_2  2700	//下り終わり 通常にもどる(最後の坂道) 3000 3500
+#define		KASA_Encoder5_2  3200	//下り終わり 通常にもどる(最後の坂道) 3000 3500
 
 
 //斜面(上り)
@@ -329,14 +329,14 @@ int 		C_TOPSPEED5 = 		40;		//再生走行時のブレーキ前 距離短い時用
 
 int 		C_short_len_boost = 600;  //再生走行　距離短い時用
 
-int			C_short_len =		590;	//この距離未満はショート、以上はロング
+int			C_short_len =		620;	//この距離未満はショート、以上はロング
 #define		C_TOPSPEED_SHORT	2		//(iEncoder10 > C_TOPSPEED + C_TOPSPEED_SHORT )のとき　＝減速できていない場合はショート
 #define		C_TOPSPEED_SHORT_NG	1		//(iEncoder10 < C_TOPSPEED - C_TOPSPEED_SHORT_NG )のとき　＝距離はショートでも速度が遅いときはロング
 
-int			date_f_brake_c	=	600;	//再生走行時のブレーキ使用可能距離(mm) クランク用
+int			date_f_brake_c	=	700;	//再生走行時のブレーキ使用可能距離(mm) クランク用 600
 int			date_f_shortcat_c=	290;	//再生走行時のショートカット距離(mm) クランク用 210
 
-char		c_cut_master  	 =	  1;	//再生走行時であっても 0= 再生しない 1= 再生する 		
+char		c_cut_master  	 =	  1;	//再生走行時であっても 0= 再生しない 1= 再生する 	
 int			c_cut_encoder	 =	540;  	//この距離未満の場合は再生しない
 
 
@@ -367,7 +367,7 @@ char		h_cut 			 =	  1;	//再生走行時であっても 0= 再生しない 1= 再生する
 ///////////////////////////////////
 
 #define			BRAKE_MAX			-100	//ブレーキの最大パワー 
-#define			BRAKE_MAX_R			-90	//ブレーキの最大パワー リア用
+#define			BRAKE_MAX_R			-70	//ブレーキの最大パワー リア用
 
 
 int				kp = -18;//- 8  3 -16 -19 -23  -13
@@ -557,6 +557,8 @@ void main( void )
 		
 		if((lEncoderTotal > 500) && ((pattern != 22 && out_cnt > 500) || (pattern != 22 && out_cnt > 2000 ) )){
 			pattern = 200;	
+			motor_mode_f( BRAKE, BRAKE );
+    		motor_mode_r( BRAKE, BRAKE );
 		}
 	}
 	
@@ -1952,13 +1954,13 @@ void main( void )
 		
 			if(c_short_mode == 1){//short
 				if((lEncoderTotal-sp) >= 130){
-					if(i < 95)iSetAngle = 125;
-					else iSetAngle = 110;
+					if(i < 95)iSetAngle = 130;
+					else iSetAngle = 115;
 				
-				}else iSetAngle = 105;
+				}else iSetAngle = 110;
 			
 				motor_f( 15, 0 );  //10,0        /* この部分は「角度計算(4WD時).xls」 85 -40*/
-        		motor_r( -35, -35 ); //-15.-15         /* で計算                        */
+        		motor_r( -40, -40 ); //-15.-15         /* で計算                        */
 			
 			}else{//long
 				if((lEncoderTotal-sp) >= 200){
@@ -2158,13 +2160,13 @@ void main( void )
 			if(c_short_mode == 1){//short
 				if((lEncoderTotal-sp) >= 130){
 				
-					if(i > -95)iSetAngle = -125;
-					else iSetAngle = -110;
+					if(i > -95)iSetAngle = -130;
+					else iSetAngle = -115;
 				
-				}else iSetAngle = -105;
+				}else iSetAngle = -110;
 			
-				motor_f( 0, 15 );    //0,10      /* この部分は「角度計算(4WD時).xls」*/
-        		motor_r( -35, -35 );   //-15.-15       /* で計算                        */
+				motor_f( 0, 15);    //0,10      /* この部分は「角度計算(4WD時).xls」*/
+        		motor_r( -40, -40 );   //-15.-15       /* で計算                        */
 				
 			}else{//long
 				
@@ -4422,7 +4424,7 @@ unsigned char check_wideline( void )
 	//cam_in();//値の取得
 	
 	ret = 0;
-	if(Wide >= 25){
+	if(Wide >= 28){
 	
 		ret = 1;			/* wideライン発見 */
 	}

@@ -51,7 +51,7 @@ void WhiteLineWide(int,int);
 
 //AD0 /* CN3-9 P40 */
 
-#define		Line_Max	560		/* ライン白色MAX値の設定 */ 
+#define		Line_Max	560 //760	//560		/* ライン白色MAX値の設定 */ 
 
 #define 	LineStart 	35		/* カメラで見る範囲(通常モード) */
 #define 	LineStop  	92
@@ -381,7 +381,7 @@ void expose( void )
 		if(-10 < sa && sa < 10){
 			//誤差なので変更しない
 		}else{ 
-			EXPOSURE_timer += max(min((long)(sa*1),500),-500) ;
+			EXPOSURE_timer += max(min((long)(sa*4),500),-500) ;
 			/*
 			if(Line_Max - Max < 0){
 				EXPOSURE_timer -= 50;
@@ -575,7 +575,8 @@ void binarization(int linestart, int linestop)
 	/* 黒は０　白は１にする */
 	White = 0;					/* 白の数を０にする */
 	
-	if( Max > Line_Max - 200 ){//320 -150  250
+	//if( Max > Line_Max - 300 ){//320 -150  250 目標値760用
+	if( Max > Line_Max - 200 ){//320 -150  250 目標値560用
 		/* 白が一直線のとき */
 		//if(Min > 290 ){//260  <-急に明るくなるとサチる
 		//if(Max - Min < 150 || (  (Max < Line_Max + 200) && ( Min > 290))  ){//130 <-真っ白のときの明暗さで調整する

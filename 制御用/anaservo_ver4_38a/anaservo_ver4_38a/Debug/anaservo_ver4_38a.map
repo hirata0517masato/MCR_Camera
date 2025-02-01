@@ -1,4 +1,4 @@
-Optimizing Linkage Editor (V.10.01.00.000)        22-Dec-2024 23:43:39
+Optimizing Linkage Editor (V.10.01.00.000)        26-Jan-2025 14:36:57
 
 *** Options ***
 
@@ -13,7 +13,6 @@ Optimizing Linkage Editor (V.10.01.00.000)        22-Dec-2024 23:43:39
 -total_size
 -input="C:\WorkSpace\anaservo_ver4_38a\anaservo_ver4_38a\Debug\anaservo_ver4_38a.obj"
 -input="C:\WorkSpace\anaservo_ver4_38a\anaservo_ver4_38a\Debug\data_flash_lib.obj"
--input="C:\WorkSpace\anaservo_ver4_38a\anaservo_ver4_38a\Debug\i2c_eeprom_lib.obj"
 -input="C:\WorkSpace\anaservo_ver4_38a\anaservo_ver4_38a\Debug\microsd_lib.obj"
 -input="C:\WorkSpace\anaservo_ver4_38a\anaservo_ver4_38a\Debug\printf_lib.obj"
 -input="C:\WorkSpace\anaservo_ver4_38a\anaservo_ver4_38a\Debug\startup.obj"
@@ -38,19 +37,19 @@ data_SO
 bss_SO
                                   00000400  00000400         0   1
 data_NE
-                                  00000400  00000609       20a   2
+                                  00000400  00000605       206   2
 bss_NE
-                                  0000060a  00001329       d20   2
+                                  00000606  00001209       c04   2
 data_NO
-                                  0000132a  0000133b        12   1
+                                  0000120a  00001215         c   1
 bss_NO
-                                  0000133c  000015ab       270   1
+                                  00001216  00001483       26e   1
 stack
-                                  000015ac  000017ab       200   1
+                                  00001484  00001683       200   1
 istack
-                                  000017ac  000018ab       100   1
+                                  00001684  00001783       100   1
 heap_NE
-                                  000018ac  000018ac         0   2
+                                  00001784  00001784         0   2
 interrupt
                                   00004000  00004000         0   2
 data_SEI
@@ -58,17 +57,17 @@ data_SEI
 data_SOI
                                   00004000  00004000         0   1
 data_NEI
-                                  00004000  00004209       20a   2
+                                  00004000  00004205       206   2
 data_NOI
-                                  0000420a  0000421b        12   1
+                                  00004206  00004211         c   1
 program
-                                  0000421c  0000fcf1      bad6   2
+                                  00004212  0000e019      9e08   2
 vector
                                   0000fed8  0000ffd7       100   2
 fvector
                                   0000ffd8  0000ffff        28   1
 rom_FO
-                                  00010000  000102a4       2a5   1
+                                  00010000  0001027f       280   1
 
 *** ID code information ***
 
