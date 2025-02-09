@@ -51,7 +51,7 @@ void WhiteLineWide(int,int);
 
 //AD0 /* CN3-9 P40 */
 
-#define		Line_Max	560 //760	//560		/* ライン白色MAX値の設定 */ 
+#define		Line_Max	760 //560 //760	//560		/* ライン白色MAX値の設定 */ 
 
 #define 	LineStart 	35		/* カメラで見る範囲(通常モード) */
 #define 	LineStop  	92
@@ -78,7 +78,7 @@ int		ImageData[130];			/* カメラの値				*/
 //int		ImageData_buf[130];			/* カメラの値				*/
 int 		BinarizationData[130];	/* ２値化					*/
 
-int		Max = 0,Min,Ave;	/*カメラ読み取り最大値、最小値、平均値*/
+int		Max = 0,Max2 = 0,Min,Ave;	/*カメラ読み取り最大値、最小値、平均値*/
 int 	Ave_old = 0;
 
 unsigned int 	Rsensor;				/* ラインの右端 */
@@ -146,7 +146,8 @@ void main(void)
 		//cam_out();//制御用へ出力
 		Center_lasttime = Center;//過去の値を保存
 		
-	}while(!((-50 < (Line_Max - Max)) && ((Line_Max - Max) < 50)) && (!((Wide != 0) && (Wide < 30))));
+	//}while(!((-50 < (Line_Max - Max)) && ((Line_Max - Max) < 50)) && (!((Wide != 0) && (Wide < 30))));
+	}while(!((-50 < (Line_Max - Max2)) && ((Line_Max - Max2) < 50)) && (!((Wide != 0) && (Wide < 30))));
 	
 	
 	while( 1 ) {
@@ -368,7 +369,8 @@ void CMT_init(void)
 void expose( void )
 {
 	unsigned long i;
-	int sa = Line_Max - Max;
+	//int sa = Line_Max - Max;
+	int sa = Line_Max - Max2;
 	
 	//if( Wide != 0 && White <= 60){//黒でなく白でもない
 	if( Wide == 0 || White >= 35){//黒or白
@@ -411,7 +413,8 @@ void expose2( void )
 	
 	//EXPOSURE_timer += (long)((Line_Max - Max)*10);
 	
-	if(Line_Max - Max < 0){
+	//if(Line_Max - Max < 0){
+	if(Line_Max - Max2 < 0){
 		EXPOSURE_timer -= 100;
 	}else{
 		EXPOSURE_timer += 100;
@@ -430,7 +433,9 @@ void ImageCapture(int linestart, int linestop){
 	
 	unsigned char i;
 
-	Max = 0,Min = 4096;
+	Max = 0;
+	Max2 = 0;
+	Min = 4096;
 
 	TAOS_SI_HIGH;
 	TAOS_CLK_HIGH;
@@ -459,9 +464,19 @@ void ImageCapture(int linestart, int linestop){
 		ImageData[i] = get_ad();	// inputs data from camera (one pixel each time through loop) 
 		TAOS_CLK_LOW;
 		
-		if(Max < ImageData[i]){
+		if(Max2 < ImageData[i]){
+			Max2 = ImageData[i];
+			
+			if(Max < ImageData[i]){
+				Max2 = Max;
+				Max = ImageData[i];
+			}
+			
+		}else if(Max < ImageData[i]){
+			Max2 = Max;
 			Max = ImageData[i];
-		}			
+		}
+		
 		if(Min > ImageData[i]){
 			Min = ImageData[i];
 		}
@@ -489,7 +504,9 @@ void ImageCapture2(int linestart, int linestop){
 	
 	unsigned char i;
 
-	Max = 0,Min = 4096;
+	Max = 0;
+	Max2 = 0;
+	Min = 4096;
 
 	TAOS_SI_HIGH;
 	TAOS_CLK_HIGH;
@@ -514,9 +531,19 @@ void ImageCapture2(int linestart, int linestop){
 		ImageData[i] = get_ad();	// inputs data from camera (one pixel each time through loop) 
 		TAOS_CLK_LOW;
 		
-		if(Max < ImageData[i]){
+		if(Max2 < ImageData[i]){
+			Max2 = ImageData[i];
+			
+			if(Max < ImageData[i]){
+				Max2 = Max;
+				Max = ImageData[i];
+			}
+			
+		}else if(Max < ImageData[i]){
+			Max2 = Max;
 			Max = ImageData[i];
-		}			
+		}
+		
 		if(Min > ImageData[i]){
 			Min = ImageData[i];
 		}
@@ -565,7 +592,8 @@ void binarization(int linestart, int linestop)
 	//if(mode == 1) Ave = Min + 130;
 	//else Ave = ((Max + Min) >> 1) - 50;
 	//else{
-		a  = ((Max + Min) >> 1);
+		//a  = ((Max + Min) >> 1);
+		a  = ((Max2 + Min) >> 1);
 		Ave = ((a+Min) >> 1);
 		Ave = ((a+Ave) >> 1);
 		
@@ -575,12 +603,12 @@ void binarization(int linestart, int linestop)
 	/* 黒は０　白は１にする */
 	White = 0;					/* 白の数を０にする */
 	
-	//if( Max > Line_Max - 300 ){//320 -150  250 目標値760用
-	if( Max > Line_Max - 200 ){//320 -150  250 目標値560用
+	if( Max2 > Line_Max - 300 ){//320 -150  250 目標値760用
+	//if( Max > Line_Max - 200 ){//320 -150  250 目標値560用
 		/* 白が一直線のとき */
 		//if(Min > 290 ){//260  <-急に明るくなるとサチる
 		//if(Max - Min < 150 || (  (Max < Line_Max + 200) && ( Min > 290))  ){//130 <-真っ白のときの明暗さで調整する
-		if(Max - Min < 130){//130 <-真っ白のときの明暗さで調整する
+		if(Max2 - Min < 130){//130 <-真っ白のときの明暗さで調整する
 		
 			White = 127;
 			for(i = linestart ; i <= linestop; i++) {
@@ -599,7 +627,7 @@ void binarization(int linestart, int linestop)
 		}
 	/* 黒が一面のとき */
 	}else{
-		if(Max - Min < 130){
+		if(Max2 - Min < 130){
 			for(i = linestart ; i <= linestop; i++) {
 				BinarizationData[i] = 0;
 			}
@@ -670,14 +698,14 @@ void WhiteLineWide(int linestart, int linestop)
 	if(White > 70){//全白にする
 		Wide = 127;Center = 64;						/* 白一面 */
 		
-	}else if((White > 6) && ((linestop - linestart) > 5)){//白が少なすぎない && ラインを探す範囲が狭すぎない
+	}else if((White > 4) && ((linestop - linestart) > 3)){//白が少なすぎない && ラインを探す範囲が狭すぎない
 	
 		Wide = Rsensor - Lsensor;					/* 幅を求める */	
 		Center = (Lsensor + Rsensor) >> 1;		/* 重心を求める */	
 			
 			
 		//ライン細すぎ || ( 前回、黒又は白一色ではない && ハーフラインなどではない &&  (急にラインが移動した))
-		if((((mode == 1) && (Wide < 4)) || ((mode != 1) && (Wide < 4))) || ((Center_lasttime != 64) && (White < 20) && (((Center - Center_lasttime) > 15) || ((Center - Center_lasttime) < -15)))){
+		if((((mode == 1) && (Wide < 3)) || ((mode != 1) && (Wide < 3))) || ((Center_lasttime != 64) && (White < 20) && (((Center - Center_lasttime) > 15) || ((Center - Center_lasttime) < -15)))){
 					
 			if(Center_lasttime < 60){
 						
