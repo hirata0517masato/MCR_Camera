@@ -1,0 +1,83 @@
+Optimizing Linkage Editor (V.10.01.00.000)        16-Mar-2024 13:40:35
+
+*** Options ***
+
+-subcommand=C:\WorkSpace\anaservo_ver4_38a\motor_test_38a\Debug\motor_test_38a.m16cl
+-noprelink
+-nomessage
+-list="C:\WorkSpace\anaservo_ver4_38a\motor_test_38a\Debug\motor_test_38a.map"
+-nooptimize
+-start=data_SE,bss_SE,data_SO,bss_SO,data_NE,bss_NE,data_NO,bss_NO,stack,istack,heap_NE/0400,interrupt,rom_NE,rom_NO,data_SEI,data_SOI,data_NEI,data_NOI,switch_table,C$VTBL,program/04000,vector/0FED8,rom_FE,rom_FO/010000
+-nologo
+-stack
+-total_size
+-input="C:\WorkSpace\anaservo_ver4_38a\motor_test_38a\Debug\motor_test_38a.obj"
+-input="C:\WorkSpace\anaservo_ver4_38a\motor_test_38a\Debug\printf_lib.obj"
+-input="C:\WorkSpace\anaservo_ver4_38a\motor_test_38a\Debug\startup.obj"
+-library="C:\WorkSpace\anaservo_ver4_38a\motor_test_38a\Debug\motor_test_38a.lib"
+-output="C:\WorkSpace\anaservo_ver4_38a\motor_test_38a\Debug\motor_test_38a.abs"
+-change_message=information=1100,1322,1410
+-end
+
+*** Error information ***
+
+*** Mapping List ***
+
+SECTION                            START      END         SIZE   ALIGN
+
+data_SE
+                                  00000400  00000400         0   2
+bss_SE
+                                  00000400  00000400         0   2
+data_SO
+                                  00000400  00000400         0   1
+bss_SO
+                                  00000400  00000400         0   1
+data_NE
+                                  00000400  00000419        1a   2
+bss_NE
+                                  0000041a  000006e3       2ca   2
+data_NO
+                                  000006e4  000006e4         0   1
+bss_NO
+                                  000006e4  0000094f       26c   1
+stack
+                                  00000950  00000b4f       200   1
+istack
+                                  00000b50  00000c4f       100   1
+heap_NE
+                                  00000c50  00000c50         0   2
+interrupt
+                                  00004000  00004000         0   2
+data_SEI
+                                  00004000  00004000         0   1
+data_SOI
+                                  00004000  00004000         0   1
+data_NEI
+                                  00004000  00004019        1a   2
+data_NOI
+                                  0000401a  0000401a         0   1
+program
+                                  0000401a  00007fb7      3f9e   2
+vector
+                                  0000fed8  0000ffd7       100   2
+fvector
+                                  0000ffd8  0000ffff        28   1
+rom_FO
+                                  00010000  000105ea       5eb   1
+
+*** ID code information ***
+
+CHARACTOR STRING=""
+NUMERICAL VALUE=
+  0000ffdf: ff
+  0000ffe3: ff
+  0000ffeb: ff
+  0000ffef: ff
+  0000fff3: ff
+  0000fff7: ff
+  0000fffb: ff
+
+*** Protect code or OFSREG code information ***
+
+  0000ffff: bf
