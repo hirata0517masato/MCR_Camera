@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			125	  	/* ハンドル最大位置 115           */
 
-#define 	MAXTIME 			1080 //1100	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
+#define 	MAXTIME 			1120 //1100	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
 
 
 /*======================================*/
@@ -1903,14 +1903,14 @@ void main( void )
 		servoPwmOut( i_ServoPwm2 );          /* 振りが弱いときは大きくする       */
         
 		//180 -15 < 25
-        if((( c_c_cut == 0 || i_date_f_mode == 0) && (l_EncoderTotal-l_startPoint ) >= 100) || ((c_c_cut == 1 && i_date_f_mode != 0) && (l_EncoderTotal-l_startPoint ) >= 240 )  ){
+        if((( c_c_cut == 0 || i_date_f_mode == 0) && (l_EncoderTotal-l_startPoint ) >= 150) || ((c_c_cut == 1 && i_date_f_mode != 0) && (l_EncoderTotal-l_startPoint ) >= 240 )  ){
 			if(i_Wide != 0){
 			//if (((20 < i_Center)&&(i_Center < 40)) || ((-15 < i_Center)&&(i_Center < 15))) {    /* 曲げ終わりチェック           */
-			if ( (( c_c_cut == 0 || i_date_f_mode == 0) && 10 < i_Center && i_Center < 35 && (i_Wide != 0 && i_Wide < 12) ) 
+			if ( (( c_c_cut == 0 || i_date_f_mode == 0) && 18 < i_Center && i_Center < 35 && (i_Wide != 0 && i_Wide < 12) ) 
 				|| ((c_c_cut == 1 && i_date_f_mode != 0) && -20 < i_Center && i_Center < 0 && (i_Wide_old == 0 || i_Wide_old == 127 || i_Wide > i_Wide_old))
 			//	|| ((c_c_cut == 1 && i_date_f_mode != 0) && -20 < i_Center && i_Center < 0 && (i_Wide != 0 && i_Wide < 30))
 				  || ((c_c_cut == 1 && i_date_f_mode != 0) && -25 < i_Center && i_Center < 25 && (i_Wide_old != 0) && (l_EncoderTotal-l_startPoint ) >= 750)
-				  || ((c_c_cut == 1 && i_date_f_mode != 0 && (c_c_cut_short == 1)) && -25 < i_Center && i_Center < 25 && (i_Wide_old != 0) && (l_EncoderTotal-l_startPoint ) >= 300)){    /* 曲げ終わりチェック           */
+				  || ((c_c_cut == 1 && i_date_f_mode != 0 && (c_c_cut_short == 1)) && -25 < i_Center && i_Center < 25 && (i_Wide_old != 0) && (l_EncoderTotal-l_startPoint ) >= 300) ){    /* 曲げ終わりチェック           */
 				
             	ul_cnt_1ms = 0;
             	i_SensorPattern = 0;
@@ -2158,10 +2158,10 @@ void main( void )
 		
 		servoPwmOut( i_ServoPwm2 );        /* 振りが弱いときは大きくする       */
         
-		if(((c_c_cut == 0 || i_date_f_mode == 0) && (l_EncoderTotal-l_startPoint ) >= 100) || ((c_c_cut == 1 && i_date_f_mode != 0) && (l_EncoderTotal-l_startPoint ) >= 240 ) ){
+		if(((c_c_cut == 0 || i_date_f_mode == 0) && (l_EncoderTotal-l_startPoint ) >= 150) || ((c_c_cut == 1 && i_date_f_mode != 0) && (l_EncoderTotal-l_startPoint ) >= 240 ) ){
 			if(i_Wide != 0){ 
 			//if( ((-40 < i_Center)&&(i_Center < -20)) || ((-15 < i_Center)&&(i_Center < 15))) {    /* 曲げ終わりチェック           */
-	 		if(( (c_c_cut == 0 || i_date_f_mode == 0) && -35 < i_Center && i_Center < -10 && (i_Wide != 0 && i_Wide < 10)) 
+	 		if(( (c_c_cut == 0 || i_date_f_mode == 0) && -35 < i_Center && i_Center < -18 && (i_Wide != 0 && i_Wide < 10)) 
 				|| ( (c_c_cut == 1 && i_date_f_mode != 0) && 0 < i_Center && i_Center < 20 && (i_Wide_old == 0 || i_Wide_old == 127 ||  i_Wide < i_Wide_old)) 
 				//|| ( (c_c_cut == 1 && i_date_f_mode != 0) && 0 < i_Center && i_Center < 20 && (i_Wide != 0 && i_Wide < 30)) 
 					|| ((c_c_cut == 1 && i_date_f_mode != 0) && -25 < i_Center && i_Center < 25 && (i_Wide_old != 0) && (l_EncoderTotal-l_startPoint ) >= 750)
@@ -2525,7 +2525,7 @@ void main( void )
 #ifdef HWall  //壁あり    	
 			i_SetAngle = 20;
 #else //壁無し
-			i_SetAngle = 15;
+			i_SetAngle = 10;
 #endif
 			servoPwmOut( i_ServoPwm2 );          
 		
@@ -2785,7 +2785,7 @@ void main( void )
 #ifdef HWall  //壁あり    	
 				i_SetAngle = 30;//-3
 #else //壁無し
-				i_SetAngle = -10;//-3 20
+				i_SetAngle = 0;//-3 20
 #endif
 			}
 		}else{
@@ -2851,7 +2851,7 @@ void main( void )
 #ifdef HWall  //壁あり    	
 			i_SetAngle = -20;
 #else //壁無し
-			i_SetAngle = -15;
+			i_SetAngle = -10;
 			
 #endif
 
