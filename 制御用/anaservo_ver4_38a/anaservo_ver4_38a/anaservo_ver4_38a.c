@@ -1025,8 +1025,9 @@ void main( void )
 		
 		}else if(c_mode == 1){//ç‚
 
-			if(((i_saka_max > 0) && ((l_EncoderTotal-l_startPoint_saka) >= KASA_Encoder5)) || 
-				((i_saka_max <= 0) && ((l_EncoderTotal-l_startPoint_saka) >= KASA_Encoder5_2))  ){//í èÌÇ…ñﬂÇ∑
+			if( (-10 < i && i < 10) &&
+				(((i_saka_max > 0) && ((l_EncoderTotal-l_startPoint_saka) >= KASA_Encoder5)) || 
+				((i_saka_max <= 0) && ((l_EncoderTotal-l_startPoint_saka) >= KASA_Encoder5_2)) ) ){//í èÌÇ…ñﬂÇ∑
 			
 				c_mode = 0;
 				
