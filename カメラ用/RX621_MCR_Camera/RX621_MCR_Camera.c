@@ -102,6 +102,12 @@ int		mode;				/* 0 = 通常 1 = 坂 2 = 右無視 3 = 左無視	*/
 
 int		EXPOSURE_cnt = 0;		/* */		
 
+#ifdef PRINT
+int		fps = 0; //10msのあいだのフレーム数
+int		fps_tmp = 0;
+int		fps_print_time = 0;
+#endif
+
 /***********************************************************************/
 /* メインプログラム                                                    */
 /***********************************************************************/
@@ -112,7 +118,9 @@ void main(void)
     	/* マイコン機能の初期化 */	
 	CLK_init();  // クロックの初期化
  	IO_init();   // IOの初期化
- //	CMT_init();  // CMTの初期化
+#ifdef PRINT
+ 	CMT_init();  // CMTの初期化
+#endif
  	AD_init();   // A/Dの初期化
 		
 #ifdef PRINT
@@ -151,7 +159,10 @@ void main(void)
 	
 	
 	while( 1 ) {
-	
+		#ifdef PRINT
+		fps++; //10msのあいだのフレーム数
+		#endif
+
 		#ifndef PRINT
 		mode = (MODE_HIGH_BIT & 0x01) + ((MODE_LOW_BIT & 0x01) << 1);//モード判定に使用
 		#endif
@@ -249,13 +260,17 @@ void main(void)
 		#ifdef PRINT
 			cnt1000++;
 			
-			if(cnt1000 > 500){
-				//for(i = LineStart; i <= LineStop; i++)printf("%d",BinarizationData[i]);
+			if(cnt1000 > 50){
+				fps_print_time = 1;
+				
+				for(i = LineStart; i <= LineStop; i++)printf("%d",BinarizationData[i]);
 				//for(i = LineStart; i <= LineStop; i+=2)printf("%d",BinarizationData[i]);
-				for(i = 0; i <=127; i+=2)printf("%d",BinarizationData[i]);
-				printf("Max = %d Min = %d Center = %d Wide = %d Lsensor = %d Rsensor = %d time = %d mode = %d Start = %d Stop = %d",Max,Min,Center,Wide,Lsensor,Rsensor,EXPOSURE_timer,mode,line_start,line_stop);
+				//for(i = 0; i <=127; i+=2)printf("%d",BinarizationData[i]);
+				printf("Max = %d Min = %d Center = %d Wide = %d Lsensor = %d Rsensor = %d time = %d mode = %d Start = %d Stop = %d fps = %d",Max,Min,Center,Wide,Lsensor,Rsensor,EXPOSURE_timer,mode,line_start,line_stop,fps_tmp);
 				printf("\n");
 				cnt1000=0;
+				
+				fps_print_time = 0;
 			}
 		#endif
     }
@@ -340,22 +355,23 @@ void AD_init(void)
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */ 
 void CMT_init(void)
 {
+    
     MSTP(CMT0) = 0;                // SYSTEM.MSTPCRA.BIT.MSTPA15 = 0; // CMT0 タイマースタンバイ解除 （0で解除）
     CMT0.CMCR.WORD = 0x0040;       // 4:割り込み許可　0:PCLK/8 1:PCLK/32 2:PCLK/128 3:PCLK/512
     CMT0.CMCOR = 3000-1;           // 1ms Count： PCLK = 24MHz/8=3MHz 3M/1mS=3000 (得たいカウント数-1)
     IPR(CMT0,CMI0) = 3;
     IEN(CMT0,CMI0) = 1;
     	
-    MSTP(CMT1) = 0;                // SYSTEM.MSTPCRA.BIT.MSTPA15 = 0; // CMT1 タイマースタンバイ解除 （0で解除）
+/*    MSTP(CMT1) = 0;                // SYSTEM.MSTPCRA.BIT.MSTPA15 = 0; // CMT1 タイマースタンバイ解除 （0で解除）
     CMT1.CMCR.WORD = 0x0040;       // 4:割り込み許可　0:PCLK/8 1:PCLK/32 2:PCLK/128 3:PCLK/512
     CMT1.CMCOR = 3000-1;           // 1ms Count： PCLK = 24MHz/8=3MHz 3M/1mS=3000 (得たいカウント数-1)
     IPR(CMT1,CMI1) = 3;
     IEN(CMT1,CMI1) = 1;
-	
+*/	
     set_psw(0x00010000);
 	
     CMT.CMSTR0.BIT.STR0 = 1;   	   // CMT0タイマースタート
-    CMT.CMSTR0.BIT.STR1 = 1;       // CMT1タイマースタート
+//    CMT.CMSTR0.BIT.STR1 = 1;       // CMT1タイマースタート
 
 }
 	
@@ -388,6 +404,7 @@ void expose( void )
 			if(Line_Max - Max < 0){
 				EXPOSURE_timer -= 50;
 			}else{
+				
 				EXPOSURE_timer += 50;
 			}
 			*/
@@ -396,6 +413,7 @@ void expose( void )
 		
 	
 	if( EXPOSURE_timer > 40000) EXPOSURE_timer = 40000;
+	//if( EXPOSURE_timer > 6000) EXPOSURE_timer = 6500; //1000fps
 	else if( EXPOSURE_timer <= 1000 ) EXPOSURE_timer = 1000;
 
 	for(i=0;i<EXPOSURE_timer;i++);
@@ -774,4 +792,29 @@ void cam_out(){
 	//WIDE_OUT  = Max/10;
 	//CENTER_OUT = Min/10;
 }
+
+/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+/* 関 数 概 要：CMT0割り込みモジュール                                                              */
+/* 関 数 詳 細：                                                                                    */
+/* 引       数：なし										    */
+/* 戻  り   値：なし										    */
+/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+#ifdef PRINT
+#pragma interrupt (Excep_CMT0_CMI0(vect=28))
+void Excep_CMT0_CMI0(void)
+{
+	static int tm_cnt = 0;
+	
+	if(fps_print_time == 0){
+		tm_cnt++;
+		
+		if(tm_cnt >= 1000){
+			tm_cnt = 0;
+			
+			fps_tmp = fps;
+			fps = 0;
+		}
+	}
+}
+#endif
 
