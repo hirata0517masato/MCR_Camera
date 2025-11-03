@@ -1,9 +1,0 @@
--lang=c
--I"..\..\..\common_r8c38a"
--DNO_FAT32
--c
--finfo
--dir "C:\WorkSpace\anaservo_ver4_38a\anaservo_ver4_38a\Debug"
--silent
--R8CE
-"C:\WorkSpace\anaservo_ver4_38a\anaservo_ver4_38a\data_flash_lib.c"
