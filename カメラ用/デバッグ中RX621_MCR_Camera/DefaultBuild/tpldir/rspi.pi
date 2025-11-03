@@ -1,0 +1,16 @@
+-We=--template_info_file="C:\WorkSpace\RX621_SAMPLE\DefaultBuild\tpldir\rspi.ti"
+-We=--ii_file="C:\WorkSpace\RX621_SAMPLE\DefaultBuild\tpldir\rspi.ii"
+-We=--tentative_info_file="C:\WorkSpace\RX621_SAMPLE\DefaultBuild\tpldir\rspi.td"
+
+-output=obj="C:\WorkSpace\RX621_SAMPLE\DefaultBuild\rspi.obj"
+-isa=rxv1
+-fpu
+-lang=cpp
+-include=USBStack\CDC
+-include=USBStack
+-include=.
+-debug
+-g_line
+-speed
+-nologo
+"rspi.cpp"
