@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			125	  	/* ハンドル最大位置 115           */
 
-#define 	MAXTIME 			1100 //1100	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
+#define 	MAXTIME 			1120 //1100	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
 
 
 /*======================================*/
@@ -557,7 +557,7 @@ void main( void )
 			i_out_cnt = 0;
 		}
 		
-		if((l_EncoderTotal > 500) && ((c_mode == 1 && i_out_cnt > 2000) || (c_mode != 1 && i_pattern != 22 && i_out_cnt > 1000) || (i_pattern == 22 && i_out_cnt > 2000 ) )){
+		if((l_EncoderTotal > 500) && ((i_pattern != 22 && i_out_cnt > 500) || (i_pattern != 22 && i_out_cnt > 2000 ) )){
 			i_pattern = 200;
 			motor_mode_f( BRAKE, BRAKE );
     		motor_mode_r( BRAKE, BRAKE );
