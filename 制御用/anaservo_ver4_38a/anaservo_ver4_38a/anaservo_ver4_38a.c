@@ -4640,7 +4640,7 @@ void get_angle_x(){
 int angle_check(){
 
 	if(200 < i_angle_y && i_angle_y < 400){
-		if(i_angle_x <= 170)return 2;//ã 170
+		if(i_angle_x < 100)return 2;//ã 170
 		if(i_angle_x > 440)return 0;//‰º
 	}
 	return 1;//•Ï‰»–³‚µ
