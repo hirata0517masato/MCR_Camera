@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			125	  	/* ƒnƒ“ƒhƒ‹Å‘åˆÊ’u 115           */
 
-#define 	MAXTIME 			1050 //1100	  	/* Å‘å‘–sŠÔ (0.01•b)  1200 = 12s     1250     */
+#define 	MAXTIME 			1300 //1100	  	/* Å‘å‘–sŠÔ (0.01•b)  1200 = 12s     1250     */
 
 
 /*======================================*/
@@ -226,9 +226,9 @@ int			i_MOTOR_in_R	=		-2;//-2		//“à‘¤ƒ‚[ƒ^[—pƒpƒ‰ƒ[ƒ^[ -2	-3
 	
 //Œã”¼
 int			i_SPEED_DOWN_N=		6;//7		//Šp“x‚É‚æ‚èi_TOPSPEED‚ğŒ¸‘¬  ƒJ[ƒuŒã”¼ 11 10
-int			i_MOTOR_out_R_N=	5;//5		//ŠO‘¤ƒ‚[ƒ^[—pƒpƒ‰ƒ[ƒ^[ Œã”¼	5	5
-int			i_MOTOR_in_F_N=		8;//8		//“à‘¤ƒ‚[ƒ^[—pƒpƒ‰ƒ[ƒ^[@Œã”¼	6	6
-int			i_MOTOR_in_R_N=		6;//6		//“à‘¤ƒ‚[ƒ^[—pƒpƒ‰ƒ[ƒ^[@Œã”¼	3	3
+int			i_MOTOR_out_R_N=	4;//5		//ŠO‘¤ƒ‚[ƒ^[—pƒpƒ‰ƒ[ƒ^[ Œã”¼	5	5
+int			i_MOTOR_in_F_N=		7;//8		//“à‘¤ƒ‚[ƒ^[—pƒpƒ‰ƒ[ƒ^[@Œã”¼	6	6
+int			i_MOTOR_in_R_N=		5;//6		//“à‘¤ƒ‚[ƒ^[—pƒpƒ‰ƒ[ƒ^[@Œã”¼	3	3
 
 
 #define		date_f_brake		400	//Ä¶‘–s ’Êí‘–s‚Æ“¯—l‚Ì‘¬“x§ŒÀ‚ğ‚·‚é‹——£ 400
@@ -331,7 +331,7 @@ char c_ch_boost_on = 0; //‚±‚Ìƒtƒ‰ƒO‚ª‚P‚Ì‚Æ‚«‚Ì‚İ@_Boost ‚ğg—p‚·‚é@ƒNƒ‰ƒ“ƒN‚
 #define			MOTOR_in_CH_R_Boost_min		 -20//-20		//“à‘¤ƒ‚[ƒ^[—pƒpƒ‰ƒ[ƒ^[@Å¬PWM
 
 //ƒNƒ‰ƒ“ƒN
-int		    i_C_TOPSPEED	=		32;		//ƒNƒ‰ƒ“ƒN(“ü)  25 33
+int		    i_C_TOPSPEED	=		27;		//ƒNƒ‰ƒ“ƒN(“ü)  25 33
 int		    i_C_TOPSPEED2	=		50;		//ƒNƒ‰ƒ“ƒN(o)	40
 
 int 		i_C_TOPSPEED4 = 		45;		//Ä¶‘–s‚ÌƒuƒŒ[ƒL‘O
@@ -958,7 +958,8 @@ void main( void )
 					}else{
 						//if( check_wideline() == 1) {       // ü•‚ª‘¾‚­‚È‚Á‚½‚ç      
 						//if( (check_crossline() || check_halfline() != 0 ||  check_wideline() == 1) && i_Encoder10 < 60){ 		
-						if( (check_crossline() || check_halfline() != 0 ) && i_Encoder10 < 53){ 
+						//if( (check_crossline() || check_halfline() != 0 ) && i_Encoder10 < 53){ 
+						if( (check_crossline() || check_halfline() != 0 )){ 
 							
 							if(i_date_f_buff_ch_int[i_date_f_num_ch] == 31 || i_date_f_buff_ch_int[i_date_f_num_ch] == 41) {       // ƒNƒƒXƒ‰ƒCƒ“ƒ`ƒFƒbƒN         
             					ul_cnt_1ms = 0;
@@ -2499,7 +2500,7 @@ void main( void )
 #endif
 
 		}else{
-			i_SetAngle = -12;
+			i_SetAngle = -16;
 		}
 		
 		servoPwmOut( i_ServoPwm2 );          /* U‚è‚ªã‚¢‚Æ‚«‚Í‘å‚«‚­‚·‚é       */
@@ -2830,7 +2831,7 @@ void main( void )
 			i_SetAngle = 50;
 #endif			
 		}else{
-			i_SetAngle = 12;//48 47
+			i_SetAngle = 16;//48 47
 		}
 		
 		servoPwmOut( i_ServoPwm2 );          /* U‚è‚ªã‚¢‚Æ‚«‚Í‘å‚«‚­‚·‚é       */
