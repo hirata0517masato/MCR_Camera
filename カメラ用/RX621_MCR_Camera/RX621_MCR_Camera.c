@@ -379,11 +379,11 @@ void expose( void )
 		EXPOSURE_cnt = 0;
 	}
 	
-	if(EXPOSURE_cnt < 10){
+	if(EXPOSURE_cnt < 1){
 		if(-10 < sa && sa < 10){
 			//誤差なので変更しない
 		}else{ 
-			EXPOSURE_timer += max(min((long)(sa*4),500),-500) ;
+			EXPOSURE_timer += max(min((long)(sa*2),200),-200) ;
 			/*
 			if(Line_Max - Max < 0){
 				EXPOSURE_timer -= 50;
@@ -606,7 +606,7 @@ void binarization(int linestart, int linestop)
 	if( Max2 > Line_Max - 300 ){//320 -150  250 目標値760用
 	//if( Max > Line_Max - 200 ){//320 -150  250 目標値560用
 		/* 白が一直線のとき */
-		//if(Min > 290 ){//260  <-急に明るくなるとサチる
+		//if(Min > 250 ){//260  <-急に明るくなるとサチる
 		//if(Max - Min < 150 || (  (Max < Line_Max + 200) && ( Min > 290))  ){//130 <-真っ白のときの明暗さで調整する
 		if(Max2 - Min < 130){//130 <-真っ白のときの明暗さで調整する
 		
@@ -627,7 +627,7 @@ void binarization(int linestart, int linestop)
 		}
 	/* 黒が一面のとき */
 	}else{
-		if(Max2 - Min < 130){
+		if(Max2 - Min < 200){
 			for(i = linestart ; i <= linestop; i++) {
 				BinarizationData[i] = 0;
 			}
@@ -767,7 +767,7 @@ void cam_out(){
 	CENTER_OUT = center;
 	*/
 	
-	WIDE_OUT  = (Wide << 1)&0xfe;//NEW
+	WIDE_OUT  = ((Wide&0x7f) << 1)&0xfe;//NEW
 	//WIDE_OUT  = Wide; //手配線
 	CENTER_OUT = Center;
 	

@@ -73,7 +73,7 @@ void WhiteLineWide(int,int);
 unsigned long   cnt1000 =  0;
 
 /* カメラ関連 */
-long	  	EXPOSURE_timer = 15000;	/* 露光時間	20000				*/
+long	  	EXPOSURE_timer = 5000;	/* 露光時間	20000				*/
 int		ImageData[2][130];			/* カメラの値				*/
 //int		ImageData_buf[130];			/* カメラの値				*/
 int 		BinarizationData[130];	/* ２値化					*/
@@ -387,11 +387,11 @@ void expose( void )
 		EXPOSURE_cnt = 0;
 	}
 	
-	if(EXPOSURE_cnt < 10){
+	if(EXPOSURE_cnt < 1){
 		if(-10 < sa && sa < 10){
 			//誤差なので変更しない
 		}else{ 
-			EXPOSURE_timer += max(min((long)(sa*4),500),-500) ;
+			EXPOSURE_timer += max(min((long)(sa*2),100),-100) ;
 			/*
 			if(Line_Max - Max < 0){
 				EXPOSURE_timer -= 50;
@@ -427,7 +427,7 @@ void expose2( void )
 	}else{
 		EXPOSURE_timer += 100;
 	}
-	if( EXPOSURE_timer > 100000) EXPOSURE_timer = 100000;
+	if( EXPOSURE_timer > 50000) EXPOSURE_timer = 50000;
 	else if( EXPOSURE_timer <= 0 ) EXPOSURE_timer = 0;
 	
 	for(i=0;i<EXPOSURE_timer;i++);
@@ -611,12 +611,12 @@ void binarization(int linestart, int linestop)
 	/* 黒は０　白は１にする */
 	White = 0;					/* 白の数を０にする */
 	
-	if( Max2 > Line_Max - 300 ){//320 -150  250 目標値760用
+	if( Max2 > Line_Max - 200 ){//320 -150  250 目標値760用
 	//if( Max > Line_Max - 200 ){//320 -150  250 目標値560用
 		/* 白が一直線のとき */
-		//if(Min > 290 ){//260  <-急に明るくなるとサチる
+		if(Min > 380 ){//260  <-急に明るくなるとサチる
 		//if(Max - Min < 150 || (  (Max < Line_Max + 200) && ( Min > 290))  ){//130 <-真っ白のときの明暗さで調整する
-		if(Max2 - Min < 230){//130 <-真っ白のときの明暗さで調整する
+		//if(Max2 - Min < 230){//130 <-真っ白のときの明暗さで調整する
 		
 			White = 127;
 			for(i = linestart ; i <= linestop; i++) {
@@ -635,7 +635,7 @@ void binarization(int linestart, int linestop)
 		}
 	/* 黒が一面のとき */
 	}else{
-		if(Max2 - Min < 230){
+		if(Max2 - Min < 200){
 			for(i = linestart ; i <= linestop; i++) {
 				BinarizationData[i] = 0;
 			}
@@ -775,7 +775,7 @@ void cam_out(){
 	CENTER_OUT = center;
 	*/
 	
-	WIDE_OUT  = (Wide << 1)&0xfe;//NEW
+	WIDE_OUT  = ((Wide&0x7f) << 1)&0xfe;//NEW
 	//WIDE_OUT  = Wide; //手配線
 	CENTER_OUT = Center;
 	
