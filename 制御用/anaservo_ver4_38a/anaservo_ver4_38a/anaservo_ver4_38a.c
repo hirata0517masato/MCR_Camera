@@ -331,7 +331,7 @@ char c_ch_boost_on = 0; //‚±‚Ìƒtƒ‰ƒO‚ª‚P‚Ì‚Æ‚«‚Ì‚İ@_Boost ‚ğg—p‚·‚é@ƒNƒ‰ƒ“ƒN‚
 #define			MOTOR_in_CH_R_Boost_min		 -20//-20		//“à‘¤ƒ‚[ƒ^[—pƒpƒ‰ƒ[ƒ^[@Å¬PWM
 
 //ƒNƒ‰ƒ“ƒN
-int		    i_C_TOPSPEED	=		27;		//ƒNƒ‰ƒ“ƒN(“ü)  25 33
+int		    i_C_TOPSPEED	=		30;		//ƒNƒ‰ƒ“ƒN(“ü)  25 33
 int		    i_C_TOPSPEED2	=		50;		//ƒNƒ‰ƒ“ƒN(o)	40
 
 int 		i_C_TOPSPEED4 = 		45;		//Ä¶‘–s‚ÌƒuƒŒ[ƒL‘O
@@ -356,7 +356,7 @@ int		    i_H_TOPSPEED	=		45;		//ƒn[ƒtiN“üj
 int		    i_H_TOPSPEED2	=		42;		//ƒn[ƒt(Î‚ß)
 #else //•Ç‚È‚µ
 int		    i_H_TOPSPEED	=		50;		//ƒn[ƒtiN“üj
-int		    i_H_TOPSPEED2	=		45;		//ƒn[ƒt(Î‚ß) ƒuƒŒ[ƒL‚ª‚©‚©‚ç‚È‚¢‚æ‚¤‚É’l‚ğ‚‚­‚·‚é
+int		    i_H_TOPSPEED2	=		50;		//ƒn[ƒt(Î‚ß) ƒuƒŒ[ƒL‚ª‚©‚©‚ç‚È‚¢‚æ‚¤‚É’l‚ğ‚‚­‚·‚é
 #endif
   
 int		    i_H_TOPSPEED2_S=		50;		//ƒn[ƒt(Î‚ß)  ƒVƒ‡[ƒgƒJƒbƒg—p
@@ -2496,7 +2496,7 @@ void main( void )
 #ifdef HWall  //•Ç‚ ‚è    	
 			i_SetAngle = -65;
 #else //•Ç–³‚µ
-			i_SetAngle = -50;
+			i_SetAngle = -40;
 #endif
 
 		}else{
@@ -2583,7 +2583,7 @@ void main( void )
            		motor_r( 60,  60 );
 #else //•Ç–³‚µ
            		motor_f( 90, 80 );
-           		motor_r( 70,  40 );
+           		motor_r( 60,  50 );
 #endif
 
 
@@ -2913,7 +2913,7 @@ void main( void )
            		motor_r( 60, 60 );
 #else //•Ç–³‚µ
 				motor_f( 80, 90 );
-           		motor_r( 40, 70 );
+           		motor_r( 50, 60 );
 #endif
            		
 			}
@@ -4374,7 +4374,7 @@ unsigned char check_crossline( void )
 	//cam_in();//’l‚Ìæ“¾
 
 	uc_ret = 0;
-	if( (i_Wide > 60) || ((i_Wide >= 40) && (-10 < i_Center ) && (i_Center < 10))   || ((i_Wide >= 35) && (i_Center > -5) && (i_Center < 5)) ){
+	if( (i_Wide > 60) || ((i_Wide >= 40) && (-8 < i_Center ) && (i_Center < 8))   || ((i_Wide >= 30) && (i_Center > -5) && (i_Center < 5)) ){
 	
 		uc_ret = 1;			/* ƒNƒƒXƒ‰ƒCƒ“”­Œ© */
 
@@ -4393,14 +4393,6 @@ unsigned char check_halfline( void )
 
 	uc_ret = 0;
 	if(i_Wide > 44 && i_Wide < 50){
-		if(i_Center < -12){//ƒZƒ“ƒ^[¶Šñ‚è
-			uc_ret = 1;
-			
-		}else if(i_Center > 12){//ƒZƒ“ƒ^[‰EŠñ‚è
-			uc_ret = 2;
-			
-		}
-	}else if(i_Wide > 34){
 		if(i_Center < -10){//ƒZƒ“ƒ^[¶Šñ‚è
 			uc_ret = 1;
 			
@@ -4408,12 +4400,20 @@ unsigned char check_halfline( void )
 			uc_ret = 2;
 			
 		}
-	
-	}else if(i_Wide > 25){
-		if(i_Center < -5){//ƒZƒ“ƒ^[¶Šñ‚è
+	}else if(i_Wide > 34){
+		if(i_Center < -8){//ƒZƒ“ƒ^[¶Šñ‚è
 			uc_ret = 1;
 			
-		}else if(i_Center > 5){//ƒZƒ“ƒ^[‰EŠñ‚è
+		}else if(i_Center > 8){//ƒZƒ“ƒ^[‰EŠñ‚è
+			uc_ret = 2;
+			
+		}
+	
+	}else if(i_Wide > 23){
+		if(i_Center < -3){//ƒZƒ“ƒ^[¶Šñ‚è
+			uc_ret = 1;
+			
+		}else if(i_Center > 3){//ƒZƒ“ƒ^[‰EŠñ‚è
 			uc_ret = 2;
 			
 		}
@@ -4431,7 +4431,7 @@ unsigned char check_halfline_forC( void ) //ƒNƒ‰ƒ“ƒN‚Ì’¼ŠpŠm”F—p
     unsigned char uc_ret;
 	
 	uc_ret = 0;
-	if(i_Wide > 24){
+	if(i_Wide > 23){
 		if(i_Center < -1){//ƒZƒ“ƒ^[¶Šñ‚è
 			uc_ret = 1;
 			
@@ -4455,7 +4455,7 @@ unsigned char check_wideline( void )
 	//cam_in();//’l‚Ìæ“¾
 	
 	uc_ret = 0;
-	if(i_Wide >= 28){
+	if(i_Wide > 23){
 	
 		uc_ret = 1;			/* wideƒ‰ƒCƒ“”­Œ© */
 	}
@@ -4558,7 +4558,16 @@ void cam_in(){
 	i_wide += ((p6 << 1 ) & 0x40);
 	
 	
-	i_Wide = i_wide;
+	//ƒJƒƒ‰ƒ\ƒtƒg‚Ìİ’è”ÍˆÍ
+	//LineStart 	35		/* ƒJƒƒ‰‚ÅŒ©‚é”ÍˆÍ(’Êíƒ‚[ƒh) */
+	//LineStop  	92
+	if(i_wide <= 57 || i_wide == 127){ //92 - 35 = 57 ‚±‚Ì•‚ğ’´‚¦‚éê‡‚Í‘S”’‚Ì127‚µ‚©‚ ‚è‚¦‚È‚¢
+		i_Wide = i_wide;
+	}else{
+		//‘O‰ñ‚Ì’l‚ğ‚»‚Ì‚Ü‚Üg—p‚·‚é	
+	}
+	
+	
 
 	//i_Center = (p5 & 0x7f);
 	
