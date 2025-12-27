@@ -238,9 +238,9 @@ int			i_MOTOR_in_R_N=		5;//6		//“à‘¤ƒ‚[ƒ^[—pƒpƒ‰ƒ[ƒ^[@Œã”¼	3	3
 
 #define		Cu_BRAKE_time  		10		//ƒJ[ƒui“ü‚ÌƒuƒŒ[ƒLŠÔ (msec)
 #define		Cu_BRAKE_SP 		30		//ƒJ[ƒui“ü‚É‚±‚Ì‘¬“xˆÈã‚È‚çƒuƒŒ[ƒL
-#define		Cu_BRAKE			-80		//ƒJ[ƒui“ü‚ÌƒuƒŒ[ƒLiŒã—Öj 
+#define		Cu_BRAKE			-90		//ƒJ[ƒui“ü‚ÌƒuƒŒ[ƒLiŒã—Öj 
 #define		Cu_BRAKE_out		 0		//ƒJ[ƒui“ü‚ÌƒuƒŒ[ƒL(‘O—ÖOUTj 
-#define		Cu_BRAKE_Fin		-25		//ƒJ[ƒui“ü‚ÌƒuƒŒ[ƒL(‘O—ÖINj 
+#define		Cu_BRAKE_Fin		-35		//ƒJ[ƒui“ü‚ÌƒuƒŒ[ƒL(‘O—ÖINj 
 
 
 #define		Cu_N_time			200	//Cu_N_time ms ƒJ[ƒu‚ğ‘–s‚·‚é‚ÆŒã”¼‚É‚È‚é 	
@@ -331,7 +331,7 @@ char c_ch_boost_on = 0; //‚±‚Ìƒtƒ‰ƒO‚ª‚P‚Ì‚Æ‚«‚Ì‚İ@_Boost ‚ğg—p‚·‚é@ƒNƒ‰ƒ“ƒN‚
 #define			MOTOR_in_CH_R_Boost_min		 -20//-20		//“à‘¤ƒ‚[ƒ^[—pƒpƒ‰ƒ[ƒ^[@Å¬PWM
 
 //ƒNƒ‰ƒ“ƒN
-int		    i_C_TOPSPEED	=		30;		//ƒNƒ‰ƒ“ƒN(“ü)  25 33
+int		    i_C_TOPSPEED	=		28;		//ƒNƒ‰ƒ“ƒN(“ü)  25 33
 int		    i_C_TOPSPEED2	=		50;		//ƒNƒ‰ƒ“ƒN(o)	40
 
 int 		i_C_TOPSPEED4 = 		45;		//Ä¶‘–s‚ÌƒuƒŒ[ƒL‘O
@@ -908,7 +908,7 @@ void main( void )
 			if(c_mode == 0){//’Êí
 				//if(angle_check() == 2 && ( (c_saka_cnt%2 == 1) || ((l_EncoderTotal-l_startPoint_saka) >= 1000) && ((l_EncoderTotal-l_startPoint ) >= 1000) )){//âƒZƒ“ƒT[ƒ`ƒFƒbƒN l_startPoint =ƒNƒ‰ƒ“ƒNI—¹ˆÊ’u
 				//if(angle_check() == 2 && ( ((l_EncoderTotal-l_startPoint_saka) >= 600) && ((l_EncoderTotal-l_startPoint ) >= 1000) )){//âƒZƒ“ƒT[ƒ`ƒFƒbƒN l_startPoint =ƒNƒ‰ƒ“ƒNI—¹ˆÊ’u
-				if(angle_check() == 2 &&  (((l_EncoderTotal-l_startPoint_saka) >= 600) || ((c_saka_cnt%2 == 1) && ((l_EncoderTotal-l_startPoint_saka) >= 300))) && ((l_EncoderTotal-l_startPoint ) >= 500) ){//âƒZƒ“ƒT[ƒ`ƒFƒbƒN l_startPoint =ƒNƒ‰ƒ“ƒNI—¹ˆÊ’u
+				if(angle_check() == 2 &&  (((l_EncoderTotal-l_startPoint_saka) >= 300) || ((c_saka_cnt%2 == 1) && ((l_EncoderTotal-l_startPoint_saka) >= 300))) && ((l_EncoderTotal-l_startPoint ) >= 500) ){//âƒZƒ“ƒT[ƒ`ƒFƒbƒN l_startPoint =ƒNƒ‰ƒ“ƒNI—¹ˆÊ’u
 					ul_cnt_saka++;
 				}else{
 					ul_cnt_saka = 0;
@@ -1155,10 +1155,10 @@ void main( void )
 			}
 		}
 		
-        if(  i > 12 ){//ƒnƒ“ƒhƒ‹‰E
+        if(  i > 9 ){//ƒnƒ“ƒhƒ‹‰E //3s‚µ‚½‚Ì”’l‚Æ‡‚í‚¹‚é‚±‚Æ
 		
 			if(c_mode != 1){//â’†‚Å‚È‚¯‚ê‚Î
-				i_Center_offset = (i-12) / i_Center_offset_Angle ;//ƒJ[ƒu‚ÅŠñ‚¹‚é
+				i_Center_offset = (i-9) / i_Center_offset_Angle ;//ƒJ[ƒu‚ÅŠñ‚¹‚é
 				if(i_Center_offset > i_Center_offset_MAX )i_Center_offset = i_Center_offset_MAX;
 				if(i_Center_offset < -i_Center_offset_MAX )i_Center_offset = -i_Center_offset_MAX;
 			}else{
@@ -1202,16 +1202,16 @@ void main( void )
 					f = ((i_TOPSPEED -(i / i_SPEED_DOWN))-i_Encoder10)*20;
 				
 					if(x < -10) x = -10;
-					if(r < -70) r = -70;
-					if(f < -25) f = -25;
+					if(r < -70) r = -80;
+					if(f < -25) f = -35;
 				}else{
 					x = ((i_TOPSPEED -(i / i_SPEED_DOWN))-i_Encoder10)*2;	
 					r = ((i_TOPSPEED -(i / i_SPEED_DOWN))-i_Encoder10)*5;
 					f = ((i_TOPSPEED -(i / i_SPEED_DOWN))-i_Encoder10)*2;
 				
-					if(x < -5) x = -5;
-					if(r < -15) r = -15;
-					if(f < -15) f = -15;	
+					if(x < -5) x = -10;
+					if(r < -15) r = -20;
+					if(f < -15) f = -20;	
 				}
 				motor_f( x, f );
             	motor_r( r, r );			
@@ -1289,11 +1289,11 @@ void main( void )
 							
 			}
 			 		 	 
-		}else if( i < -12 ){//ƒnƒ“ƒhƒ‹¶
+		}else if( i < -9 ){//ƒnƒ“ƒhƒ‹¶ //3s‚µ‚½‚Ì”’l‚Æ‡‚í‚¹‚é‚±‚Æ
 			
 		
 			if(c_mode != 1){
-				i_Center_offset = (i+12) / i_Center_offset_Angle ;//ƒJ[ƒu‚ÅŠñ‚¹‚é
+				i_Center_offset = (i+9) / i_Center_offset_Angle ;//ƒJ[ƒu‚ÅŠñ‚¹‚é
 				if(i_Center_offset > i_Center_offset_MAX )i_Center_offset = i_Center_offset_MAX;
 				if(i_Center_offset < -i_Center_offset_MAX )i_Center_offset = -i_Center_offset_MAX;
 			}else{
@@ -1338,17 +1338,17 @@ void main( void )
 							
 		
 					if(x < -10) x = -10;
-					if(r < -70) r = -70;
-					if(f < -25) f = -25;
+					if(r < -70) r = -80;
+					if(f < -25) f = -35;
 				}else{
 					x = ((i_TOPSPEED -(-i / i_SPEED_DOWN))-i_Encoder10)*2;
 					r = ((i_TOPSPEED -(-i / i_SPEED_DOWN))-i_Encoder10)*5;
 					f = ((i_TOPSPEED -(-i / i_SPEED_DOWN))-i_Encoder10)*2;
 							
 
-					if(x < -5) x = -5;
-					if(r < -15) r = -15;
-					if(f < -15) f = -15;
+					if(x < -5) x = -10;
+					if(r < -15) r = -20;
+					if(f < -15) f = -20;
 				}	
 				motor_f( f, x );
             	motor_r( r, r );

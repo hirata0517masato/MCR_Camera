@@ -379,11 +379,11 @@ void expose( void )
 		EXPOSURE_cnt = 0;
 	}
 	
-	if(EXPOSURE_cnt < 1){
+	if(EXPOSURE_cnt < 10){
 		if(-10 < sa && sa < 10){
 			//Œë·‚È‚Ì‚Å•ÏX‚µ‚È‚¢
 		}else{ 
-			EXPOSURE_timer += max(min((long)(sa*2),200),-200) ;
+			EXPOSURE_timer += max(min((long)(sa*4),500),-500) ;
 			/*
 			if(Line_Max - Max < 0){
 				EXPOSURE_timer -= 50;
