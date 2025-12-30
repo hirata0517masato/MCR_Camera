@@ -1202,16 +1202,16 @@ void main( void )
 					f = ((i_TOPSPEED -(i / i_SPEED_DOWN))-i_Encoder10)*20;
 				
 					if(x < -10) x = -10;
-					if(r < -70) r = -80;
-					if(f < -25) f = -35;
+					if(r < -80) r = -80;
+					if(f < -35) f = -35;
 				}else{
 					x = ((i_TOPSPEED -(i / i_SPEED_DOWN))-i_Encoder10)*2;	
 					r = ((i_TOPSPEED -(i / i_SPEED_DOWN))-i_Encoder10)*5;
 					f = ((i_TOPSPEED -(i / i_SPEED_DOWN))-i_Encoder10)*2;
 				
-					if(x < -5) x = -10;
-					if(r < -15) r = -20;
-					if(f < -15) f = -20;	
+					if(x < -10) x = -10;
+					if(r < -20) r = -20;
+					if(f < -20) f = -20;	
 				}
 				motor_f( x, f );
             	motor_r( r, r );			
@@ -1338,17 +1338,17 @@ void main( void )
 							
 		
 					if(x < -10) x = -10;
-					if(r < -70) r = -80;
-					if(f < -25) f = -35;
+					if(r < -80) r = -80;
+					if(f < -35) f = -35;
 				}else{
 					x = ((i_TOPSPEED -(-i / i_SPEED_DOWN))-i_Encoder10)*2;
 					r = ((i_TOPSPEED -(-i / i_SPEED_DOWN))-i_Encoder10)*5;
 					f = ((i_TOPSPEED -(-i / i_SPEED_DOWN))-i_Encoder10)*2;
 							
 
-					if(x < -5) x = -10;
-					if(r < -15) r = -20;
-					if(f < -15) f = -20;
+					if(x < -10) x = -10;
+					if(r < -20) r = -20;
+					if(f < -20) f = -20;
 				}	
 				motor_f( f, x );
             	motor_r( r, r );
