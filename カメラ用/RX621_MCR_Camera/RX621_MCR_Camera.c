@@ -51,7 +51,7 @@ void WhiteLineWide(int,int);
 
 //AD0 /* CN3-9 P40 */
 
-#define		Line_Max	760 //560 //760	//560		/* ライン白色MAX値の設定 */ 
+#define		Line_Max	660 //560 //760	//560		/* ライン白色MAX値の設定 */ 
 
 #define 	LineStart 	35		/* カメラで見る範囲(通常モード) */
 #define 	LineStop  	92
