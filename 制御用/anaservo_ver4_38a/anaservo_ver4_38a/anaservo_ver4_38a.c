@@ -1589,7 +1589,20 @@ void main( void )
 						
 					}else{
 						c_c_short_mode = 0;
-					}	
+					}
+				}else if(c_c_cut == 0 && i_date_f_mode != 0){//コース記憶でもクランクは通常
+				
+					if( (i_C_short_len > l_EncoderTotal - l_EncoderTotal_ch - (i_date_f_buff_ch_int[i_date_f_num_ch] - i_date_f_brake_c) ) || ( i_Encoder10 > i_C_TOPSPEED + C_TOPSPEED_SHORT)){ // 距離が短い || 設定速度まで減速できていない(距離が短いと減速ができていない可能性がある)
+						c_c_short_mode = 1;	
+						
+						if(i_Encoder10 < i_C_TOPSPEED - C_TOPSPEED_SHORT_NG ){//距離はショートでも進入速度が遅いのでロングとする
+							c_c_short_mode = 0;
+						}
+						
+					}else{
+						c_c_short_mode = 0;
+					}
+					
 				}else{//通常
 					if( (i_C_short_len > l_EncoderTotal - l_EncoderTotal_ch ) || ( i_Encoder10 > i_C_TOPSPEED + C_TOPSPEED_SHORT)){ // 距離が短い || 設定速度まで減速できていない(距離が短いと減速ができていない可能性がある)
 						c_c_short_mode = 1;	
@@ -1602,6 +1615,7 @@ void main( void )
 						c_c_short_mode = 0;
 					}
 				}
+				
 				
 			
 				
@@ -1647,7 +1661,20 @@ void main( void )
 						
 					}else{
 						c_c_short_mode = 0;
-					}	
+					}
+				}else if(c_c_cut == 0 && i_date_f_mode != 0){//コース記憶でもクランクは通常
+				
+					if( (i_C_short_len > l_EncoderTotal - l_EncoderTotal_ch - (i_date_f_buff_ch_int[i_date_f_num_ch] - i_date_f_brake_c) ) || ( i_Encoder10 > i_C_TOPSPEED + C_TOPSPEED_SHORT)){ // 距離が短い || 設定速度まで減速できていない(距離が短いと減速ができていない可能性がある)
+						c_c_short_mode = 1;	
+						
+						if(i_Encoder10 < i_C_TOPSPEED - C_TOPSPEED_SHORT_NG ){//距離はショートでも進入速度が遅いのでロングとする
+							c_c_short_mode = 0;
+						}
+						
+					}else{
+						c_c_short_mode = 0;
+					}
+					
 				}else{//通常
 					if( (i_C_short_len > l_EncoderTotal - l_EncoderTotal_ch ) || ( i_Encoder10 > i_C_TOPSPEED + C_TOPSPEED_SHORT)){ // 距離が短い || 設定速度まで減速できていない(距離が短いと減速ができていない可能性がある)
 						c_c_short_mode = 1;	
