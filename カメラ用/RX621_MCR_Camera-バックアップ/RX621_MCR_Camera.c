@@ -51,10 +51,7 @@ void WhiteLineWide(int,int);
 
 //AD0 /* CN3-9 P40 */
 
-////////////////////////////　　579行目付近も同時に調整すること
-#define		Line_Max	360 //460 //560 //760	// ライン白色MAX値の設定 
-#define		Line_Min	170 //200 //220	//250	//ラインの黒色はこの値より低くなるように設定する
-
+#define		Line_Max	760 //560 //760	//560		/* ライン白色MAX値の設定 */ 
 
 #define 	LineStart 	35		/* カメラで見る範囲(通常モード) */
 #define 	LineStop  	92
@@ -82,6 +79,7 @@ int		ImageData[130];			/* カメラの値				*/
 int 		BinarizationData[130];	/* ２値化					*/
 
 int		Max = 0,Max2 = 0,Min,Ave;	/*カメラ読み取り最大値、最小値、平均値*/
+int 	Ave_old = 0;
 
 unsigned int 	Rsensor;				/* ラインの右端 */
 unsigned int 	Lsensor;				/* ラインの左端 */
@@ -161,10 +159,37 @@ void main(void)
 		switch(mode){
 			case 0://通常モード
 				expose();				//露光時間
-				
-				line_start = LineStart;
-				line_stop =  LineStop;
+				/*
+				if(Wide != 0 && Wide < 20){
+					CameraWideOffset = Center -64;
 					
+					line_start = LineStart;
+					line_start += CameraWideOffset;
+					
+					line_stop =  LineStop;
+					line_stop += CameraWideOffset;
+					
+					if(line_start < 0){
+						line_stop -= line_start;
+						line_start = 0;
+					}
+					
+					if(127 < line_stop){
+						line_start -= line_stop-127;
+						line_stop = 127;
+					}
+					
+				}else{
+					line_start = LineStart;
+					line_stop =  LineStop;
+				}
+				ImageCapture(line_start,line_stop);			//イメージキャプチャー
+		
+				binarization(line_start,line_stop); 		//２値化
+		
+				WhiteLineWide(line_start,line_stop);		//白ラインの測定
+				*/
+				
 				ImageCapture(LineStart,LineStop);			//イメージキャプチャー
 		
 				binarization(LineStart,LineStop); 		//２値化
@@ -225,10 +250,10 @@ void main(void)
 			cnt1000++;
 			
 			if(cnt1000 > 500){
-				for(i = LineStart; i <= LineStop; i++)printf("%d",BinarizationData[i]);
+				//for(i = LineStart; i <= LineStop; i++)printf("%d",BinarizationData[i]);
 				//for(i = LineStart; i <= LineStop; i+=2)printf("%d",BinarizationData[i]);
-				//for(i = 0; i <=127; i+=2)printf("%d",BinarizationData[i]);
-				printf("Max2 = %d Min = %d Center = %d Wide = %d Lsensor = %d Rsensor = %d Ave = %d time = %d mode = %d Start = %d Stop = %d",Max2,Min,Center,Wide,Lsensor,Rsensor,Ave,EXPOSURE_timer,mode,line_start,line_stop);
+				for(i = 0; i <=127; i+=2)printf("%d",BinarizationData[i]);
+				printf("Max = %d Min = %d Center = %d Wide = %d Lsensor = %d Rsensor = %d time = %d mode = %d Start = %d Stop = %d",Max,Min,Center,Wide,Lsensor,Rsensor,EXPOSURE_timer,mode,line_start,line_stop);
 				printf("\n");
 				cnt1000=0;
 			}
@@ -354,7 +379,7 @@ void expose( void )
 		EXPOSURE_cnt = 0;
 	}
 	
-	if(EXPOSURE_cnt < 2){
+	if(EXPOSURE_cnt < 10){
 		if(-10 < sa && sa < 10){
 			//誤差なので変更しない
 		}else{ 
@@ -578,10 +603,11 @@ void binarization(int linestart, int linestop)
 	/* 黒は０　白は１にする */
 	White = 0;					/* 白の数を０にする */
 	
-	//if( Max2 > Line_Max - 300 ){//目標値760用
-	//if( Max2 > Line_Max - 200 ){//目標値460用
-	if( Max2 > Line_Max - 100 ){//目標値360用
+	if( Max2 > Line_Max - 300 ){//320 -150  250 目標値760用
+	//if( Max > Line_Max - 200 ){//320 -150  250 目標値560用
 		/* 白が一直線のとき */
+		//if(Min > 250 ){//260  <-急に明るくなるとサチる
+		//if(Max - Min < 150 || (  (Max < Line_Max + 200) && ( Min > 290))  ){//130 <-真っ白のときの明暗さで調整する
 		if(Max2 - Min < 130){//130 <-真っ白のときの明暗さで調整する
 		
 			White = 127;
@@ -597,21 +623,6 @@ void binarization(int linestart, int linestop)
 				}else{
 					BinarizationData[i] = 0;
 				}	
-			}
-			
-			
-			if(mode == 0){//通常画角の時
-				if(White > 24 ){//通常の幅より太い可能性がある場合（ハーフorクロス）
-					
-					if(Min > Line_Min){//minが小さく無い場合はクロスラインとする
-		
-						White = 127;
-						for(i = linestart ; i <= linestop; i++) {
-							BinarizationData[i] = 1;
-						}
-					}
-						
-				}
 			}
 		}
 	/* 黒が一面のとき */
@@ -630,6 +641,7 @@ void binarization(int linestart, int linestop)
 					BinarizationData[i] = 0;
 				}	
 			}
+			
 		}
 	}
 
@@ -683,7 +695,7 @@ void WhiteLineWide(int linestart, int linestop)
 	}
 		
 	
-	if(White > 45){//全白にする
+	if(White > 70){//全白にする
 		Wide = 127;Center = 64;						/* 白一面 */
 		
 	}else if((White > 4) && ((linestop - linestart) > 3)){//白が少なすぎない && ラインを探す範囲が狭すぎない

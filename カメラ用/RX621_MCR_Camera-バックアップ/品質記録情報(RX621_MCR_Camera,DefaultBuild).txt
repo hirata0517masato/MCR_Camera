@@ -1,50 +1,13 @@
 品質記録情報
-2026年2月10日 1:13:48
+2026年2月7日 13:20:41
 
 ------ ビルド開始(RX621_MCR_Camera, DefaultBuild) ------
-C:\Program Files (x86)\Renesas Electronics\CS+\CC\CC-RX\V3.05.00\Bin\ccrx.exe RX621_MCR_Camera.c -isa=rxv1 -fpu -lang=c -include=USBStack\CDC -include=USBStack -include=. -output=obj -obj_path=DefaultBuild -debug -g_line -optimize=0 -speed -nologo
-C:\Program Files (x86)\Renesas Electronics\CS+\CC\CC-RX\V3.05.00\Bin\rlink.exe -subcommand=DefaultBuild\RX621_MCR_Camera.clnk
-W0561017:Paid license of CC-RX V3 is not found, and the evaluation period has expired. Please consider purchasing the product.
-W0561017:Paid license of CC-RX V3 is not found, and the evaluation period has expired. Please consider purchasing the product.
-Renesas Optimizing Linker Completed
------- ビルド終了(エラー:0個, 警告:2個)(RX621_MCR_Camera, DefaultBuild) ------
-
---- CommandFile 1 ---
-DefaultBuild\RX621_MCR_Camera.clnk :
--library=DefaultBuild\RX621_MCR_Camera.lib
--input=DefaultBuild\dbsct.obj
--input=DefaultBuild\intprg.obj
--input=DefaultBuild\resetprg.obj
--input=DefaultBuild\sbrk.obj
--input=DefaultBuild\vecttbl.obj
--input=DefaultBuild\usb_core.obj
--input=DefaultBuild\usb_hal.obj
--input=DefaultBuild\lowsrc.obj
--input=DefaultBuild\usbdescriptors.obj
--input=DefaultBuild\usb_cdc.obj
--input=DefaultBuild\usb.obj
--input=DefaultBuild\RX621_MCR_Camera.obj
--input=DefaultBuild\wait.obj
--input=DefaultBuild\rspi.obj
--input=DefaultBuild\Gyro.obj
--input=DefaultBuild\MPU9250.obj
--noprelink
--output=DefaultBuild\RX621_MCR_Camera.abs
--list=DefaultBuild\RX621_MCR_Camera.map
--nooptimize
--start=B_1,R_1,B_2,R_2,B,R,SU,SI/04,PResetPRG/0FFF80000,C_1,C_2,C,C$DSEC,C$BSEC,C$INIT,C$VTBL,C$VECT,D_1,D_2,D,P,PIntPRG,W_1,W_2,W,L/0FFF80100,FIXEDVECT/0FFFFFFD0
--rom=D=R,D_1=R_1,D_2=R_2
--nologo
--end
--input=DefaultBuild\RX621_MCR_Camera.abs
--output=DefaultBuild\RX621_MCR_Camera.mot
--form=stype
--exit
+------ ビルド終了(エラー:0個, 警告:0個)(RX621_MCR_Camera, DefaultBuild) ------
 
 
 --- SHA1 hash value of output files ---
-C:\WorkSpace\RX621_MCR_Camera\DefaultBuild\RX621_MCR_Camera.abs: 0afe6748a4fbce1bd30004ac7dee07c82641f0a7
-C:\WorkSpace\RX621_MCR_Camera\DefaultBuild\RX621_MCR_Camera.mot: e7d5bf140c45f345188977e05ab430d788d5ef47
+C:\WorkSpace\RX621_MCR_Camera\DefaultBuild\RX621_MCR_Camera.abs: 16fa449af4b71690a00158654eb992504e1cc363
+C:\WorkSpace\RX621_MCR_Camera\DefaultBuild\RX621_MCR_Camera.mot: 96ac093ce4df9016a8cbec78092efbf6d1e6312a
 
 
 --- システム情報 ---
@@ -70,13 +33,13 @@ C:\WorkSpace\RX621_MCR_Camera\DefaultBuild\RX621_MCR_Camera.mot: e7d5bf140c45f34
  C:\Program Files (x86)\Renesas Electronics\CS+\CC
 *メモリ使用量
  *プライベート・ワーキング・セット
-  270 MB
+  247 MB
  *GDIオブジェクト数
-  2021
+  2019
  *USERオブジェクト数
-  987
+  914
  *開いているファイル
-  1 editors, 1 files, 22 KB
+  1 editors, 1 files, 23 KB
 
 --- ビルド・ツール・プラグイン情報 ---
 RH850ビルド・ツールCC-RH用プラグイン

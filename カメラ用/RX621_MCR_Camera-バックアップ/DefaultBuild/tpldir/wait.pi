@@ -1,0 +1,16 @@
+-We=--template_info_file="C:\WorkSpace\RX621_SAMPLE\DefaultBuild\tpldir\wait.ti"
+-We=--ii_file="C:\WorkSpace\RX621_SAMPLE\DefaultBuild\tpldir\wait.ii"
+-We=--tentative_info_file="C:\WorkSpace\RX621_SAMPLE\DefaultBuild\tpldir\wait.td"
+
+-output=obj="C:\WorkSpace\RX621_SAMPLE\DefaultBuild\wait.obj"
+-isa=rxv1
+-fpu
+-lang=cpp
+-include=USBStack\CDC
+-include=USBStack
+-include=.
+-debug
+-g_line
+-speed
+-nologo
+"wait.cpp"
