@@ -2002,12 +2002,12 @@ void main( void )
 		servoPwmOut( i_ServoPwm2 );          /* 振りが弱いときは大きくする       */
         
 
-        if((( c_c_cut == 0 || i_date_f_mode == 0) && (l_EncoderTotal-l_startPoint ) >= 150) || ((c_c_cut == 1 && i_date_f_mode != 0) && (l_EncoderTotal-l_startPoint ) >= 240 )  ){
+        if((( c_c_cut == 0 || i_date_f_mode == 0) && (l_EncoderTotal-l_startPoint ) >= 150) || ((c_c_cut == 1 && i_date_f_mode != 0) && (l_EncoderTotal-l_startPoint ) >= 200 )  ){
 			if(i_Wide != 0){
 
 				if ( (( c_c_cut == 0 || i_date_f_mode == 0) &&  18 < i_Center && i_Center < 35 && (i_Wide != 0 && i_Wide < 12) ) 
-				   || ((c_c_cut == 1 && i_date_f_mode != 0) && -20 < i_Center && i_Center <  0 && (i_Wide_old == 0 || i_Wide_old == 127 || i_Wide > i_Wide_old))
-				   || ((c_c_cut == 1 && i_date_f_mode != 0) && -25 < i_Center && i_Center < 25 && (i_Wide_old != 0) && (l_EncoderTotal-l_startPoint ) >= 750)   ){    /* 曲げ終わりチェック           */
+				   || ((c_c_cut == 1 && i_date_f_mode != 0) && -20 < i_Center && i_Center < -3 && (i_Wide_old == 0 || i_Wide_old == 127 || i_Wide > i_Wide_old))
+				   || ((c_c_cut == 1 && i_date_f_mode != 0) && -25 < i_Center && i_Center < 25 && (i_Wide_old != 0) && (l_EncoderTotal-l_startPoint ) >= 1000)   ){    /* 曲げ終わりチェック           */
 				
 	            	ul_cnt_1ms = 0;
 	            	i_SensorPattern = 0;
@@ -2301,12 +2301,12 @@ void main( void )
 		
 		servoPwmOut( i_ServoPwm2 );        /* 振りが弱いときは大きくする       */
         
-		if(((c_c_cut == 0 || i_date_f_mode == 0) && (l_EncoderTotal-l_startPoint ) >= 150) || ((c_c_cut == 1 && i_date_f_mode != 0) && (l_EncoderTotal-l_startPoint ) >= 240 ) ){
+		if(((c_c_cut == 0 || i_date_f_mode == 0) && (l_EncoderTotal-l_startPoint ) >= 150) || ((c_c_cut == 1 && i_date_f_mode != 0) && (l_EncoderTotal-l_startPoint ) >= 200 ) ){
 			if(i_Wide != 0){ 
 
 		 		if(( (c_c_cut == 0 || i_date_f_mode == 0) && -35 < i_Center && i_Center < -18 && (i_Wide != 0 && i_Wide < 10)) 
-				|| ( (c_c_cut == 1 && i_date_f_mode != 0) &&   0 < i_Center && i_Center <  20 && (i_Wide_old == 0 || i_Wide_old == 127 ||  i_Wide < i_Wide_old)) 
-				|| ( (c_c_cut == 1 && i_date_f_mode != 0) && -25 < i_Center && i_Center <  25 && (i_Wide_old != 0) && (l_EncoderTotal-l_startPoint ) >= 750) ){    /* 曲げ終わりチェック           */
+				|| ( (c_c_cut == 1 && i_date_f_mode != 0) &&   3 < i_Center && i_Center <  20 && (i_Wide_old == 0 || i_Wide_old == 127 ||  i_Wide > i_Wide_old)) 
+				|| ( (c_c_cut == 1 && i_date_f_mode != 0) && -25 < i_Center && i_Center <  25 && (i_Wide_old != 0) && (l_EncoderTotal-l_startPoint ) >= 1000) ){    /* 曲げ終わりチェック           */
 	 	
 	            	ul_cnt_1ms = 0;
 	            	i_SensorPattern = 0;
@@ -3381,7 +3381,7 @@ int date_f_make(int i_pattern, int i_angle, int i_encoder, int i_rmode){
 		case -1:
 			//if(	sl_Encoder >= 500){//この距離以下は無視（滑り？）
 				if(si_mode == 0){//S
-					if(sl_Encoder > 1000){//この距離以下は無効
+					if(sl_Encoder > 500){//この距離以下は無効
 						i_date_f_buff_int[si_buff_num_int] += sl_Encoder;
 						si_buff_num_int++;
 						
@@ -3401,7 +3401,7 @@ int date_f_make(int i_pattern, int i_angle, int i_encoder, int i_rmode){
 		//if(	sl_Encoder >= 500){//この距離以下は無視（滑り？）
 			if(si_mode == 0){//S
 				if(((i_rmode == 0 ) && (i_angle < -i_Cu_Angle)) || ((i_rmode != 0 ) && (i_angle < -(i_Cu_Angle_saka)))){
-					if(sl_Encoder > 1000){//この距離以下は無効
+					if(sl_Encoder > 500){//この距離以下は無効
 						i_date_f_buff_int[si_buff_num_int] += sl_Encoder;
 						si_buff_num_int++;
 						
@@ -3416,7 +3416,7 @@ int date_f_make(int i_pattern, int i_angle, int i_encoder, int i_rmode){
 					si_mode = 1;//L
 						
 				}else if(((i_rmode == 0) &&(i_Cu_Angle < i_angle)) || ((i_rmode != 0) &&(i_Cu_Angle_saka < i_angle))){
-					if(sl_Encoder > 1000){//この距離以下は無効
+					if(sl_Encoder > 500){//この距離以下は無効
 						i_date_f_buff_int[si_buff_num_int] += sl_Encoder;
 						si_buff_num_int++;
 						
@@ -3459,7 +3459,7 @@ int date_f_make(int i_pattern, int i_angle, int i_encoder, int i_rmode){
 		case 22:
 			if(si_mode != 3){//C
 				if(si_mode == 0){//S
-					if(sl_Encoder > 1000){//この距離以下は無効
+					if(sl_Encoder > 500){//この距離以下は無効
 						i_date_f_buff_int[si_buff_num_int] += sl_Encoder;
 						si_buff_num_int++;
 						
@@ -3509,7 +3509,7 @@ int date_f_make(int i_pattern, int i_angle, int i_encoder, int i_rmode){
 		case 62:
 			if(si_mode != 4){//H
 				if(si_mode == 0){//S
-					if(sl_Encoder > 1000){//この距離以下は無効
+					if(sl_Encoder > 500){//この距離以下は無効
 						i_date_f_buff_int[si_buff_num_int] += sl_Encoder;
 						si_buff_num_int++;
 						
@@ -3822,10 +3822,10 @@ void intTRB( void )
 				
 				if(c_mode == 0){
 					//if(i_date_f_buff_int[i_date_f_num] - date_f_brake < l_straight_EncoderTotal)si_flag = 1;//記録した直線を走った
-					if(i_date_f_buff_int[i_date_f_num] - 500 < l_straight_EncoderTotal)si_flag = 1;//記録した直線を走った
+					if(i_date_f_buff_int[i_date_f_num] - 250 < l_straight_EncoderTotal)si_flag = 1;//記録した直線を走った
 				}else{
 					//if(i_date_f_buff_int[i_date_f_num] - date_f_brake - 500 < l_straight_EncoderTotal)si_flag = 1;//記録した直線を走った
-					if(i_date_f_buff_int[i_date_f_num] - 500 - 600 < l_straight_EncoderTotal)si_flag = 1;//記録した直線を走った
+					if(i_date_f_buff_int[i_date_f_num] - 250 - 600 < l_straight_EncoderTotal)si_flag = 1;//記録した直線を走った
 				}
 				si_flag20 = 0;
 			
