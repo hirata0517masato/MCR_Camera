@@ -1,4 +1,4 @@
-Optimizing Linkage Editor (V.10.01.00.000)        10-Feb-2026 01:33:39
+Optimizing Linkage Editor (V.10.01.00.000)        11-Feb-2026 11:42:25
 
 *** Options ***
 
@@ -41,13 +41,13 @@ data_NE
 bss_NE
                                   000005ec  000011e9       bfe   2
 data_NO
-                                  000011ea  000011f5         c   1
+                                  000011ea  000011f6         d   1
 bss_NO
-                                  000011f6  00001462       26d   1
+                                  000011f7  00001463       26d   1
 stack
-                                  00001463  00001662       200   1
+                                  00001464  00001663       200   1
 istack
-                                  00001663  00001762       100   1
+                                  00001664  00001763       100   1
 heap_NE
                                   00001764  00001764         0   2
 interrupt
@@ -59,9 +59,9 @@ data_SOI
 data_NEI
                                   00004000  000041eb       1ec   2
 data_NOI
-                                  000041ec  000041f7         c   1
+                                  000041ec  000041f8         d   1
 program
-                                  000041f8  0000e0e3      9eec   2
+                                  000041fa  0000e11d      9f24   2
 vector
                                   0000fed8  0000ffd7       100   2
 fvector

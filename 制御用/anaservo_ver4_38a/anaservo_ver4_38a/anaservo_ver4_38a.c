@@ -37,8 +37,8 @@
 
 #define 	SERVO_MAX 			125	  	/* ハンドル最大位置 115           */
 
-#define 	MAXTIME 			1600 //1100	  	/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
-
+#define 	MAXTIME 			1600 //1100	  				/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
+#define 	START_WAIT 			 100 //motor+0.5 bat+0.5	// スタート時の走行待ち時間 (1.00秒)  100 = 1s        */
 
 /*======================================*/
 /* プロトタイプ宣言                     */
@@ -98,6 +98,7 @@ char			c_out_flag = 0;			//脱線flag 1=コースアウト
 char 			c_black_flag = 0;			//
 char			c_Cu_flag = 0;			//0 = 直線, 1 = カーブ
 char			c_c_short_mode = 0; //クランク　0:long 1:short
+char			c_start_wait_cancel = 0; //スタート待ち時間のキャンセルフラグ　1:キャンセル
 
 /* microSD関連変数 */
 signed char     c_msdBuff[ 512 ];         /* 一時保存バッファ             */
@@ -512,6 +513,8 @@ void main( void )
 	}else if( dipsw_get2() == 0x20) {
 		i_pattern = 500;
 */	
+	}else if((dipsw_get() & 0x04) == 0x04 ){//スタート時、マイコンディップスイッチ 3 = ON　スタート待ち時間キャンセル
+		c_start_wait_cancel = 1;	
 	}
  
 
@@ -768,6 +771,18 @@ void main( void )
         if(  (!check_startgate()) && (i_Wide != 0)) {//ゲートが消えた　&& ラインが見えた
 		
             ul_cnt_1ms = 0;
+		
+            i_pattern = 2;
+            break;
+			
+        }
+		
+        led_out( 1 << (ul_cnt_1ms/50) % 8 );
+        break;
+
+	case 2://スタート時の走行待ち時間
+	
+		if(((START_WAIT*10) <= ul_cnt_1ms)  || (c_start_wait_cancel == 1) ){//待ち時間が経過した　|| ディップスイッチでキャンセルした
 			ul_cnt_running_1ms = 0;
 			ul_cnt_straight_time_1ms = 0;
 			c_running_flag = 1;//走行開始
@@ -782,13 +797,11 @@ void main( void )
             i_msdFlag = 1;                /* データ記録開始               */
 		
             i_pattern = 10;
-            break;
-			
-        }
+		}
 		
-        led_out( 1 << (ul_cnt_1ms/50) % 8 );
-        break;
-
+		led_out(0);		
+	
+		break;
 	case 10://スタート直後
 		
 		if(i_Center < -10)i_Center = -10;
