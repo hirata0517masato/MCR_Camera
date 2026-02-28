@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			125	  	/* ÉnÉìÉhÉãç≈ëÂà íu 115           */
 
-#define 	MAXTIME 			1600 //1100	  				/* ç≈ëÂëñçséûä‘ (0.01ïb)  1200 = 12s     1250     */
+#define 	MAXTIME 			1050 //1100	  				/* ç≈ëÂëñçséûä‘ (0.01ïb)  1200 = 12s     1250     */
 #define 	START_WAIT 			 100 //motor+0.5 bat+0.5	// ÉXÉ^Å[ÉgéûÇÃëñçsë“Çøéûä‘ (1.00ïb)  100 = 1s        */
 
 /*======================================*/
@@ -130,7 +130,7 @@ signed char 	c_date_f_buff[32] ={0};
 int			 	i_date_f_buff_int[16] ={0};
 int				i_date_f_num = 0;
 int				i_Cu_Angle	=		20;		//ÉJÅ[ÉuîªíËÇ…égóp ê≥êîå¿íË
-int				i_Cu_Angle_saka	=	55;		//ÉJÅ[ÉuîªíËÇ…égóp ê≥êîå¿íË ç‚óp
+int				i_Cu_Angle_saka	=	40;		//ÉJÅ[ÉuîªíËÇ…égóp ê≥êîå¿íË ç‚óp
 signed char 	c_date_f_buff_ch[32] ={0};
 int			 	i_date_f_buff_ch_int[32] ={0};//ãÙêîÅÅÉpÉ^Å[ÉìÅ@äÔêîÅÅãóó£
 int				i_date_f_num_ch = 0;
@@ -322,7 +322,7 @@ char c_ch_boost_on = 0; //Ç±ÇÃÉtÉâÉOÇ™ÇPÇÃÇ∆Ç´ÇÃÇ›Å@_Boost ÇégópÇ∑ÇÈÅ@ÉNÉâÉìÉNÇ
 #define			SPEED_DOWN_CH_N_Boost	20		//äpìxÇ…ÇÊÇËTOPSPEEDÇå∏ë¨  ÉJÅ[Éuå„îºÅié¿éøñ≥å¯Åj
 
 #define			MOTOR_out_CH_R_Boost	 -2		//äOë§ÉÇÅ[É^Å[ópÉpÉâÉÅÅ[É^Å[
-#define			MOTOR_in_CH_F_Boost		 2		//ì‡ë§ÉÇÅ[É^Å[ópÉpÉâÉÅÅ[É^Å[
+#define			MOTOR_in_CH_F_Boost		 1		//ì‡ë§ÉÇÅ[É^Å[ópÉpÉâÉÅÅ[É^Å[
 #define			MOTOR_in_CH_R_Boost		-3		//ì‡ë§ÉÇÅ[É^Å[ópÉpÉâÉÅÅ[É^Å[
 
 #define			MOTOR_out_CH_R_Boost_min	 -20//-20		//äOë§ÉÇÅ[É^Å[ópÉpÉâÉÅÅ[É^Å[ ç≈è¨PWM	
@@ -1856,7 +1856,7 @@ void main( void )
 					else i_SetAngle = 98;
 				
 					motor2_f( 20,   -10 );  //80 0       
-	        		motor2_r( -20,   -20 );   //0 0
+	        		motor2_r( -20,   -30 );   //0 0
 			
 				
 				}else if((l_EncoderTotal-l_startPoint ) >= 150){
@@ -1865,7 +1865,7 @@ void main( void )
 					else i_SetAngle = 80;
 				
 					motor2_f( 30,   -10 );  //85 5      
-	        		motor2_r( -10,   -20 );  //15 0
+	        		motor2_r( -10,   -30 );  //15 0
 				
 				}else if((l_EncoderTotal-l_startPoint ) >= 100){
 				
@@ -1873,7 +1873,7 @@ void main( void )
 					else i_SetAngle = 50;
 				
 					motor2_f( 35,  -10 ); //85 30        
-	        		motor2_r( 0,   -20 );  //25 0
+	        		motor2_r( 0,   -30 );  //25 0
 			
 				}else if((l_EncoderTotal-l_startPoint ) >= 50){
 				
@@ -1881,12 +1881,12 @@ void main( void )
 					else i_SetAngle = 35;
 				
 					motor2_f( 40, -10 ); //90 35        
-	        		motor2_r( 0,  -20 );   //35 0
+	        		motor2_r( 0,  -30 );   //35 0
 					
 				}else{
 					i_SetAngle = 25;
-					motor2_f( 40,   -5 );  //90 40       
-	        		motor2_r( 0,   -20 );   //40  0	
+					motor2_f( 50,   -5 );  //90 40       
+	        		motor2_r( 0,   -30 );   //40  0	
 				} 
 				
 				
@@ -1897,7 +1897,7 @@ void main( void )
 				if(0 < i_Center  && (l_EncoderTotal-l_startPoint ) >= 150){
 			
 					i_SetAngle = -30;
-					motor2_f( -20,   50 );  //0 80    
+					motor2_f( -50,   80 );  //0 80    
 	        		motor2_r( 0,   0 );   //0 0
 				
 				//	l_startPoint += 2; //éËëOÇ≈ã»Ç™ÇËÇ∑Ç¨ÇƒÇ¢ÇÈÇΩÇﬂãóó£Çè≠ÇµÇÃÇŒÇ∑
@@ -2006,7 +2006,8 @@ void main( void )
 			if(i_Wide != 0){
 
 				if ( (( c_c_cut == 0 || i_date_f_mode == 0) &&  18 < i_Center && i_Center < 35 && (i_Wide != 0 && i_Wide < 12) ) 
-				   || ((c_c_cut == 1 && i_date_f_mode != 0) && -20 < i_Center && i_Center < -3 && (i_Wide_old == 0 || i_Wide_old == 127 || i_Wide > i_Wide_old))
+				   //|| ((c_c_cut == 1 && i_date_f_mode != 0) && -20 < i_Center && i_Center < -3 && (i_Wide_old == 0 || i_Wide_old == 127 || i_Wide > i_Wide_old))
+				   || ((c_c_cut == 1 && i_date_f_mode != 0) && -20 < i_Center && i_Center < -3 && (i_Wide_old == 0 || i_Wide_old == 127))
 				   || ((c_c_cut == 1 && i_date_f_mode != 0) && -25 < i_Center && i_Center < 25 && (i_Wide_old != 0) && (l_EncoderTotal-l_startPoint ) >= 1000)   ){    /* ã»Ç∞èIÇÌÇËÉ`ÉFÉbÉN           */
 				
 	            	ul_cnt_1ms = 0;
@@ -2169,7 +2170,7 @@ void main( void )
 					else i_SetAngle = -98;
 
 					motor2_f( -10,   20 ); //0 80        
-	        		motor2_r( -20,   -20 );  //0 0
+	        		motor2_r( -30,   -20 );  //0 0
 			
 				
 				}else if((l_EncoderTotal-l_startPoint ) >= 150){
@@ -2177,26 +2178,26 @@ void main( void )
 					else i_SetAngle = -80;
 				
 					motor2_f( -10,   30 ); //5 85        
-	        		motor2_r( -20,   -10 ); //0 15
+	        		motor2_r( -30,   -10 ); //0 15
 				
 				}else if((l_EncoderTotal-l_startPoint ) >= 100){
 					if(i > -30)i_SetAngle = -80;
 					else i_SetAngle = -50;
 				
 					motor2_f( -5,   35 ); //30 85        
-	        		motor2_r( -20,   0 ); //0 25
+	        		motor2_r( -30,   0 ); //0 25
 			
 				}else if((l_EncoderTotal-l_startPoint ) >= 50){
 					if(i > -20)i_SetAngle = -50;
 					else i_SetAngle = -35;
 				
 					motor2_f( -5,   40 ); //35 90       
-	        		motor2_r( -20,  0 );   //0 35
+	        		motor2_r( -30,  0 );   //0 35
 					
 				}else{
 					i_SetAngle = -25;
-					motor2_f( -5,   40 );  //40 90    
-	        		motor2_r( -20,   0 );   // 0 40
+					motor2_f( -5,   50 );  //40 90    
+	        		motor2_r( -30,   0 );   // 0 40
 					
 				}
 			  
@@ -2205,7 +2206,7 @@ void main( void )
 				if((i_Center < 0 && (l_EncoderTotal-l_startPoint ) >= 150) ){
 					i_SetAngle = 30;
 
-					motor2_f( 50,   -20 );  //80 0       
+					motor2_f( 80,   -50 );  //80 0       
 	        		motor2_r( 0,   0 );  //0 0
 		
 					//l_startPoint += 2; //éËëOÇ≈ã»Ç™ÇËÇ∑Ç¨ÇƒÇ¢ÇÈÇΩÇﬂãóó£Çè≠ÇµÇÃÇŒÇ∑
@@ -2251,6 +2252,7 @@ void main( void )
 					motor2_f( 10,   50 );  //40 90    
         			motor2_r( -5,   20 );   // 0 40
 				}  
+			
 			
 			
 /*				
@@ -2305,7 +2307,8 @@ void main( void )
 			if(i_Wide != 0){ 
 
 		 		if(( (c_c_cut == 0 || i_date_f_mode == 0) && -35 < i_Center && i_Center < -18 && (i_Wide != 0 && i_Wide < 10)) 
-				|| ( (c_c_cut == 1 && i_date_f_mode != 0) &&   3 < i_Center && i_Center <  20 && (i_Wide_old == 0 || i_Wide_old == 127 ||  i_Wide > i_Wide_old)) 
+				//|| ( (c_c_cut == 1 && i_date_f_mode != 0) &&   3 < i_Center && i_Center <  20 && (i_Wide_old == 0 || i_Wide_old == 127 ||  i_Wide > i_Wide_old)) 
+				|| ( (c_c_cut == 1 && i_date_f_mode != 0) &&   3 < i_Center && i_Center <  20 && (i_Wide_old == 0 || i_Wide_old == 127 )) 
 				|| ( (c_c_cut == 1 && i_date_f_mode != 0) && -25 < i_Center && i_Center <  25 && (i_Wide_old != 0) && (l_EncoderTotal-l_startPoint ) >= 1000) ){    /* ã»Ç∞èIÇÌÇËÉ`ÉFÉbÉN           */
 	 	
 	            	ul_cnt_1ms = 0;
@@ -3401,7 +3404,7 @@ int date_f_make(int i_pattern, int i_angle, int i_encoder, int i_rmode){
 		//if(	sl_Encoder >= 500){//Ç±ÇÃãóó£à»â∫ÇÕñ≥éãÅiääÇËÅHÅj
 			if(si_mode == 0){//S
 				if(((i_rmode == 0 ) && (i_angle < -i_Cu_Angle)) || ((i_rmode != 0 ) && (i_angle < -(i_Cu_Angle_saka)))){
-					if(sl_Encoder > 500){//Ç±ÇÃãóó£à»â∫ÇÕñ≥å¯
+					if((i_rmode == 0 && sl_Encoder > 500) || (i_rmode != 0 && sl_Encoder > 1000) ){//Ç±ÇÃãóó£à»â∫ÇÕñ≥å¯
 						i_date_f_buff_int[si_buff_num_int] += sl_Encoder;
 						si_buff_num_int++;
 						
@@ -3416,7 +3419,7 @@ int date_f_make(int i_pattern, int i_angle, int i_encoder, int i_rmode){
 					si_mode = 1;//L
 						
 				}else if(((i_rmode == 0) &&(i_Cu_Angle < i_angle)) || ((i_rmode != 0) &&(i_Cu_Angle_saka < i_angle))){
-					if(sl_Encoder > 500){//Ç±ÇÃãóó£à»â∫ÇÕñ≥å¯
+					if((i_rmode == 0 && sl_Encoder > 500) || (i_rmode != 0 && sl_Encoder > 1000)){//Ç±ÇÃãóó£à»â∫ÇÕñ≥å¯
 						i_date_f_buff_int[si_buff_num_int] += sl_Encoder;
 						si_buff_num_int++;
 						
@@ -4412,7 +4415,7 @@ unsigned char check_crossline( void )
 	//cam_in();//ílÇÃéÊìæ
 
 	uc_ret = 0;
-	if( (i_Wide > 60) || ((i_Wide >= 40) && (-8 < i_Center ) && (i_Center < 8))   || ((i_Wide >= 28) && (i_Center > -5) && (i_Center < 5)) ){
+	if( (i_Wide > 60) || ((i_Wide >= 40) && (-8 < i_Center ) && (i_Center < 8))   || ((i_Wide >= 28) && (i_Center > -4) && (i_Center < 4)) ){
 	
 		uc_ret = 1;			/* ÉNÉçÉXÉâÉCÉìî≠å© */
 
