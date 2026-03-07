@@ -3384,9 +3384,26 @@ int date_f_make(int i_pattern, int i_angle, int i_encoder, int i_rmode){
 	static int si_buff_num_int = 0;
 //	static int si_buff_num_ch = 0;
 //	static int si_buff_num_int_ch = 0;
+
+	static long sl_Encoder_Total = 0;
+	static long sl_Encoder_Saka = 20000;
+	static int	si_saka_flag = 0;
 	
 	sl_Encoder += i_encoder;
+	sl_Encoder_Total += i_encoder;
 	
+	if(si_saka_flag == 0){
+		if(	i_rmode == 1 && (i_pattern == 10 || i_pattern == 11)){//坂開始
+			si_saka_flag = 1;
+			sl_Encoder_Saka = sl_Encoder_Total;
+		}
+	}else{
+		if(	i_rmode == 0){//坂終了
+			si_saka_flag = 0;
+			sl_Encoder_Saka = sl_Encoder_Total;
+		}
+	}
+				
 	switch(i_pattern){
 		case -1:
 			//if(	sl_Encoder >= 500){//この距離以下は無視（滑り？）
@@ -3409,8 +3426,12 @@ int date_f_make(int i_pattern, int i_angle, int i_encoder, int i_rmode){
 		case 10:
 		case 11:
 		//if(	sl_Encoder >= 500){//この距離以下は無視（滑り？）
-			if(si_mode == 0){//S
-				if(((i_rmode == 0 ) && (i_angle < -i_Cu_Angle)) || ((i_rmode != 0 ) && (i_angle < -(i_Cu_Angle_saka)))){
+			if(si_mode == 0){//S	
+				
+				if(( (sl_Encoder_Total - sl_Encoder_Saka > 1500) && (i_rmode == 0 ) && (i_angle < -i_Cu_Angle) ) 
+				 ||( (sl_Encoder_Total - sl_Encoder_Saka <= 1500) && (i_rmode == 0 ) && (i_angle < -i_Cu_Angle_saka) ) 
+				 || ((i_rmode != 0 ) && (i_angle < -(i_Cu_Angle_saka)))){
+					 
 					if((i_rmode == 0 && sl_Encoder > 500) || (i_rmode != 0 && sl_Encoder > 1000) ){//この距離以下は無効
 						i_date_f_buff_int[si_buff_num_int] += sl_Encoder;
 						si_buff_num_int++;
@@ -3425,7 +3446,10 @@ int date_f_make(int i_pattern, int i_angle, int i_encoder, int i_rmode){
 						
 					si_mode = 1;//L
 						
-				}else if(((i_rmode == 0) &&(i_Cu_Angle < i_angle)) || ((i_rmode != 0) &&(i_Cu_Angle_saka < i_angle))){
+				}else if(( (sl_Encoder_Total - sl_Encoder_Saka > 1500) && (i_rmode == 0) &&(i_Cu_Angle < i_angle))
+					  || ( (sl_Encoder_Total - sl_Encoder_Saka <= 1500) && (i_rmode == 0) &&(i_Cu_Angle_saka < i_angle))
+				 	  || ((i_rmode != 0) &&(i_Cu_Angle_saka < i_angle))){
+					 
 					if((i_rmode == 0 && sl_Encoder > 500) || (i_rmode != 0 && sl_Encoder > 1000)){//この距離以下は無効
 						i_date_f_buff_int[si_buff_num_int] += sl_Encoder;
 						si_buff_num_int++;
