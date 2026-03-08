@@ -3856,16 +3856,14 @@ void intTRB( void )
 				
 				if(c_mode == 0){
 					//if(i_date_f_buff_int[i_date_f_num] - date_f_brake < l_straight_EncoderTotal)si_flag = 1;//‹L˜^‚µ‚½’¼ü‚ğ‘–‚Á‚½
-					if(i_date_f_buff_int[i_date_f_num] > 990){
-						if(i_date_f_buff_int[i_date_f_num] - 500 < l_straight_EncoderTotal)si_flag = 1;//‹L˜^‚µ‚½’¼ü‚ğ‘–‚Á‚½
-					}else{
+					
+					if(l_straight_EncoderTotal > 300){
 						if(i_date_f_buff_int[i_date_f_num] - 300 < l_straight_EncoderTotal)si_flag = 1;//‹L˜^‚µ‚½’¼ü‚ğ‘–‚Á‚½
 					}
 				}else{
-					if(i_date_f_buff_int[i_date_f_num] > 990){
-						//if(i_date_f_buff_int[i_date_f_num] - date_f_brake - 500 < l_straight_EncoderTotal)si_flag = 1;//‹L˜^‚µ‚½’¼ü‚ğ‘–‚Á‚½
-						if(i_date_f_buff_int[i_date_f_num] - 500 - 600 < l_straight_EncoderTotal)si_flag = 1;//‹L˜^‚µ‚½’¼ü‚ğ‘–‚Á‚½
-					}else{
+					//if(i_date_f_buff_int[i_date_f_num] - date_f_brake - 500 < l_straight_EncoderTotal)si_flag = 1;//‹L˜^‚µ‚½’¼ü‚ğ‘–‚Á‚½
+					
+					if(l_straight_EncoderTotal > 300){
 						if(i_date_f_buff_int[i_date_f_num] - 300 - 600 < l_straight_EncoderTotal)si_flag = 1;//‹L˜^‚µ‚½’¼ü‚ğ‘–‚Á‚½
 					}
 				}
