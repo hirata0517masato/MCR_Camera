@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			125	  	/* ハンドル最大位置 115           */
 
-#define 	MAXTIME 			1050 //1100	  				/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
+#define 	MAXTIME 			1100 //1100	  				/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
 #define 	START_WAIT 			 100 //motor+0.5 bat+0.5	// スタート時の走行待ち時間 (1.00秒)  100 = 1s        */
 
 /*======================================*/
@@ -209,13 +209,13 @@ int  		i_Center_offset_Angle = -4;	/*この値につき１ＩＮ側に寄せる	正：IN　負：OU
 int			i_KASOKU = 15;
 
 
-#define		MOTOR_OUT_BASE			90		//カーブ前半用　外側モーター用パラメーター 
+#define		MOTOR_OUT_BASE			95		//カーブ前半用　外側モーター用パラメーター 
 
 #define		MOTOR_OUT_BASE_N		100		//カーブ後半用　外側モーター用パラメーター 
 
 #define		MAX_TOPSPEED	99	//ブースト時でもこの速度以上は出ないように制限する JMCR指定モータ相当の最大速度と同等に設定する
 
-int		    i_TOPSPEED	=		50;		//直線 
+int		    i_TOPSPEED	=		52;		//直線 
 
 /////////////////////////////////////////////////////////////////////////////////////// 0:禁止 1と-1は同じ
 //前半
@@ -225,7 +225,7 @@ int			i_MOTOR_in_F	=		4;//4		//内側モーター用パラメーター 	2 	1
 int			i_MOTOR_in_R	=		-2;//-2		//内側モーター用パラメーター -2	-3
 	
 //後半
-int			i_SPEED_DOWN_N=		7;//7		//角度によりi_TOPSPEEDを減速  カーブ後半 11 10
+int			i_SPEED_DOWN_N=		8;//7		//角度によりi_TOPSPEEDを減速  カーブ後半 11 10
 int			i_MOTOR_out_R_N=	4;//5		//外側モーター用パラメーター 後半	5	5
 int			i_MOTOR_in_F_N=		7;//8		//内側モーター用パラメーター　後半	6	6
 int			i_MOTOR_in_R_N=		4;//6		//内側モーター用パラメーター　後半	3	3
@@ -237,7 +237,7 @@ int			i_MOTOR_in_R_N=		4;//6		//内側モーター用パラメーター　後半	3	3
 #define		Cu_FREE_time  		15		//カーブ終了時の後輪フリーの時間(msec）
 
 #define		Cu_BRAKE_time  		10		//カーブ進入時のブレーキ時間 (msec)
-#define		Cu_BRAKE_SP 		30		//カーブ進入時にこの速度以上ならブレーキ
+#define		Cu_BRAKE_SP 		35		//カーブ進入時にこの速度以上ならブレーキ
 #define		Cu_BRAKE			-90		//カーブ進入時のブレーキ（後輪） 
 #define		Cu_BRAKE_out		 0		//カーブ進入時のブレーキ(前輪OUT） 
 #define		Cu_BRAKE_Fin		-35		//カーブ進入時のブレーキ(前輪IN） 
@@ -252,8 +252,8 @@ int			i_MOTOR_in_R_N=		4;//6		//内側モーター用パラメーター　後半	3	3
 int			i_S_flag = 2;				//坂道　遇数回を　1 = 無視しない  2 = 無視する
 int			i_saka_max	  =		  1;	//認識可能な坂の数
 #define 	KASA_Encoder1  	100	//坂開始	50
-#define 	KASA_Encoder2  	400	//上り途中 終わり 300
-#define 	KASA_Encoder3  	1500	//上り終わり 
+#define 	KASA_Encoder2  	500	//上り途中 終わり 300
+#define 	KASA_Encoder3  	1400	//上り終わり 
 
 #define		KASA_Encoder4  	3800	//坂上終わり  2500
 #define		KASA_Encoder5  	4400	//下り終わり 通常にもどる 
@@ -263,7 +263,7 @@ int			i_saka_max	  =		  1;	//認識可能な坂の数
 
 
 //斜面(上り)
-#define		    TOPSPEED2			44		//直線(坂）30 33
+#define		    TOPSPEED2			46		//直線(坂）30 33
 #define			SPEED_DOWN2			20		//角度によりTOPSPEEDを減速(坂）カーブ前半
 #define			SPEED_DOWN2_N		20		//角度によりTOPSPEEDを減速  カーブ後半
 #define			MOTOR_out2_R		20 		//外側モーター用パラメーター(坂）
@@ -272,7 +272,7 @@ int			i_saka_max	  =		  1;	//認識可能な坂の数
 
 
 //斜面(上り,頂上付近　飛び跳ね防止)
-#define		    TOPSPEED3			31		//直線(坂）30 33
+#define		    TOPSPEED3			33		//直線(坂）30 33
 #define			SPEED_DOWN3			6		//角度によりTOPSPEEDを減速(坂）カーブ前半
 #define			SPEED_DOWN3_N		6		//角度によりTOPSPEEDを減速  カーブ後半
 #define			MOTOR_out3_R		2	//外側モーター用パラメーター(坂）
@@ -302,6 +302,7 @@ int			i_saka_max	  =		  1;	//認識可能な坂の数
 
 //クランク、ハーフ直後の設定値	カーブのパラメータ変更がクランク、ハーフに影響しないようにするため
 #define		    TOPSPEED_CH_Len		700		//クランク、ハーフ直後のこの距離未満は以下の設定値で走る　注意：カーブ前半のみ有効
+											//クランクは400くらいで良いがハーフが700必要
 
 #define			MOTOR_OUT_BASE_CH	85		//カーブ前半用　外側モーター用パラメーター クランク、ハーフの直後
 
@@ -834,7 +835,7 @@ void main( void )
 		}
 		
 		
-		if(l_EncoderTotal > 700){
+		if(l_EncoderTotal > 500){
 			
 			c_mode = 0;//元に戻す
 			
@@ -1852,7 +1853,7 @@ void main( void )
 					if(i < 70)i_SetAngle = 120;
 					else i_SetAngle = 98;
 				
-					motor2_f( 20,   -10 );  //80 0       
+					motor2_f( 20,   -15 );  //80 0       
 	        		motor2_r( -20,   -30 );   //0 0
 			
 				
@@ -1861,7 +1862,7 @@ void main( void )
 					if(i < 90)i_SetAngle = 150;
 					else i_SetAngle = 100;//80
 				
-					motor2_f( 30,   -10 );  //85 5      
+					motor2_f( 30,   -15 );  //85 5      
 	        		motor2_r( -10,   -30 );  //15 0
 				
 				}else if((l_EncoderTotal-l_startPoint ) >= 100){
@@ -1869,7 +1870,7 @@ void main( void )
 					if(i < 50)i_SetAngle = 120;
 					else i_SetAngle = 60;//50;
 				
-					motor2_f( 35,  -10 ); //85 30        
+					motor2_f( 35,  -15 ); //85 30        
 	        		motor2_r( -10,   -30 );  //25 0
 			
 				}else if((l_EncoderTotal-l_startPoint ) >= 50){
@@ -1877,12 +1878,12 @@ void main( void )
 					if(i < 25)i_SetAngle = 60;
 					else i_SetAngle = 35;
 				
-					motor2_f( 40, -10 ); //90 35        
+					motor2_f( 40, -15 ); //90 35        
 	        		motor2_r( -5,  -30 );   //35 0
 					
 				}else{
 					i_SetAngle = 25;
-					motor2_f( 40,   -5 );  //90 40       
+					motor2_f( 40,  -10 );  //90 40       
 	        		motor2_r( 0,   -30 );   //40  0	
 				} 
 				
@@ -1899,14 +1900,14 @@ void main( void )
 				
 				//	l_startPoint += 2; //手前で曲がりすぎているため距離を少しのばす
 				
-				}else if((l_EncoderTotal-l_startPoint ) >= 350){
+				}else if((l_EncoderTotal-l_startPoint ) >= 370){
 				
 					i_SetAngle = 90;
 					motor2_f( 40,   5 );  //85 5       
         			motor2_r( 8,   -5 );  //25 0
 				
 				
-				}else if((l_EncoderTotal-l_startPoint ) >= 250){
+				}else if((l_EncoderTotal-l_startPoint ) >= 270){
 				
 					if(i < 70)i_SetAngle = 120;
 					else i_SetAngle = 98;
@@ -1915,36 +1916,39 @@ void main( void )
         			motor2_r( -10,   -10 );   //0 0
 			
 				
-				}else if((l_EncoderTotal-l_startPoint ) >= 150){
+				}else if((l_EncoderTotal-l_startPoint ) >= 170){
 				
-					if(i < 50)i_SetAngle = 100;
-					else i_SetAngle = 60;//80
+					if(i < 60)i_SetAngle = 100;
+					else i_SetAngle = 70;//80
 				
 					motor2_f( 40,   0 );  //85 5      
         			motor2_r( 0,   -10 );  //15 0
 				
 				}else if((l_EncoderTotal-l_startPoint ) >= 100){
 				
-					if(i < 30)i_SetAngle = 80;
-					else i_SetAngle = 40;//50
+					if(i < 25)i_SetAngle = 80;
+					else if(i > 38)i_SetAngle = 15;
+					else i_SetAngle = 35;//50
 				
-					motor2_f( 45,   2 ); //85 30        
+					motor2_f( 45,   5 ); //85 30        
         			motor2_r( 10,   -10 );  //25 0
 			
 				}else if((l_EncoderTotal-l_startPoint ) >= 50){
 				
 					if(i < 15)i_SetAngle = 50;
-					else i_SetAngle = 25; //35
+					else if(i > 23)i_SetAngle = 5;
+					else i_SetAngle = 20; //35
 				
-					motor2_f( 50,   5 ); //90 35        
+					motor2_f( 50,   10 ); //90 35        
         			motor2_r( 15,  -5 );   //35 0
 					
 				}else{
 					if(i < 5)i_SetAngle = 25;
+					else if(i > 13)i_SetAngle = 0;
 					else i_SetAngle = 10;//25
 				
 					motor2_f( 60,   15 );  //90 40       
-        			motor2_r( 20,   -5 );   //40  0	
+        			motor2_r( 20,   0 );   //40  0	
 				} 
 /*		
 				}else if((l_EncoderTotal-l_startPoint ) >= 350){
@@ -2171,7 +2175,7 @@ void main( void )
 					if(i > -70)i_SetAngle = -120;
 					else i_SetAngle = -98;
 
-					motor2_f( -10,   20 ); //0 80        
+					motor2_f( -15,   20 ); //0 80        
 	        		motor2_r( -30,   -20 );  //0 0
 			
 				
@@ -2179,26 +2183,26 @@ void main( void )
 					if(i > -90)i_SetAngle = -150;
 					else i_SetAngle = -100;//-80
 				
-					motor2_f( -10,   30 ); //5 85        
+					motor2_f( -15,   30 ); //5 85        
 	        		motor2_r( -30,   -10 ); //0 15
 				
 				}else if((l_EncoderTotal-l_startPoint ) >= 100){
 					if(i > -50)i_SetAngle = -120;
 					else i_SetAngle = -60;//-50;
 				
-					motor2_f( -10,   35 ); //30 85        
+					motor2_f( -15,   35 ); //30 85        
 	        		motor2_r( -30,   -10 ); //0 25
 			
 				}else if((l_EncoderTotal-l_startPoint ) >= 50){
 					if(i > -25)i_SetAngle = -60;
 					else i_SetAngle = -35;
 				
-					motor2_f( -10,   40 ); //35 90       
+					motor2_f( -15,   40 ); //35 90       
 	        		motor2_r( -30,  -5 );   //0 35
 					
 				}else{
 					i_SetAngle = -25;
-					motor2_f( -5,   40 );  //40 90    
+					motor2_f( -10,   40 );  //40 90    
 	        		motor2_r( -30,   0 );   // 0 40
 					
 				}
@@ -2213,13 +2217,13 @@ void main( void )
 		
 					//l_startPoint += 2; //手前で曲がりすぎているため距離を少しのばす
 
-				}else if((l_EncoderTotal-l_startPoint ) >= 350){
+				}else if((l_EncoderTotal-l_startPoint ) >= 370){
 					i_SetAngle = -90;
 
 					motor2_f( 5,   40 ); //5 85        
         			motor2_r( -5,   8 );  //0 25
 				
-				}else if((l_EncoderTotal-l_startPoint ) >= 250){
+				}else if((l_EncoderTotal-l_startPoint ) >= 270){
 				
 					if(i > -70)i_SetAngle = -120;
 					else i_SetAngle = -98;
@@ -2228,33 +2232,36 @@ void main( void )
         			motor2_r( -10,   -10 );  //0 0
 			
 				
-				}else if((l_EncoderTotal-l_startPoint ) >= 150){
-					if(i > -50)i_SetAngle = -100;
-					else i_SetAngle = -60;//-80
+				}else if((l_EncoderTotal-l_startPoint ) >= 170){
+					if(i > -60)i_SetAngle = -100;
+					else i_SetAngle = -70;//-80
 				
 					motor2_f( 0,   40 ); //5 85        
         			motor2_r( -10,   0 ); //0 15
 				
 				}else if((l_EncoderTotal-l_startPoint ) >= 100){
-					if(i > -30)i_SetAngle = -80;
-					else i_SetAngle = -40;//-50
+					if(i > -25)i_SetAngle = -80;
+					else if(i < -38)i_SetAngle = -15;
+					else i_SetAngle = -35;//-50
 				
-					motor2_f( 2,   45 ); //30 85        
+					motor2_f( 5,   45 ); //30 85        
         			motor2_r( -10,   10 ); //0 25
 			
 				}else if((l_EncoderTotal-l_startPoint ) >= 50){
 					if(i > -15)i_SetAngle = -50;
-					else i_SetAngle = -25;//-35
+					else if(i < -23)i_SetAngle = -5;
+					else i_SetAngle = -20;//-35
 				
-					motor2_f( 5,   50 ); //35 90       
+					motor2_f( 10,   50 ); //35 90       
         			motor2_r( -5,  15 );   //0 35
 					
 				}else{
 					if(i > -5)i_SetAngle = -25;
+					else if(i < -13)i_SetAngle = 0;
 					else i_SetAngle = -10;//-25
 					
 					motor2_f( 15,   60 );  //40 90    
-        			motor2_r( -5,   20 );   // 0 40
+        			motor2_r(  0,   20 );   // 0 40
 				}  
 			
 			
@@ -4452,7 +4459,7 @@ unsigned char check_crossline( void )
 	//cam_in();//値の取得
 
 	uc_ret = 0;
-	if( (i_Wide > 60) || ((i_Wide >= 40) && (-8 < i_Center ) && (i_Center < 8))   || ((i_Wide >= 28) && (i_Center > -4) && (i_Center < 4)) ){
+	if( (i_Wide > 60) || ((i_Wide >= 40) && (-8 < i_Center ) && (i_Center < 8)) || ((i_Wide >= 28) && (i_Center > -4) && (i_Center < 4)) ){
 	
 		uc_ret = 1;			/* クロスライン発見 */
 
