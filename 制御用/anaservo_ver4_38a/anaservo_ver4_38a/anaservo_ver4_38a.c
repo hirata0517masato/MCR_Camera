@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			125	  	/* ハンドル最大位置 115           */
 
-#define 	MAXTIME 			1100 //1100	  				/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
+#define 	MAXTIME 			1650 //1100	  				/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
 #define 	START_WAIT 			 100 //motor+0.5 bat+0.5	// スタート時の走行待ち時間 (1.00秒)  100 = 1s        */
 
 /*======================================*/
@@ -216,7 +216,7 @@ int			i_KASOKU = 15;
 #define		MAX_TOPSPEED	99	//ブースト時でもこの速度以上は出ないように制限する JMCR指定モータ相当の最大速度と同等に設定する
 
 int		    i_TOPSPEED	=		52;		//直線 
-int		    i_TOPSPEED_B=		54;		//直線 コース記憶用
+int		    i_TOPSPEED_B=		52;		//直線 コース記憶用
 
 /////////////////////////////////////////////////////////////////////////////////////// 0:禁止 1と-1は同じ
 //前半
@@ -645,7 +645,6 @@ void main( void )
 					i_date_f_buff_ch_int[j] = (int)(c_date_f_buff_ch[i+1])*100 + (int)c_date_f_buff_ch[i+2];
 					j++;
 				}
-				
 			
 				
 			/*	
@@ -700,7 +699,8 @@ void main( void )
 					j++;
 				}
 		
-
+				
+		
 				
 				
 				/*
@@ -2474,7 +2474,7 @@ void main( void )
 #ifdef HWall  //壁あり    	
 			i_SetAngle = -65;
 #else //壁無し
-			i_SetAngle = -50;
+			i_SetAngle = -60;
 #endif
 
 		}else{
@@ -2539,7 +2539,7 @@ void main( void )
 #ifdef HWall  //壁あり    	
 				i_SetAngle = -30;
 #else //壁無し
-				i_SetAngle = 0; // -20
+				i_SetAngle = -10; // -20
 #endif
 			}
 		}else{
@@ -2806,7 +2806,7 @@ void main( void )
 #ifdef HWall  //壁あり    	
 			i_SetAngle = 68;
 #else //壁無し
-			i_SetAngle = 50;
+			i_SetAngle = 60;
 #endif			
 		}else{
 			i_SetAngle = 16;//48 47
@@ -2868,7 +2868,7 @@ void main( void )
 #ifdef HWall  //壁あり    	
 				i_SetAngle = 30;//-3
 #else //壁無し
-				i_SetAngle = 0;//-3 20
+				i_SetAngle = 10;//-3 20
 #endif
 			}
 		}else{

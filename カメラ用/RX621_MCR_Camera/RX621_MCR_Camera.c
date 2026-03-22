@@ -52,8 +52,8 @@ void WhiteLineWide(int,int);
 
 #define		Line_Max	760 //560　//360はNG誤検知が多い		/* ライン白色MAX値の設定 */ 
 
-#define 	LineStart 	35		/* カメラで見る範囲(通常モード) */
-#define 	LineStop  	92
+#define 	LineStart 	38 //35		/* カメラで見る範囲(通常モード) */
+#define 	LineStop  	89 //92
 
 #define 	LineStartSaka 	50		/* カメラで見る範囲(坂モード) */
 #define 	LineStopSaka  	77
@@ -359,7 +359,7 @@ void expose( void )
 		if(-10 < sa && sa < 10){
 			//誤差なので変更しない
 		}else{ 
-			EXPOSURE_timer += max(min((long)(sa*4),400),-400) ;
+			EXPOSURE_timer += max(min((long)(sa*4),500),-500) ;
 			/*
 			if(Line_Max - Max < 0){
 				EXPOSURE_timer -= 50;
@@ -612,7 +612,7 @@ void WhiteLineWide(int linestart, int linestop)
 			
 			
 		//ライン細すぎ || ( 前回、黒又は白一色ではない && ハーフラインなどではない &&  (急にラインが移動した))
-		if((((mode == 1) && (Wide < 3)) || ((mode != 1) && (Wide < 3))) || ((Center_lasttime != 64) && (White < 20) && (((Center - Center_lasttime) > 15) || ((Center - Center_lasttime) < -15)))){
+		if((((mode == 1) && (Wide < 3)) || ((mode != 1) && (Wide < 7))) || ((Center_lasttime != 64) && (White < 20) && (((Center - Center_lasttime) > 15) || ((Center - Center_lasttime) < -15)))){
 					
 			if(Center_lasttime < 60){
 						
