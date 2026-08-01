@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			125	  	/* ハンドル最大位置 115           */
 
-#define 	MAXTIME 			900 //1100	  				/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
+#define 	MAXTIME 			950 //1100	  				/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
 #define 	START_WAIT 			 100 //motor+0.5 bat+0.5	// スタート時の走行待ち時間 (1.00秒)  100 = 1s        */
 
 /*======================================*/
@@ -203,8 +203,8 @@ unsigned char   uc_types_dipsw;            /* ディップスイッチ値保存       */
 
 **************************************************************************************************/
 //オフセット
-int  		i_Center_offset_MAX = 2;		/*カーブ時カメラセンターを移動＝寄せる 最小値 0 	*/
-int  		i_Center_offset_Angle = -10;	/*この値につき１ＩＮ側に寄せる	正：IN　負：OUT		*/
+int  		i_Center_offset_MAX = 5;		/*カーブ時カメラセンターを移動＝寄せる 最小値 0 	*/
+int  		i_Center_offset_Angle = -5;	/*この値につき１ＩＮ側に寄せる	正：IN　負：OUT		*/
 
 int			i_KASOKU = 15;
 
@@ -322,11 +322,11 @@ int			i_saka_max	  =		  1;	//認識可能な坂の数
 #define			SPEED_DOWN_CH_Boost		20		//角度によりTOPSPEEDを減速  カーブ前半
 #define			SPEED_DOWN_CH_N_Boost	20		//角度によりTOPSPEEDを減速  カーブ後半（実質無効）
 
-#define			MOTOR_out_CH_R_Boost	 -2		//外側モーター用パラメーター
-#define			MOTOR_in_CH_F_Boost		 2		//内側モーター用パラメーター
-#define			MOTOR_in_CH_R_Boost		-2		//内側モーター用パラメーター
+#define			MOTOR_out_CH_R_Boost	 1		//外側モーター用パラメーター -2
+#define			MOTOR_in_CH_F_Boost		 2		//内側モーター用パラメーター 2
+#define			MOTOR_in_CH_R_Boost		-2		//内側モーター用パラメーター -2
 
-#define			MOTOR_out_CH_R_Boost_min	 0//-20		//外側モーター用パラメーター 最小PWM	
+#define			MOTOR_out_CH_R_Boost_min	 10//-20		//外側モーター用パラメーター 最小PWM	
 #define			MOTOR_in_CH_F_Boost_min		 -5 //-10		//内側モーター用パラメーター　最小PWM
 #define			MOTOR_in_CH_R_Boost_min		 0//-20		//内側モーター用パラメーター　最小PWM
 
@@ -645,6 +645,7 @@ void main( void )
 					i_date_f_buff_ch_int[j] = (int)(c_date_f_buff_ch[i+1])*100 + (int)c_date_f_buff_ch[i+2];
 					j++;
 				}
+			
 			
 				
 			/*	
@@ -1817,8 +1818,8 @@ void main( void )
 				
 				}else i_SetAngle = 110;
 			
-				motor_f( 15, 0 );  //10,0        /* この部分は「角度計算(4WD時).xls」 85 -40*/
-        		motor_r( -40, -40 ); //-15.-15         /* で計算                        */
+				motor_f( 15, 5 );  //10,0        /* この部分は「角度計算(4WD時).xls」 85 -40*/
+        		motor_r( -20, -20 ); //-15.-15         /* で計算                        */
 			
 			}else{//long
 				if((l_EncoderTotal-l_startPoint ) >= 200){
@@ -1828,7 +1829,7 @@ void main( void )
 				}else i_SetAngle = 95;
 			
 				motor_f( 85,  -5 );          /* この部分は「角度計算(4WD時).xls」 85 -40*/
-        		motor_r( -30,  -30 );          /* で計算                        */
+        		motor_r( -20,  -20 );          /* で計算                        */
 			}
 			
 		
@@ -1904,26 +1905,26 @@ void main( void )
 				if(0 < i_Center  && (l_EncoderTotal-l_startPoint ) >= 150){
 			
 					i_SetAngle = -50;
-					motor2_f( -50,   80 );  //0 80    
-	        		motor2_r( -10,   0 );   //0 0
+					motor2_f( -50,   80 );  //-50 80    
+	        		motor2_r( -10,   0 );   //-10 0
 				
 				//	l_startPoint += 2; //手前で曲がりすぎているため距離を少しのばす
 				
 				}else if((l_EncoderTotal-l_startPoint ) >= 370){
 				
 					i_SetAngle = 90;
-					motor2_f( 20,   5 );  //85 5       
-        			motor2_r( 8,   -5 );  //25 0
+					motor2_f( 20,   5 );  //20 5       
+        			motor2_r( 8,   -5 );  //8 -5
 				
 				
 				}else if((l_EncoderTotal-l_startPoint ) >= 270){
 				
-					if(i < 70)i_SetAngle = 120;
-					else if(i > 102)i_SetAngle = 20;
-					else i_SetAngle = 100;
+					if(i < 60)i_SetAngle = 100;
+					else if(i > 72)i_SetAngle = 20;
+					else i_SetAngle = 70;//80
 				
-					motor2_f( 20,   0 );  //80 0       
-        			motor2_r( -10,   -10 );   //0 0
+					motor2_f( 20,   0 );  //20 0       
+        			motor2_r( 0,   -10 );   //-10 -10
 			
 				
 				}else if((l_EncoderTotal-l_startPoint ) >= 170){
@@ -1932,8 +1933,8 @@ void main( void )
 					else if(i > 72)i_SetAngle = 20;
 					else i_SetAngle = 70;//80
 				
-					motor2_f( 35,   0 );  //85 5      
-        			motor2_r( 0,   -10 );  //15 0
+					motor2_f( 35,   0 );  //35 0      
+        			motor2_r( 0,   -10 );  //0 -10
 				
 				}else if((l_EncoderTotal-l_startPoint ) >= 100){
 				
@@ -1941,8 +1942,8 @@ void main( void )
 					else if(i > 38)i_SetAngle = 5;
 					else i_SetAngle = 35;//50
 				
-					motor2_f( 45,   5 ); //85 30        
-        			motor2_r( 10,   -10 );  //25 0
+					motor2_f( 45,   10 ); //45 10        
+        			motor2_r( 10,   -10 );  //10 -10
 			
 				}else if((l_EncoderTotal-l_startPoint ) >= 50){
 				
@@ -1950,16 +1951,16 @@ void main( void )
 					else if(i > 20)i_SetAngle = 5;
 					else i_SetAngle = 18; //35
 				
-					motor2_f( 50,   10 ); //90 35        
-        			motor2_r( 15,  -5 );   //35 0
+					motor2_f( 50,   15 ); //50 15        
+        			motor2_r( 15,  -5 );   //15 -5
 					
 				}else{
 					if(i < 5)i_SetAngle = 25;
 					else if(i > 13)i_SetAngle = 0;
 					else i_SetAngle = 10;//25
 				
-					motor2_f( 60,   15 );  //90 40       
-        			motor2_r( 20,   0 );   //40  0	
+					motor2_f( 60,   20 );  //60 20       
+        			motor2_r( 20,   0 );   //20  0	
 				} 
 				
 			}
@@ -1976,7 +1977,7 @@ void main( void )
 
 				if ( (( c_c_cut == 0 || i_date_f_mode == 0) &&  18 < i_Center && i_Center < 35 && (i_Wide != 0 && i_Wide < 12) ) 
 				   //|| ((c_c_cut == 1 && i_date_f_mode != 0) && -20 < i_Center && i_Center < -3 && (i_Wide_old == 0 || i_Wide_old == 127 || i_Wide > i_Wide_old))
-				   || ((c_c_cut == 1 && i_date_f_mode != 0  && c_c_short_mode == 0) && -20 < i_Center && i_Center < -3 && (i_Wide_old == 0 || i_Wide_old == 127))
+				   || ((c_c_cut == 1 && i_date_f_mode != 0  && c_c_short_mode == 0) && -20 < i_Center && i_Center < 0 && (i_Wide_old == 0 || i_Wide_old == 127))
 				   || ((c_c_cut == 1 && i_date_f_mode != 0  && c_c_short_mode == 1) && -20 < i_Center && i_Center < 0 && (i_Wide_old == 0 || i_Wide_old == 127))
 				   || ((c_c_cut == 1 && i_date_f_mode != 0) && -25 < i_Center && i_Center < 25 && (i_Wide_old != 0) && (l_EncoderTotal-l_startPoint ) >= 500)   ){    /* 曲げ終わりチェック           */
 				
@@ -2096,8 +2097,8 @@ void main( void )
 				
 				}else i_SetAngle = -110;
 			
-				motor_f( 0, 15);    //0,10      /* この部分は「角度計算(4WD時).xls」*/
-        		motor_r( -40, -40 );   //-15.-15       /* で計算                        */
+				motor_f( 5, 15);    //0,10      /* この部分は「角度計算(4WD時).xls」*/
+        		motor_r( -20, -20 );   //-15.-15       /* で計算                        */
 				
 			}else{//long
 				
@@ -2109,7 +2110,7 @@ void main( void )
 				}else i_SetAngle = -95;
 			
 				motor_f(  -5, 85 );          /* この部分は「角度計算(4WD時).xls」*/
-        		motor_r(  -30, -30 );          /* で計算                        */
+        		motor_r(  -20, -20 );          /* で計算                        */
 			}
 		}else{
 			c_mode = 1;//見る範囲を狭く
@@ -2178,25 +2179,25 @@ void main( void )
 					
 					i_SetAngle = 50;//30
 
-					motor2_f( 80,   -50 );  //80 0       
-	        		motor2_r( 0,   -10 );  //0 0
+					motor2_f( 80,   -50 );  //80 -50       
+	        		motor2_r( 0,   -10 );  //0 -10
 		
 					//l_startPoint += 2; //手前で曲がりすぎているため距離を少しのばす
 
 				}else if((l_EncoderTotal-l_startPoint ) >= 370){
 					i_SetAngle = -90;
 
-					motor2_f( 5,   20 ); //5 85        
-        			motor2_r( -5,   8 );  //0 25
+					motor2_f( 5,   20 ); //5 20        
+        			motor2_r( -5,   8 );  //-5 8
 				
 				}else if((l_EncoderTotal-l_startPoint ) >= 270){
 				
-					if(i > -70)i_SetAngle = -120;
-					else if(i < -102)i_SetAngle = -20;
-					else i_SetAngle = -100;
+					if(i > -60)i_SetAngle = -100;
+					else if(i < -72)i_SetAngle = -20;
+					else i_SetAngle = -70;//-80
 
-					motor2_f( 0,   20 ); //0 80        
-        			motor2_r( -10,   -10 );  //0 0
+					motor2_f( 0,   20 ); //0 20        
+        			motor2_r( -10,   0 );  //-10 -10
 			
 				
 				}else if((l_EncoderTotal-l_startPoint ) >= 170){
@@ -2204,32 +2205,32 @@ void main( void )
 					else if(i < -72)i_SetAngle = -20;
 					else i_SetAngle = -70;//-80
 				
-					motor2_f( 0,   35 ); //5 85        
-        			motor2_r( -10,   0 ); //0 15
+					motor2_f( 0,   35 ); //0 35        
+        			motor2_r( -10,   0 ); //-10 0
 				
 				}else if((l_EncoderTotal-l_startPoint ) >= 100){
 					if(i > -25)i_SetAngle = -80;
 					else if(i < -38)i_SetAngle = -5;
 					else i_SetAngle = -35;//-50
 				
-					motor2_f( 5,   45 ); //30 85        
-        			motor2_r( -10,   10 ); //0 25
+					motor2_f( 10,   45 ); //10 45        
+        			motor2_r( -10,   10 ); //-10 10
 			
 				}else if((l_EncoderTotal-l_startPoint ) >= 50){
 					if(i > -15)i_SetAngle = -50;
 					else if(i < -20)i_SetAngle = -5;
 					else i_SetAngle = -18;//-35
 				
-					motor2_f( 10,   50 ); //35 90       
-        			motor2_r( -5,  15 );   //0 35
+					motor2_f( 15,   50 ); //15 50       
+        			motor2_r( -5,  15 );   //-5 15
 					
 				}else{
 					if(i > -5)i_SetAngle = -25;
 					else if(i < -13)i_SetAngle = 0;
 					else i_SetAngle = -10;//-25
 					
-					motor2_f( 15,   60 );  //40 90    
-        			motor2_r(  0,   20 );   // 0 40
+					motor2_f( 20,   60 );  //20 60    
+        			motor2_r(  0,   20 );   // 0 20
 				}  
 			
 			}
@@ -2244,7 +2245,7 @@ void main( void )
 
 		 		if(( (c_c_cut == 0 || i_date_f_mode == 0) && -35 < i_Center && i_Center < -18 && (i_Wide != 0 && i_Wide < 10)) 
 				//|| ( (c_c_cut == 1 && i_date_f_mode != 0) &&   3 < i_Center && i_Center <  20 && (i_Wide_old == 0 || i_Wide_old == 127 ||  i_Wide > i_Wide_old)) 
-				|| ( (c_c_cut == 1 && i_date_f_mode != 0 && c_c_short_mode == 0) &&   3 < i_Center && i_Center <  20 && (i_Wide_old == 0 || i_Wide_old == 127 )) 
+				|| ( (c_c_cut == 1 && i_date_f_mode != 0 && c_c_short_mode == 0) &&   0 < i_Center && i_Center <  20 && (i_Wide_old == 0 || i_Wide_old == 127 )) 
 				|| ( (c_c_cut == 1 && i_date_f_mode != 0 && c_c_short_mode == 1) &&   0 < i_Center && i_Center <  20 && (i_Wide_old == 0 || i_Wide_old == 127 )) 
 				|| ( (c_c_cut == 1 && i_date_f_mode != 0) && -25 < i_Center && i_Center <  25 && (i_Wide_old != 0) && (l_EncoderTotal-l_startPoint ) >= 500) ){    /* 曲げ終わりチェック           */
 	 	
@@ -2474,7 +2475,7 @@ void main( void )
 #ifdef HWall  //壁あり    	
 			i_SetAngle = -65;
 #else //壁無し
-			i_SetAngle = -60;
+			i_SetAngle = -55;
 #endif
 
 		}else{
@@ -2806,7 +2807,7 @@ void main( void )
 #ifdef HWall  //壁あり    	
 			i_SetAngle = 68;
 #else //壁無し
-			i_SetAngle = 60;
+			i_SetAngle = 55;
 #endif			
 		}else{
 			i_SetAngle = 16;//48 47
@@ -3318,6 +3319,7 @@ int date_f_make(int i_pattern, int i_angle, int i_encoder, int i_rmode){
 	static long sl_Encoder_Total = 0;
 	static long sl_Encoder_Saka = 20000;
 	static int	si_saka_flag = 0;
+	static int si_Encoder_min = 800;
 	
 	sl_Encoder += i_encoder;
 	sl_Encoder_Total += i_encoder;
@@ -3338,7 +3340,7 @@ int date_f_make(int i_pattern, int i_angle, int i_encoder, int i_rmode){
 		case -1:
 			//if(	sl_Encoder >= 500){//この距離以下は無視（滑り？）
 				if(si_mode == 0){//S
-					if(sl_Encoder > 500){//この距離以下は無効
+					if(sl_Encoder > si_Encoder_min){//この距離以下は無効
 						i_date_f_buff_int[si_buff_num_int] += sl_Encoder;
 						si_buff_num_int++;
 						
@@ -3362,7 +3364,7 @@ int date_f_make(int i_pattern, int i_angle, int i_encoder, int i_rmode){
 				 ||( (sl_Encoder_Total - sl_Encoder_Saka <= 1500) && (i_rmode == 0 ) && (i_angle < -i_Cu_Angle_saka) ) 
 				 || ((i_rmode != 0 ) && (i_angle < -(i_Cu_Angle_saka)))){
 					 
-					if((i_rmode == 0 && sl_Encoder > 500) || (i_rmode != 0 && sl_Encoder > 1000) ){//この距離以下は無効
+					if((i_rmode == 0 && sl_Encoder > si_Encoder_min) || (i_rmode != 0 && sl_Encoder > si_Encoder_min + 200) ){//この距離以下は無効
 						i_date_f_buff_int[si_buff_num_int] += sl_Encoder;
 						si_buff_num_int++;
 						
@@ -3380,7 +3382,7 @@ int date_f_make(int i_pattern, int i_angle, int i_encoder, int i_rmode){
 					  || ( (sl_Encoder_Total - sl_Encoder_Saka <= 1500) && (i_rmode == 0) &&(i_Cu_Angle_saka < i_angle))
 				 	  || ((i_rmode != 0) &&(i_Cu_Angle_saka < i_angle))){
 					 
-					if((i_rmode == 0 && sl_Encoder > 500) || (i_rmode != 0 && sl_Encoder > 1000)){//この距離以下は無効
+					if((i_rmode == 0 && sl_Encoder > si_Encoder_min) || (i_rmode != 0 && sl_Encoder > si_Encoder_min+200)){//この距離以下は無効
 						i_date_f_buff_int[si_buff_num_int] += sl_Encoder;
 						si_buff_num_int++;
 						
@@ -3423,7 +3425,7 @@ int date_f_make(int i_pattern, int i_angle, int i_encoder, int i_rmode){
 		case 22:
 			if(si_mode != 3){//C
 				if(si_mode == 0){//S
-					if(sl_Encoder > 500){//この距離以下は無効
+					if(sl_Encoder > si_Encoder_min){//この距離以下は無効
 						i_date_f_buff_int[si_buff_num_int] += sl_Encoder;
 						si_buff_num_int++;
 						
@@ -3473,7 +3475,7 @@ int date_f_make(int i_pattern, int i_angle, int i_encoder, int i_rmode){
 		case 62:
 			if(si_mode != 4){//H
 				if(si_mode == 0){//S
-					if(sl_Encoder > 500){//この距離以下は無効
+					if(sl_Encoder > si_Encoder_min){//この距離以下は無効
 						i_date_f_buff_int[si_buff_num_int] += sl_Encoder;
 						si_buff_num_int++;
 						
