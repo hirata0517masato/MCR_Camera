@@ -73,7 +73,7 @@ void WhiteLineWide(int,int);
 unsigned long   cnt1000 =  0;
 
 /* カメラ関連 */
-long	  	EXPOSURE_timer = 15000;	/* 露光時間	20000				*/
+long	  	EXPOSURE_timer = 20000;	/* 露光時間	20000				*/
 int		ImageData[130];			/* カメラの値				*/
 //int		ImageData_buf[130];			/* カメラの値				*/
 int 		BinarizationData[130];	/* ２値化					*/
@@ -190,6 +190,9 @@ void main(void)
 				WhiteLineWide(line_start,line_stop);		//白ラインの測定
 				*/
 				
+				line_start = LineStart;
+				line_stop =  LineStop;
+					
 				ImageCapture(LineStart,LineStop);			//イメージキャプチャー
 		
 				binarization(LineStart,LineStop); 		//２値化
@@ -249,10 +252,10 @@ void main(void)
 		#ifdef PRINT
 			cnt1000++;
 			
-			if(cnt1000 > 500){
-				//for(i = LineStart; i <= LineStop; i++)printf("%d",BinarizationData[i]);
+			if(cnt1000 > 100){
+				for(i = LineStart; i <= LineStop; i++)printf("%d",BinarizationData[i]);
 				//for(i = LineStart; i <= LineStop; i+=2)printf("%d",BinarizationData[i]);
-				for(i = 0; i <=127; i+=2)printf("%d",BinarizationData[i]);
+				//for(i = 0; i <=127; i+=2)printf("%d",BinarizationData[i]);
 				printf("Max = %d Min = %d Center = %d Wide = %d Lsensor = %d Rsensor = %d time = %d mode = %d Start = %d Stop = %d",Max,Min,Center,Wide,Lsensor,Rsensor,EXPOSURE_timer,mode,line_start,line_stop);
 				printf("\n");
 				cnt1000=0;
@@ -373,7 +376,10 @@ void expose( void )
 	int sa = Line_Max - Max2;
 	
 	//if( Wide != 0 && White <= 60){//黒でなく白でもない
-	if( Wide == 0 || White >= 35){//黒or白
+	if( Wide == 0){//黒
+		EXPOSURE_cnt+=1000;
+		
+	}else if(White >= 35){//白
 		EXPOSURE_cnt++;
 	}else{
 		EXPOSURE_cnt = 0;
@@ -608,7 +614,7 @@ void binarization(int linestart, int linestop)
 		/* 白が一直線のとき */
 		//if(Min > 250 ){//260  <-急に明るくなるとサチる
 		//if(Max - Min < 150 || (  (Max < Line_Max + 200) && ( Min > 290))  ){//130 <-真っ白のときの明暗さで調整する
-		if(Max2 - Min < 100){//130 <-真っ白のときの明暗さで調整する
+		if(( Max2 > Line_Max - 200) && (Max2 - Min < 400)){//130 <-真っ白のときの明暗さで調整する
 		
 			White = 127;
 			for(i = linestart ; i <= linestop; i++) {
