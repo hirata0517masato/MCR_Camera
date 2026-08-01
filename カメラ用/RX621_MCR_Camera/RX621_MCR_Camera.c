@@ -603,12 +603,12 @@ void binarization(int linestart, int linestop)
 	/* 黒は０　白は１にする */
 	White = 0;					/* 白の数を０にする */
 	
-	if( Max2 > Line_Max - 300 ){//320 -150  250 目標値760用
+	if( Max2 > Line_Max - 350 ){//320 -150  250 目標値760用
 	//if( Max > Line_Max - 200 ){//320 -150  250 目標値560用
 		/* 白が一直線のとき */
 		//if(Min > 250 ){//260  <-急に明るくなるとサチる
 		//if(Max - Min < 150 || (  (Max < Line_Max + 200) && ( Min > 290))  ){//130 <-真っ白のときの明暗さで調整する
-		if(Max2 - Min < 130){//130 <-真っ白のときの明暗さで調整する
+		if(Max2 - Min < 100){//130 <-真っ白のときの明暗さで調整する
 		
 			White = 127;
 			for(i = linestart ; i <= linestop; i++) {
