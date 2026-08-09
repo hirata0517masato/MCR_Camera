@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			125	  	/* ハンドル最大位置 115           */
 
-#define 	MAXTIME 			950 //1100	  				/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
+#define 	MAXTIME 			1300 //1100	  				/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
 #define 	START_WAIT 			 100 //motor+0.5 bat+0.5	// スタート時の走行待ち時間 (1.00秒)  100 = 1s        */
 
 /*======================================*/
@@ -256,11 +256,11 @@ int			i_saka_max	  =		  1;	//認識可能な坂の数
 #define 	KASA_Encoder2  	600	//上り途中 終わり 300
 #define 	KASA_Encoder3  	1400	//上り終わり 
 
-#define		KASA_Encoder4  	3800	//坂上終わり  2500
+#define		KASA_Encoder4  	3800	//坂上終わり  
 #define		KASA_Encoder5  	4400	//下り終わり 通常にもどる 
 
-#define		KASA_Encoder4_2  3000	//坂上終わり(最後の坂道)2500 3000
-#define		KASA_Encoder5_2  3600	//下り終わり 通常にもどる(最後の坂道) 3000 3200 3500 4500
+#define		KASA_Encoder4_2  3000	//坂上終わり(最後の坂道)
+#define		KASA_Encoder5_2  4600	//下り終わり 通常にもどる(最後の坂道) 
 
 
 //斜面(上り)
@@ -645,8 +645,7 @@ void main( void )
 					i_date_f_buff_ch_int[j] = (int)(c_date_f_buff_ch[i+1])*100 + (int)c_date_f_buff_ch[i+2];
 					j++;
 				}
-			
-			
+
 				
 			/*	
 					//31：右クランク 41：左クランク 53:左ハーフ 63:右ハーフ
@@ -700,8 +699,7 @@ void main( void )
 					j++;
 				}
 		
-				
-		
+
 				
 				
 				/*
@@ -943,7 +941,7 @@ void main( void )
 //}		
 		//if(-20 < i && i < 20){
 		//if(-50 < i && i < 50){
-		if(-30 < i && i < 30){
+		if(-20 < i && i < 20){
 			if(c_mode == 0){//坂中でなければ
 				if(l_EncoderTotal > 200 && (l_startPoint_saka == 0 || (l_EncoderTotal-l_startPoint_saka) >= 500) && (l_startPoint == 0 || (l_EncoderTotal-l_startPoint ) >= 150) && (l_startPoint_curve == 0 || (l_EncoderTotal-l_startPoint_curve) >= 0)){//ゲートに反応しないように && 坂終了から少しの間は無視 && クランク、ハーフ終了後少し無視 && カーブ直後は無視
 				
@@ -1819,7 +1817,7 @@ void main( void )
 				}else i_SetAngle = 110;
 			
 				motor_f( 15, 5 );  //10,0        /* この部分は「角度計算(4WD時).xls」 85 -40*/
-        		motor_r( -20, -20 ); //-15.-15         /* で計算                        */
+        		motor_r( -30, -30 ); //-15.-15         /* で計算                        */
 			
 			}else{//long
 				if((l_EncoderTotal-l_startPoint ) >= 200){
@@ -1829,7 +1827,7 @@ void main( void )
 				}else i_SetAngle = 95;
 			
 				motor_f( 85,  -5 );          /* この部分は「角度計算(4WD時).xls」 85 -40*/
-        		motor_r( -20,  -20 );          /* で計算                        */
+        		motor_r( -30,  -30 );          /* で計算                        */
 			}
 			
 		
@@ -2098,7 +2096,7 @@ void main( void )
 				}else i_SetAngle = -110;
 			
 				motor_f( 5, 15);    //0,10      /* この部分は「角度計算(4WD時).xls」*/
-        		motor_r( -20, -20 );   //-15.-15       /* で計算                        */
+        		motor_r( -30, -30 );   //-15.-15       /* で計算                        */
 				
 			}else{//long
 				
@@ -2110,7 +2108,7 @@ void main( void )
 				}else i_SetAngle = -95;
 			
 				motor_f(  -5, 85 );          /* この部分は「角度計算(4WD時).xls」*/
-        		motor_r(  -20, -20 );          /* で計算                        */
+        		motor_r(  -30, -30 );          /* で計算                        */
 			}
 		}else{
 			c_mode = 1;//見る範囲を狭く
