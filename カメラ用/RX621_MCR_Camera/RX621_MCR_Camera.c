@@ -53,8 +53,8 @@ void WhiteLineWide(int,int);
 
 #define		Line_Max	760 //560 //760	//560		/* ライン白色MAX値の設定 */ 
 
-#define 	LineStart 	35		/* カメラで見る範囲(通常モード) */
-#define 	LineStop  	92
+#define 	LineStart 	35	//35	/* カメラで見る範囲(通常モード) */
+#define 	LineStop  	92	//92
 
 #define 	LineStartSaka 	50		/* カメラで見る範囲(坂モード) */
 #define 	LineStopSaka  	77
@@ -143,7 +143,7 @@ void main(void)
 		
 		WhiteLineWide(LineStart,LineStop);		//白ラインの測定	
 		
-		//cam_out();//制御用へ出力
+		cam_out();//制御用へ出力
 		Center_lasttime = Center;//過去の値を保存
 		
 	//}while(!((-50 < (Line_Max - Max)) && ((Line_Max - Max) < 50)) && (!((Wide != 0) && (Wide < 30))));
@@ -601,7 +601,7 @@ void binarization(int linestart, int linestop)
 		//a  = ((Max + Min) >> 1);
 		a  = ((Max2 + Min) >> 1);
 		Ave = ((a+Min) >> 1);
-		Ave = ((a+Ave) >> 1);
+		//Ave = ((a+Ave) >> 1);
 		
 		//Ave  = ((Max + Min) >> 1);
 	//}
@@ -609,12 +609,12 @@ void binarization(int linestart, int linestop)
 	/* 黒は０　白は１にする */
 	White = 0;					/* 白の数を０にする */
 	
-	if( Max2 > Line_Max - 350 ){//320 -150  250 目標値760用
+	if( Max2 > Line_Max - 400 ){//320 -150  250 目標値760用 350
 	//if( Max > Line_Max - 200 ){//320 -150  250 目標値560用
 		/* 白が一直線のとき */
 		//if(Min > 250 ){//260  <-急に明るくなるとサチる
 		//if(Max - Min < 150 || (  (Max < Line_Max + 200) && ( Min > 290))  ){//130 <-真っ白のときの明暗さで調整する
-		if(( Max2 > Line_Max - 200) && (Max2 - Min < 400)){//130 <-真っ白のときの明暗さで調整する
+		if((mode == 0) && ( Max2 > Line_Max - 200) && (Max2 - Min < 180)){//130 <-真っ白のときの明暗さで調整する
 		
 			White = 127;
 			for(i = linestart ; i <= linestop; i++) {
