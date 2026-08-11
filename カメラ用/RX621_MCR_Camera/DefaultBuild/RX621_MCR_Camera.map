@@ -1,4 +1,4 @@
-Renesas Optimizing Linker (W3.05.00 )             08-Aug-2026 13:11:04
+Renesas Optimizing Linker (W3.05.00 )             11-Aug-2026 19:54:38
 
 *** Options ***
 
@@ -9,17 +9,9 @@ Renesas Optimizing Linker (W3.05.00 )             08-Aug-2026 13:11:04
 -input=DefaultBuild\resetprg.obj
 -input=DefaultBuild\sbrk.obj
 -input=DefaultBuild\vecttbl.obj
--input=DefaultBuild\usb_core.obj
--input=DefaultBuild\usb_hal.obj
--input=DefaultBuild\lowsrc.obj
--input=DefaultBuild\usbdescriptors.obj
--input=DefaultBuild\usb_cdc.obj
--input=DefaultBuild\usb.obj
 -input=DefaultBuild\RX621_MCR_Camera.obj
 -input=DefaultBuild\wait.obj
--input=DefaultBuild\rspi.obj
--input=DefaultBuild\Gyro.obj
--input=DefaultBuild\MPU9250.obj
+-input=DefaultBuild\printf_lib.obj
 -noprelink
 -output=DefaultBuild\RX621_MCR_Camera.abs
 -list=DefaultBuild\RX621_MCR_Camera.map
@@ -35,57 +27,57 @@ Renesas Optimizing Linker (W3.05.00 )             08-Aug-2026 13:11:04
 
 SECTION                            START      END         SIZE   ALIGN
 B_1
-                                  00000004  00000015        12   1
+                                  00000004  00000004         0   1
 R_1
-                                  00000016  00000068        53   1
+                                  00000004  00000004         0   1
 B_2
-                                  0000006a  00000077         e   2
+                                  00000004  00000004         0   1
 R_2
-                                  00000078  00000078         0   1
+                                  00000004  00000004         0   1
 B
-                                  00000078  0000092f       8b8   4
+                                  00000004  0000083f       83c   4
 R
-                                  00000930  00000c9b       36c   4
+                                  00000840  00000877        38   4
 SU
-                                  00000c9c  00000d9b       100   4
+                                  00000878  00000977       100   4
 SI
-                                  00000d9c  0000109b       300   4
+                                  00000978  00000c77       300   4
 PResetPRG
                                   fff80000  fff80030        31   1
 C_1
-                                  fff80100  fff80275       176   1
+                                  fff80100  fff80100         0   1
 C_2
-                                  fff80276  fff80477       202   2
+                                  fff80100  fff80100         0   1
 C
-                                  fff80478  fff80563        ec   4
+                                  fff80100  fff80133        34   4
 C$DSEC
-                                  fff80564  fff80587        24   4
+                                  fff80134  fff80157        24   4
 C$BSEC
-                                  fff80588  fff8059f        18   4
+                                  fff80158  fff8016f        18   4
 C$INIT
-                                  fff805a0  fff805a0         0   1
+                                  fff80170  fff80170         0   1
 C$VTBL
-                                  fff805a0  fff805a0         0   1
+                                  fff80170  fff80170         0   1
 C$VECT
-                                  fff805a0  fff8099f       400   4
+                                  fff80170  fff8056f       400   4
 D_1
-                                  fff809a0  fff809f2        53   1
+                                  fff80570  fff80570         0   1
 D_2
-                                  fff809f3  fff809f3         0   1
+                                  fff80570  fff80570         0   1
 D
-                                  fff809f4  fff80d5f       36c   4
+                                  fff80570  fff805a7        38   4
 P
-                                  fff80d60  fff86911      5bb2   1
+                                  fff805a8  fff813d5       e2e   1
 PIntPRG
-                                  fff86912  fff86a61       150   1
+                                  fff813d6  fff8151d       148   1
 W_1
-                                  fff86a62  fff86a6b         a   1
+                                  fff8151e  fff8151e         0   1
 W_2
-                                  fff86a6c  fff86a6c         0   2
+                                  fff8151e  fff8151e         0   1
 W
-                                  fff86a6c  fff86a6c         0   4
+                                  fff8151e  fff8151e         0   1
 L
-                                  fff86a6c  fff86c58       1ed   4
+                                  fff8151e  fff8151e         0   1
 $ADDR_C_FFFFFFA0
                                   ffffffa0  ffffffaf        10   1
 FIXEDVECT

@@ -8,10 +8,15 @@
 /* 作成日      ：2017/02/10 									    */
 /****************************************************************************************************/                  
 #include "iodefine.h"
+#include <stdio.h>
 #include <machine.h>
 //#include "lowsrc.h"
 
-#include "usb.h"
+//#include "usb.h"
+
+#include <stdlib.h>
+#include "printf_lib.h"   /* printf2 関連処理    コンパイルおよびライブラリジェネレートオプションにてC99対応が必要  */
+
 
 /*======================================*/
 /* プロトタイプ宣言                     */
@@ -25,7 +30,6 @@ void CMT_init(void);
 
 void cam_out(void);
 void ImageCapture(int,int);
-void ImageCapture2(int,int);
 int  get_ad( void );
 void expose( void );
 void expose2( void );
@@ -37,16 +41,17 @@ void WhiteLineWide(int,int);
 
 //#define PRINT//データ出力時のみ有効にする
 
+
 /* TAOS TSL1401CL */
 #define	TAOS_SI_HIGH	PORTD.DR.BIT.B0 = 1	/* CN3-17 */
 #define	TAOS_SI_LOW	PORTD.DR.BIT.B0 = 0	/* CN3-17 */
 #define	TAOS_CLK_HIGH	PORTD.DR.BIT.B1 = 1	/* CN3-18 */
 #define	TAOS_CLK_LOW	PORTD.DR.BIT.B1 = 0	/* CN3-18 */
 
-#define MODE_HIGH_BIT	PORT3.PORT.BIT.B0 /* CN2-8 */
+#define MODE_HIGH_BIT	PORT1.PORT.BIT.B6 /* CN2-8 */  //PORT3.PORT.BIT.B0 /* CN2-8 */
 #define MODE_LOW_BIT	PORT3.PORT.BIT.B1 /* CN2-7 */
 
-#define WIDE_OUT 	PORT2.DR.BYTE /* CN2-16-9 */
+#define WIDE_OUT 	PORT2.DR.BYTE /* CN2-16-9 */ //p2-6 -> p1-4
 #define CENTER_OUT 	PORTC.DR.BYTE /* CN4-19-20 CN2-30-25 */
 
 //AD0 /* CN3-9 P40 */
@@ -102,6 +107,7 @@ int		mode;				/* 0 = 通常 1 = 坂 2 = 右無視 3 = 左無視	*/
 
 int		EXPOSURE_cnt = 0;		/* */		
 
+
 /***********************************************************************/
 /* メインプログラム                                                    */
 /***********************************************************************/
@@ -116,7 +122,9 @@ void main(void)
  	AD_init();   // A/Dの初期化
 		
 #ifdef PRINT
-	USB_init();  //USB CDCの初期化
+	//USB_init();  //USB CDCの初期化
+	initSCI1(SPEED_9600);
+	//initSCI1(SPEED_38400);
 #endif //PRINT
 	
 	/* Data Initialization */
@@ -131,13 +139,11 @@ void main(void)
 	//明るさの最大値が目標値に近づくまでループ && ラインを発見するまでループ
 	do{
 		
-		#ifndef PRINT
-		mode = (MODE_HIGH_BIT & 0x01) + ((MODE_LOW_BIT & 0x01) << 1);//モード判定に使用
-		#endif
+		mode = 0;//モード判定に使用
 		
 		expose2();				//露光時間（全白、全黒でも時間変更)
 		
-		ImageCapture2(LineStart,LineStop);			//イメージキャプチャー
+		ImageCapture(LineStart,LineStop);			//イメージキャプチャー
 		
 		binarization(LineStart,LineStop); 		//２値化
 		
@@ -152,10 +158,8 @@ void main(void)
 	
 	while( 1 ) {
 	
-		#ifndef PRINT
 		mode = (MODE_HIGH_BIT & 0x01) + ((MODE_LOW_BIT & 0x01) << 1);//モード判定に使用
-		#endif
-		
+	
 		switch(mode){
 			case 0://通常モード
 				expose();				//露光時間
@@ -252,11 +256,15 @@ void main(void)
 		#ifdef PRINT
 			cnt1000++;
 			
-			if(cnt1000 > 100){
+			if(cnt1000 > 5){
+						
 				for(i = LineStart; i <= LineStop; i++)printf("%d",BinarizationData[i]);
-				//for(i = LineStart; i <= LineStop; i+=2)printf("%d",BinarizationData[i]);
-				//for(i = 0; i <=127; i+=2)printf("%d",BinarizationData[i]);
-				printf("Max = %d Min = %d Center = %d Wide = %d Lsensor = %d Rsensor = %d time = %d mode = %d Start = %d Stop = %d",Max,Min,Center,Wide,Lsensor,Rsensor,EXPOSURE_timer,mode,line_start,line_stop);
+				//for(i = LineStart; i <= LineStop; i+=2)printf2("%d",BinarizationData[i]);
+				//for(i = 0; i <=127; i+=2)printf2("%d",BinarizationData[i]);
+				
+				printf("Max = %d Min = %d Center = %d Wide = %d ",Max,Min,Center,Wide);
+				printf("Lsensor = %d Rsensor = %d time = %d mode = %d",Lsensor,Rsensor,EXPOSURE_timer,mode);
+				
 				printf("\n");
 				cnt1000=0;
 			}
@@ -290,6 +298,8 @@ void IO_init(void)
 	//unsigned int uc;
 	
  //  PORTC.PCR.BYTE   = 0x03;        // PC0,1をプルアップ指定
+    
+    PORT1.DDR.BYTE = 0xbf;           // P1 1-6入力　1-4 出力
     
     PORT2.DDR.BYTE = 0xff;           // P2を出力に設定
     PORTC.DDR.BYTE = 0xff;           // PCを出力に設定
@@ -373,7 +383,7 @@ void expose( void )
 {
 	unsigned long i;
 	//int sa = Line_Max - Max;
-	int sa = Line_Max - Max2;
+	long sa = Line_Max - Max2;
 	
 	//if( Wide != 0 && White <= 60){//黒でなく白でもない
 	if( Wide == 0){//黒
@@ -454,9 +464,6 @@ void ImageCapture(int linestart, int linestop){
 	}
 	for(i = LineStart; i < linestart; i++) {		
 		TAOS_CLK_HIGH;	
-		/*if(ImageData_buf[i] + 200 > ImageData[i]){
-			ImageData_buf[i] = ImageData[i];
-		}*/
 		ImageData[i] = get_ad();
 		TAOS_CLK_LOW;
 	}
@@ -464,9 +471,6 @@ void ImageCapture(int linestart, int linestop){
 	for(i = linestart; i <= linestop; i++) {				
 		 
 		TAOS_CLK_HIGH;
-		/*if(ImageData_buf[i] + 200 > ImageData[i]){
-			ImageData_buf[i] = ImageData[i];
-		}*/
 		ImageData[i] = get_ad();	// inputs data from camera (one pixel each time through loop) 
 		TAOS_CLK_LOW;
 		
@@ -491,9 +495,6 @@ void ImageCapture(int linestart, int linestop){
 	
 	for(i = linestop+1; i <= LineStop; i++) {		
 		TAOS_CLK_HIGH;
-		/*if(ImageData_buf[i] + 200 > ImageData[i]){
-			ImageData_buf[i] = ImageData[i];
-		}*/
 		ImageData[i] = get_ad();
 		TAOS_CLK_LOW;
 	}
@@ -505,71 +506,7 @@ void ImageCapture(int linestart, int linestop){
 	TAOS_CLK_HIGH;
 	TAOS_CLK_LOW;
 }
-/////////////////////////////////////前回の値を毎回更新する版
-void ImageCapture2(int linestart, int linestop){	 
-	
-	unsigned char i;
 
-	Max = 0;
-	Max2 = 0;
-	Min = 4096;
-
-	TAOS_SI_HIGH;
-	TAOS_CLK_HIGH;
-	TAOS_SI_LOW;
-	ImageData[0] = 0;
-	TAOS_CLK_LOW;
-	for(i = 1; i < LineStart; i++) {		
-		TAOS_CLK_HIGH;		
-		TAOS_CLK_LOW;
-	}
-	for(i = LineStart; i < linestart; i++) {		
-		TAOS_CLK_HIGH;	
-	//	ImageData_buf[i] = ImageData[i];
-		ImageData[i] = get_ad();
-		TAOS_CLK_LOW;
-	}
-	
-	for(i = linestart; i <= linestop; i++) {				
-		 
-		TAOS_CLK_HIGH;
-	//	ImageData_buf[i] = ImageData[i];
-		ImageData[i] = get_ad();	// inputs data from camera (one pixel each time through loop) 
-		TAOS_CLK_LOW;
-		
-		if(Max2 < ImageData[i]){
-			Max2 = ImageData[i];
-			
-			if(Max < ImageData[i]){
-				Max2 = Max;
-				Max = ImageData[i];
-			}
-			
-		}else if(Max < ImageData[i]){
-			Max2 = Max;
-			Max = ImageData[i];
-		}
-		
-		if(Min > ImageData[i]){
-			Min = ImageData[i];
-		}
-		
-	}
-	
-	for(i = linestop+1; i <= LineStop; i++) {		
-		TAOS_CLK_HIGH;
-	//	ImageData_buf[i] = ImageData[i];
-		ImageData[i] = get_ad();
-		TAOS_CLK_LOW;
-	}
-	for(i = LineStop+1; i < 128; i++) {		
-		TAOS_CLK_HIGH;		
-		TAOS_CLK_LOW;
-	}
-	
-	TAOS_CLK_HIGH;
-	TAOS_CLK_LOW;
-}
 /************************************************************************/
 /* A/D値読み込み(AN0)                                                 */
 /* 引数　 なし                                                          */
@@ -773,11 +710,19 @@ void cam_out(){
 	CENTER_OUT = center;
 	*/
 	
-	WIDE_OUT  = ((Wide&0x7f) << 1)&0xfe;//NEW
-	//WIDE_OUT  = Wide; //手配線
-	CENTER_OUT = Center;
 	
-	//WIDE_OUT  = Max/10;
-	//CENTER_OUT = Min/10;
+	//WIDE_OUT  = ((Wide&0x7f) << 1)&0xfe;//USB版
+	PORT2.DR.BIT.B1 = (Wide & 0x01);
+	PORT2.DR.BIT.B2 = (Wide & 0x02)>>1;
+	PORT2.DR.BIT.B3 = (Wide & 0x04)>>2;
+	PORT2.DR.BIT.B4 = (Wide & 0x08)>>3;
+	PORT1.DR.BIT.B4 = (Wide & 0x10)>>4;//USB版->シリアル版基板に変更した際のポート差分対応
+	PORT2.DR.BIT.B6 = (Wide & 0x20)>>5; 
+	PORT2.DR.BIT.B7 = (Wide & 0x40)>>6;
+	//PORT2.DR.BIT.B7 = (Wide & 0x80)>>7;
+	
+	
+	CENTER_OUT = Center;
+
 }
 

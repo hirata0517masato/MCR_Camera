@@ -448,16 +448,16 @@ void Excep_SCI0_TXI0(void){ }
 void Excep_SCI0_TEI0(void){ }
 
 // SCI1 ERI1
-void Excep_SCI1_ERI1(void){ }
+//void Excep_SCI1_ERI1(void){ }
 
 // SCI1 RXI1
-void Excep_SCI1_RXI1(void){ }
+//void Excep_SCI1_RXI1(void){ }
 
 // SCI1 TXI1
-void Excep_SCI1_TXI1(void){ }
+//void Excep_SCI1_TXI1(void){ }
 
 // SCI1 TEI1
-void Excep_SCI1_TEI1(void){ }
+//void Excep_SCI1_TEI1(void){ }
 
 // SCI2 ERI2
 void Excep_SCI2_ERI2(void){ }

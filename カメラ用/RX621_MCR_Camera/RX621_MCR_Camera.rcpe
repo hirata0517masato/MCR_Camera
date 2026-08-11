@@ -10,38 +10,18 @@
       <Path>dbsct.c</Path>
       <Path>intprg.c</Path>
       <Path>resetprg.c</Path>
-      <Path>rspi.c</Path>
       <Path>wait.h</Path>
       <Path>RX621_MCR_Camera.c</Path>
-      <Path>Gyro.c</Path>
       <Path>wait.c</Path>
-      <Path>Gyro.h</Path>
-      <Path>rspi.h</Path>
       <Path>sbrk.c</Path>
-      <Path>usb.h</Path>
-      <Path>MPU9250.h</Path>
       <Path>vecttbl.c</Path>
-      <Path>MPU9250.c</Path>
       <Path>iodefine.h</Path>
-      <Path>usb.c</Path>
       <Path>sbrk.h</Path>
       <Path>stacksct.h</Path>
       <Path>typedefine.h</Path>
       <Path>vect.h</Path>
-      <Category Name="USBStack">
-        <Category Name="CDC">
-          <Path>USBStack\CDC\lowsrc.c</Path>
-          <Path>USBStack\CDC\usbdescriptors.c</Path>
-          <Path>USBStack\CDC\usbdescriptors.h</Path>
-          <Path>USBStack\CDC\usb_cdc.c</Path>
-          <Path>USBStack\CDC\usb_cdc.h</Path>
-        </Category>
-        <Path>USBStack\usb_common.h</Path>
-        <Path>USBStack\usb_core.c</Path>
-        <Path>USBStack\usb_core.h</Path>
-        <Path>USBStack\usb_hal.c</Path>
-        <Path>USBStack\usb_hal.h</Path>
-      </Category>
+      <Path>printf_lib.c</Path>
+      <Path>printf_lib.h</Path>
     </Files>
     <DebugOptions>
       <ConnectSettings>
@@ -58,7 +38,7 @@
         <CompileOptions>
           <Option>-isa=rxv1</Option>
           <Option>-fpu</Option>
-          <Option>-lang=c</Option>
+          <Option>-lang=c99</Option>
           <Option>-include=USBStack\CDC</Option>
           <Option>-include=USBStack</Option>
           <Option>-include=.</Option>
@@ -93,6 +73,7 @@
         <LibraryGenerateOptions>
           <Option>-isa=rxv1</Option>
           <Option>-fpu</Option>
+          <Option>-lang=c99</Option>
           <Option>-head=runtime,stdio,stdlib,string,new</Option>
           <Option>-output=%BuildModeName%\%ProjectName%.lib</Option>
           <Option>-nologo</Option>
@@ -104,17 +85,9 @@
           <Path>DefaultBuild\resetprg.obj</Path>
           <Path>DefaultBuild\sbrk.obj</Path>
           <Path>DefaultBuild\vecttbl.obj</Path>
-          <Path>DefaultBuild\usb_core.obj</Path>
-          <Path>DefaultBuild\usb_hal.obj</Path>
-          <Path>DefaultBuild\lowsrc.obj</Path>
-          <Path>DefaultBuild\usbdescriptors.obj</Path>
-          <Path>DefaultBuild\usb_cdc.obj</Path>
-          <Path>DefaultBuild\usb.obj</Path>
           <Path>DefaultBuild\RX621_MCR_Camera.obj</Path>
           <Path>DefaultBuild\wait.obj</Path>
-          <Path>DefaultBuild\rspi.obj</Path>
-          <Path>DefaultBuild\Gyro.obj</Path>
-          <Path>DefaultBuild\MPU9250.obj</Path>
+          <Path>DefaultBuild\printf_lib.obj</Path>
         </LinkOrder>
         <CommonOptions>
           <IncludePathForC>USBStack\CDC</IncludePathForC>
