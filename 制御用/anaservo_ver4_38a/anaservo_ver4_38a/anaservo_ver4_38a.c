@@ -213,7 +213,7 @@ int			i_KASOKU = 15;
 
 #define		MOTOR_OUT_BASE_N		100		//カーブ後半用　外側モーター用パラメーター 
 
-#define		MAX_TOPSPEED	62	//ブースト時でもこの速度以上は出ないように制限する JMCR指定モータ相当の最大速度と同等に設定する
+#define		MAX_TOPSPEED	55	//ブースト時でもこの速度以上は出ないように制限する JMCR指定モータ相当の最大速度と同等に設定する
 
 int		    i_TOPSPEED	=		50;		//直線 
 int		    i_TOPSPEED_B=		50;		//直線 コース記憶用
