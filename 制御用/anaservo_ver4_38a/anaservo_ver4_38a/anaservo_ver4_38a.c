@@ -38,7 +38,7 @@
 #define 	SERVO_MAX 			125	  	/* ハンドル最大位置 115           */
 
 #define 	MAXTIME 			1300 //1100	  				/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
-#define 	START_WAIT 			 100 //motor+0.5 bat+0.5	// スタート時の走行待ち時間 (1.00秒)  100 = 1s        */
+//#define 	START_WAIT 			 100 //motor+0.5 bat+0.5	// スタート時の走行待ち時間 (1.00秒)  100 = 1s        */
 
 /*======================================*/
 /* プロトタイプ宣言                     */
@@ -213,7 +213,7 @@ int			i_KASOKU = 15;
 
 #define		MOTOR_OUT_BASE_N		100		//カーブ後半用　外側モーター用パラメーター 
 
-#define		MAX_TOPSPEED	99	//ブースト時でもこの速度以上は出ないように制限する JMCR指定モータ相当の最大速度と同等に設定する
+#define		MAX_TOPSPEED	62	//ブースト時でもこの速度以上は出ないように制限する JMCR指定モータ相当の最大速度と同等に設定する
 
 int		    i_TOPSPEED	=		50;		//直線 
 int		    i_TOPSPEED_B=		50;		//直線 コース記憶用
@@ -513,11 +513,13 @@ void main( void )
 	}else if( dipsw_get2() == 0x20) {
 		i_pattern = 500;
 */	
+/*
 	}else if((dipsw_get() & 0x04) == 0x04 ){//スタート時、マイコンディップスイッチ 3 = ON　スタート待ち時間キャンセル
-		c_start_wait_cancel = 1;	
+		c_start_wait_cancel = 1;
+*/	
 	}
  
- 	
+
 	i_topspeed = i_TOPSPEED;		//初期値
 	i_speed_down = i_SPEED_DOWN;
 	i_speed_down_n = i_SPEED_DOWN_N;
@@ -776,17 +778,11 @@ void main( void )
 		
             ul_cnt_1ms = 0;
 		
+			/*
             i_pattern = 2;
-            break;
+			break;
+			*/
 			
-        }
-		
-        led_out( 1 << (ul_cnt_1ms/50) % 8 );
-        break;
-
-	case 2://スタート時の走行待ち時間
-	
-		if(((START_WAIT*10) <= ul_cnt_1ms)  || (c_start_wait_cancel == 1) ){//待ち時間が経過した　|| ディップスイッチでキャンセルした
 			ul_cnt_running_1ms = 0;
 			ul_cnt_straight_time_1ms = 0;
 			c_running_flag = 1;//走行開始
@@ -801,11 +797,39 @@ void main( void )
             i_msdFlag = 1;                /* データ記録開始               */
 		
             i_pattern = 10;
+			
+			
+            break;
+			
+        }
+		
+        led_out( 1 << (ul_cnt_1ms/50) % 8 );
+        break;
+
+/*
+	case 2://スタート時の走行待ち時間
+	
+		if(((START_WAIT*10) <= ul_cnt_1ms)  || (c_start_wait_cancel == 1) ){//待ち時間が経過した　|| ディップスイッチでキャンセルした
+			ul_cnt_running_1ms = 0;
+			ul_cnt_straight_time_1ms = 0;
+			c_running_flag = 1;//走行開始
+			l_EncoderTotal = 0;  
+			l_startPoint = 0;
+			l_startPoint_saka = 0;
+			
+			c_saka_cnt = 0;//坂道の回数
+			
+			i_msdBuffAddress = 0;
+            ul_msdWorkAddress = ul_msdStartAddress;
+            i_msdFlag = 1;                // データ記録開始               
+		
+            i_pattern = 10;
 		}
 		
 		led_out(0);		
 	
 		break;
+*/
 	case 10://スタート直後
 		
 		if(i_Center < -10)i_Center = -10;
