@@ -38,9 +38,11 @@ void WhiteLineWide(int,int);
 
 
 /* 定数設定 */
-
 //#define PRINT//データ出力時のみ有効にする
 
+#ifdef PRINT
+int printf_flag = 0;
+#endif
 
 /* TAOS TSL1401CL */
 #define	TAOS_SI_HIGH	PORTD.DR.BIT.B0 = 1	/* CN3-17 */
@@ -83,7 +85,7 @@ int		ImageData[130];			/* カメラの値				*/
 //int		ImageData_buf[130];			/* カメラの値				*/
 int 		BinarizationData[130];	/* ２値化					*/
 
-int		Max = 0,Max2 = 0,Min,Ave;	/*カメラ読み取り最大値、最小値、平均値*/
+int		Max = 0,Max2 = 0,Min,Min2,Ave;	/*カメラ読み取り最大値、最小値、平均値*/
 int 	Ave_old = 0;
 
 unsigned int 	Rsensor;				/* ラインの右端 */
@@ -149,7 +151,7 @@ void main(void)
 		
 		WhiteLineWide(LineStart,LineStop);		//白ラインの測定	
 		
-		cam_out();//制御用へ出力
+		//cam_out();//制御用へ出力
 		Center_lasttime = Center;//過去の値を保存
 		
 	//}while(!((-50 < (Line_Max - Max)) && ((Line_Max - Max) < 50)) && (!((Wide != 0) && (Wide < 30))));
@@ -256,8 +258,8 @@ void main(void)
 		#ifdef PRINT
 			cnt1000++;
 			
-			if(cnt1000 > 5){
-						
+			if(cnt1000 > 100){
+				printf_flag = 1;	
 				for(i = LineStart; i <= LineStop; i++)printf("%d",BinarizationData[i]);
 				//for(i = LineStart; i <= LineStop; i+=2)printf2("%d",BinarizationData[i]);
 				//for(i = 0; i <=127; i+=2)printf2("%d",BinarizationData[i]);
@@ -385,15 +387,24 @@ void expose( void )
 	//int sa = Line_Max - Max;
 	long sa = Line_Max - Max2;
 	
-	//if( Wide != 0 && White <= 60){//黒でなく白でもない
-	if( Wide == 0){//黒
-		EXPOSURE_cnt+=1000;
-		
-	}else if(White >= 35){//白
-		EXPOSURE_cnt++;
+#ifdef PRINT
+	if(printf_flag == 1){
+		printf_flag = 0;
 	}else{
-		EXPOSURE_cnt = 0;
+#endif
+		//if( Wide != 0 && White <= 60){//黒でなく白でもない
+		if( Wide == 0){//黒
+			EXPOSURE_cnt+=1000;
+			
+		}else if(White >= 35){//白
+			EXPOSURE_cnt++;
+		}else{
+			EXPOSURE_cnt = 0;
+		}
+	
+#ifdef PRINT
 	}
+#endif
 	
 	if(EXPOSURE_cnt < 10){
 		if(-10 < sa && sa < 10){
@@ -452,6 +463,7 @@ void ImageCapture(int linestart, int linestop){
 	Max = 0;
 	Max2 = 0;
 	Min = 4096;
+	Min2 = 4096;
 
 	TAOS_SI_HIGH;
 	TAOS_CLK_HIGH;
@@ -474,23 +486,21 @@ void ImageCapture(int linestart, int linestop){
 		ImageData[i] = get_ad();	// inputs data from camera (one pixel each time through loop) 
 		TAOS_CLK_LOW;
 		
-		if(Max2 < ImageData[i]){
-			Max2 = ImageData[i];
-			
-			if(Max < ImageData[i]){
-				Max2 = Max;
-				Max = ImageData[i];
-			}
-			
-		}else if(Max < ImageData[i]){
+		if(Max < ImageData[i]){
 			Max2 = Max;
 			Max = ImageData[i];
+			
+		}else if(Max2 < ImageData[i]){
+			Max2 = ImageData[i];
 		}
 		
-		if(Min > ImageData[i]){
+		if(Min >  ImageData[i]){
+			Min2 = Min;
 			Min = ImageData[i];
+
+		}else if(Min2 > ImageData[i]){
+			Min2 = ImageData[i];
 		}
-		
 	}
 	
 	for(i = linestop+1; i <= LineStop; i++) {		
@@ -535,10 +545,10 @@ void binarization(int linestart, int linestop)
 	//if(mode == 1) Ave = Min + 130;
 	//else Ave = ((Max + Min) >> 1) - 50;
 	//else{
-		//a  = ((Max + Min) >> 1);
-		a  = ((Max2 + Min) >> 1);
-		Ave = ((a+Min) >> 1);
-		//Ave = ((a+Ave) >> 1);
+		//a  = ((Max2 + Min2) >> 1);
+		a  = ((Max2 + Min2) >> 1);
+		Ave = ((a+Min2) >> 1);
+		Ave = ((a+Ave) >> 1);
 		
 		//Ave  = ((Max + Min) >> 1);
 	//}
@@ -551,13 +561,13 @@ void binarization(int linestart, int linestop)
 		/* 白が一直線のとき */
 		//if(Min > 250 ){//260  <-急に明るくなるとサチる
 		//if(Max - Min < 150 || (  (Max < Line_Max + 200) && ( Min > 290))  ){//130 <-真っ白のときの明暗さで調整する
-		if((mode == 0) && ( Max2 > Line_Max - 200) && (Max2 - Min < 180)){//130 <-真っ白のときの明暗さで調整する
+		/*if((mode == 0) && ( Max2 > Line_Max - 50) && (Max2 - Min2 < 50)){//130 <-真っ白のときの明暗さで調整する
 		
 			White = 127;
 			for(i = linestart ; i <= linestop; i++) {
 				BinarizationData[i] = 1;
 			}
-		}else{		
+		}else{*/		
 			for(i = linestart ; i <= linestop; i++) {
 				//if(  ImageData[i] > Ave || ( (Max < Line_Max + 200) && (ImageData_buf[i] + 200 < ImageData[i]))){ //閾値以上　|| 前回から急激に変化した	
 				if( ImageData[i] > Ave ){ //閾値以上	
@@ -567,10 +577,20 @@ void binarization(int linestart, int linestop)
 					BinarizationData[i] = 0;
 				}	
 			}
-		}
+				
+			/*if(White > 30){
+				if((mode == 0) && ( Max2 > Line_Max - 50) && (Max2 - Min2 < 50)){//130 <-真っ白のときの明暗さで調整する
+			
+					White = 127;
+					for(i = linestart ; i <= linestop; i++) {
+						BinarizationData[i] = 1;
+					}
+				}
+			}*/
+		//}
 	/* 黒が一面のとき */
 	}else{
-		if(Max2 - Min < 200){
+		if(Max2 - Min2 < 200){
 			for(i = linestart ; i <= linestop; i++) {
 				BinarizationData[i] = 0;
 			}
@@ -716,8 +736,8 @@ void cam_out(){
 	PORT2.DR.BIT.B2 = (Wide & 0x02)>>1;
 	PORT2.DR.BIT.B3 = (Wide & 0x04)>>2;
 	PORT2.DR.BIT.B4 = (Wide & 0x08)>>3;
-	PORT1.DR.BIT.B4 = (Wide & 0x10)>>4;//USB版->シリアル版基板に変更した際のポート差分対応
-	PORT2.DR.BIT.B6 = (Wide & 0x20)>>5; 
+	PORT2.DR.BIT.B5 = (Wide & 0x10)>>4;
+	PORT1.DR.BIT.B4 = (Wide & 0x20)>>5; //USB版->シリアル版基板に変更した際のポート差分対応
 	PORT2.DR.BIT.B7 = (Wide & 0x40)>>6;
 	//PORT2.DR.BIT.B7 = (Wide & 0x80)>>7;
 	
