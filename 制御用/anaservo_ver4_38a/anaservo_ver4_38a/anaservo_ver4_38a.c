@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			125	  	/* ハンドル最大位置 115           */
 
-#define 	MAXTIME 			1300 //1100	  				/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
+#define 	MAXTIME 			1200 //1100	  				/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
 //#define 	START_WAIT 			 100 //motor+0.5 bat+0.5	// スタート時の走行待ち時間 (1.00秒)  100 = 1s        */
 
 /*======================================*/
@@ -221,15 +221,15 @@ int		    i_TOPSPEED_B=		50;		//直線 コース記憶用
 /////////////////////////////////////////////////////////////////////////////////////// 0:禁止 1と-1は同じ
 //前半
 int			i_SPEED_DOWN	=		5;//5		//角度によりi_TOPSPEEDを減速 カーブ前半 8 6
-int			i_MOTOR_out_R	=	 	1;//1		//外側モーター用パラメーター 1	-2
-int			i_MOTOR_in_F	=		4;//4		//内側モーター用パラメーター 	2 	1
-int			i_MOTOR_in_R	=		-2;//-2		//内側モーター用パラメーター -2	-3
+int			i_MOTOR_out_R	=	 	-2;//1		//外側モーター用パラメーター 1	-2
+int			i_MOTOR_in_F	=		3;//4		//内側モーター用パラメーター 	2 	1
+int			i_MOTOR_in_R	=		-3;//-2		//内側モーター用パラメーター -2	-3
 	
 //後半
 int			i_SPEED_DOWN_N=		8;//7		//角度によりi_TOPSPEEDを減速  カーブ後半 11 10
-int			i_MOTOR_out_R_N=	5;//5		//外側モーター用パラメーター 後半	5	5
-int			i_MOTOR_in_F_N=		8;//8		//内側モーター用パラメーター　後半	6	6
-int			i_MOTOR_in_R_N=		5;//6		//内側モーター用パラメーター　後半	3	3
+int			i_MOTOR_out_R_N=	4;//5		//外側モーター用パラメーター 後半	5	5
+int			i_MOTOR_in_F_N=		7;//8		//内側モーター用パラメーター　後半	6	6
+int			i_MOTOR_in_R_N=		4;//6		//内側モーター用パラメーター　後半	3	3
 
 
 #define		date_f_brake		400	//再生走行時 通常走行と同様の速度制限をする距離 400
@@ -256,10 +256,10 @@ int			i_saka_max	  =		  1;	//認識可能な坂の数
 #define 	KASA_Encoder2  	600	//上り途中 終わり 300
 #define 	KASA_Encoder3  	1400	//上り終わり 
 
-#define		KASA_Encoder4  	3800	//坂上終わり  
+#define		KASA_Encoder4  	3000	//坂上終わり  
 #define		KASA_Encoder5  	4400	//下り終わり 通常にもどる 
 
-#define		KASA_Encoder4_2  3000	//坂上終わり(最後の坂道)
+#define		KASA_Encoder4_2  3800	//坂上終わり(最後の坂道)
 #define		KASA_Encoder5_2  4600	//下り終わり 通常にもどる(最後の坂道) 
 
 
@@ -356,7 +356,7 @@ int		    i_H_TOPSPEED	=		45;		//ハーフ（侵入）
 int		    i_H_TOPSPEED2	=		42;		//ハーフ(斜め)
 #else //壁なし
 int		    i_H_TOPSPEED	=		50;		//ハーフ（侵入）
-int		    i_H_TOPSPEED2	=		47;		//ハーフ(斜め) ブレーキがかからないように値を高くする
+int		    i_H_TOPSPEED2	=		50;		//ハーフ(斜め) ブレーキがかからないように値を高くする
 #endif
   
 int		    i_H_TOPSPEED2_S=		50;		//ハーフ(斜め)  ショートカット用
@@ -518,6 +518,7 @@ void main( void )
 		c_start_wait_cancel = 1;
 */	
 	}
+
  
 
 	i_topspeed = i_TOPSPEED;		//初期値
@@ -1840,7 +1841,7 @@ void main( void )
 				
 				}else i_SetAngle = 110;
 			
-				motor_f( 15, 5 );  //10,0        /* この部分は「角度計算(4WD時).xls」 85 -40*/
+				motor_f( 20, 5 );  //10,0        /* この部分は「角度計算(4WD時).xls」 85 -40*/
         		motor_r( -30, -30 ); //-15.-15         /* で計算                        */
 			
 			}else{//long
@@ -1850,7 +1851,7 @@ void main( void )
 				
 				}else i_SetAngle = 95;
 			
-				motor_f( 85,  -5 );          /* この部分は「角度計算(4WD時).xls」 85 -40*/
+				motor_f( 90,  -8 );          /* この部分は「角度計算(4WD時).xls」 85 -40*/
         		motor_r( -30,  -30 );          /* で計算                        */
 			}
 			
@@ -1992,7 +1993,7 @@ void main( void )
 		servoPwmOut( i_ServoPwm2 );          /* 振りが弱いときは大きくする       */
         
 
-        if((( c_c_cut == 0 || i_date_f_mode == 0) && (l_EncoderTotal-l_startPoint ) >= 150) 
+        if((( c_c_cut == 0 || i_date_f_mode == 0) && (l_EncoderTotal-l_startPoint ) >= 100) 
 		 || ((c_c_cut == 1 && i_date_f_mode != 0  && c_c_short_mode == 0) && (l_EncoderTotal-l_startPoint ) >= 100 ) 
 		 || ((c_c_cut == 1 && i_date_f_mode != 0  && c_c_short_mode == 1) && (l_EncoderTotal-l_startPoint ) >= 50 )  ){
 			if(i_Wide != 0){
@@ -2034,8 +2035,8 @@ void main( void )
 		}
 		
 		if(c_c_short_mode == 1){//short
-        	if((l_EncoderTotal-l_startPoint ) >= 110)i_SetAngle = 90;
-			else i_SetAngle = 95;
+        	if((l_EncoderTotal-l_startPoint ) >= 110)i_SetAngle = 95;
+			else i_SetAngle = 100;
 		}else{//long
 			if((l_EncoderTotal-l_startPoint ) >= 100)i_SetAngle = 90;
 			else i_SetAngle = 95;
@@ -2050,7 +2051,7 @@ void main( void )
            	motor_r( x, x );
        	}else{
 			if(c_c_short_mode == 1){//short
-				motor2_f( 50, 40 );
+				motor2_f( 50, 20 );
            		motor2_r( 0, 0 );
 		
 		
@@ -2119,7 +2120,7 @@ void main( void )
 				
 				}else i_SetAngle = -110;
 			
-				motor_f( 5, 15);    //0,10      /* この部分は「角度計算(4WD時).xls」*/
+				motor_f( 5, 20);    //0,10      /* この部分は「角度計算(4WD時).xls」*/
         		motor_r( -30, -30 );   //-15.-15       /* で計算                        */
 				
 			}else{//long
@@ -2131,7 +2132,7 @@ void main( void )
 				
 				}else i_SetAngle = -95;
 			
-				motor_f(  -5, 85 );          /* この部分は「角度計算(4WD時).xls」*/
+				motor_f(  -8, 90 );          /* この部分は「角度計算(4WD時).xls」*/
         		motor_r(  -30, -30 );          /* で計算                        */
 			}
 		}else{
@@ -2260,7 +2261,7 @@ void main( void )
 		
 		servoPwmOut( i_ServoPwm2 );        /* 振りが弱いときは大きくする       */
         
-		if(((c_c_cut == 0 || i_date_f_mode == 0) && (l_EncoderTotal-l_startPoint ) >= 150)
+		if(((c_c_cut == 0 || i_date_f_mode == 0) && (l_EncoderTotal-l_startPoint ) >= 100)
 		|| ((c_c_cut == 1 && i_date_f_mode != 0  && c_c_short_mode == 0) && (l_EncoderTotal-l_startPoint ) >= 100 ) 
 		|| ((c_c_cut == 1 && i_date_f_mode != 0  && c_c_short_mode == 1) && (l_EncoderTotal-l_startPoint ) >= 50 ) ){
 			if(i_Wide != 0){ 
@@ -2302,8 +2303,8 @@ void main( void )
 		
 		/* 安定するまで (ショーカットは42には来ないよ)*/
 		if(c_c_short_mode == 1){//short
-			if((l_EncoderTotal-l_startPoint ) >= 110)i_SetAngle = -90;
-			else i_SetAngle = -95;
+			if((l_EncoderTotal-l_startPoint ) >= 110)i_SetAngle = -95;
+			else i_SetAngle = -100;
 		}else{//long
 			if((l_EncoderTotal-l_startPoint ) >= 100)i_SetAngle = -90;
 			else i_SetAngle = -95;
@@ -2319,7 +2320,7 @@ void main( void )
            	motor_r( x, x );
        	}else{
 			if(c_c_short_mode == 1){//short
-				motor2_f( 40, 50);
+				motor2_f( 20, 50);
            		motor2_r( 0, 0 );
 			}else{//long
 				motor2_f( 40, 80);
@@ -4590,24 +4591,28 @@ void cam_in(){
 	i_wide += ((p6 << 1 ) & 0x40);
 	
 	
-	//カメラソフトの設定範囲
-	//LineStart 	35		/* カメラで見る範囲(通常モード) */
-	//LineStop  	92
-	if(i_wide <= 57 || i_wide == 127){ //92 - 35 = 57 この幅を超える場合は全白の127しかありえない
-		i_Wide = i_wide;
-	}else{
-		//前回の値をそのまま使用する	
-	}
-	
-	
-
 	//i_Center = (p5 & 0x7f);
 	
-	if(1 < i_Wide  && i_Wide < 100){//カメラの取り付けで少しずれていすので
-		i_Center = (p5 & 0x7f) - 64 + 3;	
+	if((p5 & 0x7f) == 0){//カメラ側が起動直後　or マイコンリセット
+		//値を更新しない
+		
 	}else{
-		i_Center = (p5 & 0x7f) - 64;
-	}
+		if(1 < i_Wide  && i_Wide < 100){//カメラの取り付けで少しずれていすので
+			i_Center = (p5 & 0x7f) - 64 + 3;	
+		}else{
+			i_Center = (p5 & 0x7f) - 64;
+		}
+	
+	
+		//カメラソフトの設定範囲
+		//LineStart 	35		/* カメラで見る範囲(通常モード) */
+		//LineStop  	92
+		if(i_wide <= 57 || i_wide == 127){ //92 - 35 = 57 この幅を超える場合は全白の127しかありえない
+			i_Wide = i_wide;
+		}else{
+			//前回の値をそのまま使用する	
+		}
+	}	
 }
 
 /**************************************************************************/
