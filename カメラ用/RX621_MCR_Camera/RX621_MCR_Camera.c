@@ -565,7 +565,7 @@ void binarization(int linestart, int linestop)
 				}	
 			}
 			
-			if(White > 18){ //幅が太い可能性がある
+			if(White > 18 && mode == 0){ //幅が太い可能性がある
 				White = 0;
 				for(i = linestart ; i <= linestop; i++) {	
 					if( ImageData[i] > WB_Ave ){ //閾値以上	 通常ライン幅の時の閾値で判定しなおす
