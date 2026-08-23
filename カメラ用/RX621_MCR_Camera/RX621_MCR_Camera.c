@@ -87,6 +87,7 @@ int 		BinarizationData[130];	/* ２値化					*/
 
 int		Max = 0,Max2 = 0,Min,Min2,Ave;	/*カメラ読み取り最大値、最小値、平均値*/
 int 	Ave_old = 0;
+int 	WB_Ave = 0;
 
 unsigned int 	Rsensor;				/* ラインの右端 */
 unsigned int 	Lsensor;				/* ラインの左端 */
@@ -165,36 +166,7 @@ void main(void)
 		switch(mode){
 			case 0://通常モード
 				expose();				//露光時間
-				/*
-				if(Wide != 0 && Wide < 20){
-					CameraWideOffset = Center -64;
-					
-					line_start = LineStart;
-					line_start += CameraWideOffset;
-					
-					line_stop =  LineStop;
-					line_stop += CameraWideOffset;
-					
-					if(line_start < 0){
-						line_stop -= line_start;
-						line_start = 0;
-					}
-					
-					if(127 < line_stop){
-						line_start -= line_stop-127;
-						line_stop = 127;
-					}
-					
-				}else{
-					line_start = LineStart;
-					line_stop =  LineStop;
-				}
-				ImageCapture(line_start,line_stop);			//イメージキャプチャー
-		
-				binarization(line_start,line_stop); 		//２値化
-		
-				WhiteLineWide(line_start,line_stop);		//白ラインの測定
-				*/
+				
 				
 				line_start = LineStart;
 				line_stop =  LineStop;
@@ -250,15 +222,26 @@ void main(void)
 				break;
 		}
 	
+		#ifdef PRINT
+		if(printf_flag == 0){
+		#endif
+			cam_out();//制御用へ出力
+			if( 1 < Wide && Wide < 18){ 
+				Center_lasttime = Center;//過去の値を保存
+				WB_Ave = Ave;
+			}
+			
+			
+		#ifdef PRINT
+		}
+		#endif
 		
-		cam_out();//制御用へ出力
-		Center_lasttime = Center;//過去の値を保存
 		
 				
 		#ifdef PRINT
 			cnt1000++;
-			
-			if(cnt1000 > 100){
+			printf_flag = 0;
+			if(cnt1000 > 10){
 				printf_flag = 1;	
 				for(i = LineStart; i <= LineStop; i++)printf("%d",BinarizationData[i]);
 				//for(i = LineStart; i <= LineStop; i+=2)printf2("%d",BinarizationData[i]);
@@ -389,7 +372,7 @@ void expose( void )
 	
 #ifdef PRINT
 	if(printf_flag == 1){
-		printf_flag = 0;
+		
 	}else{
 #endif
 		//if( Wide != 0 && White <= 60){//黒でなく白でもない
@@ -474,10 +457,12 @@ void ImageCapture(int linestart, int linestop){
 		TAOS_CLK_HIGH;		
 		TAOS_CLK_LOW;
 	}
-	for(i = LineStart; i < linestart; i++) {		
-		TAOS_CLK_HIGH;	
-		ImageData[i] = get_ad();
-		TAOS_CLK_LOW;
+	if(LineStart < linestart){
+		for(i = LineStart; i < linestart; i++) {		
+			TAOS_CLK_HIGH;	
+			ImageData[i] = get_ad();
+			TAOS_CLK_LOW;
+		}
 	}
 	
 	for(i = linestart; i <= linestop; i++) {				
@@ -503,10 +488,12 @@ void ImageCapture(int linestart, int linestop){
 		}
 	}
 	
-	for(i = linestop+1; i <= LineStop; i++) {		
-		TAOS_CLK_HIGH;
-		ImageData[i] = get_ad();
-		TAOS_CLK_LOW;
+	if(linestop < LineStop ){
+		for(i = linestop+1; i <= LineStop; i++) {		
+			TAOS_CLK_HIGH;
+			ImageData[i] = get_ad();
+			TAOS_CLK_LOW;
+		}
 	}
 	for(i = LineStop+1; i < 128; i++) {		
 		TAOS_CLK_HIGH;		
@@ -577,16 +564,18 @@ void binarization(int linestart, int linestop)
 					BinarizationData[i] = 0;
 				}	
 			}
-				
-			/*if(White > 30){
-				if((mode == 0) && ( Max2 > Line_Max - 50) && (Max2 - Min2 < 50)){//130 <-真っ白のときの明暗さで調整する
 			
-					White = 127;
-					for(i = linestart ; i <= linestop; i++) {
+			if(White > 18){ //幅が太い可能性がある
+				White = 0;
+				for(i = linestart ; i <= linestop; i++) {	
+					if( ImageData[i] > WB_Ave ){ //閾値以上	 通常ライン幅の時の閾値で判定しなおす
+						White++;			
 						BinarizationData[i] = 1;
-					}
-				}
-			}*/
+					}else{
+						BinarizationData[i] = 0;
+					}	
+				}	
+			}
 		//}
 	/* 黒が一面のとき */
 	}else{
@@ -624,63 +613,86 @@ void binarization(int linestart, int linestop)
 void WhiteLineWide(int linestart, int linestop)
 {
 	int t,i;
-		
+	
 	Lsensor = linestart;Rsensor = linestop;Wide = 0;t = 0;		
 	
-	if(Center_lasttime < 60){//ライン左寄り
-		for(i = linestart ; i <= linestop; i++) {
-			if(t==0){
-				if( BinarizationData[i] ){					/* 左から最初の白 */
-					Lsensor = i;
-					t = 1;
-				}
-			}else if(t==1){
-				if( !BinarizationData[i] ){					/* 左から最初の黒 */			
-					Rsensor = i;
-					t = 2;
+	while(1){
+		if(Center_lasttime < 60){//ライン左寄り
+			for(i = linestart ; i <= linestop; i++) {
+				if(t==0){
+					if( BinarizationData[i] ){					/* 左から最初の白 */
+						Lsensor = i;
+						t = 1;
+					}
+				}else if(t==1){
+					if( !BinarizationData[i]){					/* 左から最初の黒 */			
+						Rsensor = i;
+						t = 2;
+					}
 				}
 			}
+		}else{//ライン右寄り
+			for(i = linestop; i >= linestart; i--) {
+				if(t==0){
+					if( BinarizationData[i] ){					/* 右から最初の白 */
+						Rsensor = i;
+						t = 1;
+					}
+				}else if(t==1){
+					if( !BinarizationData[i] ){					/* 右から最初の黒 */			
+						Lsensor = i;
+						t = 2;
+					}
+				}
+			}	
 		}
-	}else{//ライン右寄り
-		for(i = linestop; i >= linestart; i--) {
-			if(t==0){
-				if( BinarizationData[i] ){					/* 右から最初の白 */
-					Rsensor = i;
-					t = 1;
-				}
-			}else if(t==1){
-				if( !BinarizationData[i] ){					/* 右から最初の黒 */			
-					Lsensor = i;
-					t = 2;
-				}
-			}
-		}	
-	}
-		
-	
-	if(White > 70){//全白にする
-		Wide = 127;Center = 64;						/* 白一面 */
-		
-	}else if((White > 4) && ((linestop - linestart) > 3)){//白が少なすぎない && ラインを探す範囲が狭すぎない
-	
-		Wide = Rsensor - Lsensor;					/* 幅を求める */	
-		Center = (Lsensor + Rsensor) >> 1;		/* 重心を求める */	
 			
+		
+		if(White > 70){//全白にする
+			Wide = 127;Center = 64;						/* 白一面 */
+			break;
 			
-		//ライン細すぎ || ( 前回、黒又は白一色ではない && ハーフラインなどではない &&  (急にラインが移動した))
-		if((((mode == 1) && (Wide < 3)) || ((mode != 1) && (Wide < 3))) || ((Center_lasttime != 64) && (White < 20) && (((Center - Center_lasttime) > 15) || ((Center - Center_lasttime) < -15)))){
-					
-			if(Center_lasttime < 60){
+		}else if((White > 4) && ((linestop - linestart) > 3)){//白が少なすぎない && ラインを探す範囲が狭すぎない
+		
+			Wide = Rsensor - Lsensor;					/* 幅を求める */	
+			Center = (Lsensor + Rsensor) >> 1;		/* 重心を求める */	
+				
+				
+			//ライン細すぎ || ( 前回、黒又は白一色ではない && ハーフラインなどではない &&  (急にラインが移動した))
+			//if((((mode == 1) && (Wide < 3)) || ((mode != 1) && (Wide < 3))) || ((Center_lasttime != 64) && (White < 20) && (((Center - Center_lasttime) > 15) || ((Center - Center_lasttime) < -15)))){
+			
+			//ライン細すぎ 
+			if( ((mode == 1) && (Wide < 3)) || ((mode != 1) && (Wide < 3)) ){
 						
-				WhiteLineWide(Rsensor,linestop);//もう一度ラインを探す			
-			}else{
+				if(Center_lasttime < 60){
+							
+					//WhiteLineWide(Rsensor,linestop);//もう一度ラインを探す	
+					linestart = Rsensor;
 					
-				WhiteLineWide(linestart,Lsensor);//もう一度ラインを探す
+					Lsensor = linestart;
+					Rsensor = linestop;
+					
+					Wide = 0;
+					t = 0;	
+				}else{
+						
+					//WhiteLineWide(linestart,Lsensor);//もう一度ラインを探す
+					linestop = Lsensor;
+					
+					Lsensor = linestart;
+					Rsensor = linestop;
+					
+					Wide = 0;
+					t = 0;	
+				}
+			}else{
+				break;
 			}
-		}	
-	}else{//全黒にする
-		Wide = 0;Center = 64;						/* 黒一面 */
-	}	
+		}else{//全黒にする
+			Wide = 0;Center = 64;						/* 黒一面 */
+			break;
+		}
+	}
 }
 
 /**********************************************************************/

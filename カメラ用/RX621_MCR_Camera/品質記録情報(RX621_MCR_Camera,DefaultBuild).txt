@@ -1,13 +1,42 @@
 品質記録情報
-2026年8月22日 15:42:50
+2026年8月24日 1:01:11
 
 ------ ビルド開始(RX621_MCR_Camera, DefaultBuild) ------
------- ビルド終了(エラー:0個, 警告:0個)(RX621_MCR_Camera, DefaultBuild) ------
+C:\Program Files (x86)\Renesas Electronics\CS+\CC\CC-RX\V3.05.00\Bin\ccrx.exe RX621_MCR_Camera.c -isa=rxv1 -fpu -lang=c99 -include=USBStack\CDC -include=USBStack -include=. -output=obj -obj_path=DefaultBuild -debug -g_line -optimize=0 -speed -nologo
+C:\Program Files (x86)\Renesas Electronics\CS+\CC\CC-RX\V3.05.00\Bin\rlink.exe -subcommand=DefaultBuild\RX621_MCR_Camera.clnk
+W0561017:Paid license of CC-RX V3 is not found, and the evaluation period has expired. Please consider purchasing the product.
+W0561017:Paid license of CC-RX V3 is not found, and the evaluation period has expired. Please consider purchasing the product.
+Renesas Optimizing Linker Completed
+------ ビルド終了(エラー:0個, 警告:2個)(RX621_MCR_Camera, DefaultBuild) ------
+
+--- CommandFile 1 ---
+DefaultBuild\RX621_MCR_Camera.clnk :
+-library=DefaultBuild\RX621_MCR_Camera.lib
+-input=DefaultBuild\dbsct.obj
+-input=DefaultBuild\intprg.obj
+-input=DefaultBuild\resetprg.obj
+-input=DefaultBuild\sbrk.obj
+-input=DefaultBuild\vecttbl.obj
+-input=DefaultBuild\RX621_MCR_Camera.obj
+-input=DefaultBuild\wait.obj
+-input=DefaultBuild\printf_lib.obj
+-noprelink
+-output=DefaultBuild\RX621_MCR_Camera.abs
+-list=DefaultBuild\RX621_MCR_Camera.map
+-nooptimize
+-start=B_1,R_1,B_2,R_2,B,R,SU,SI/04,PResetPRG/0FFF80000,C_1,C_2,C,C$DSEC,C$BSEC,C$INIT,C$VTBL,C$VECT,D_1,D_2,D,P,PIntPRG,W_1,W_2,W,L/0FFF80100,FIXEDVECT/0FFFFFFD0
+-rom=D=R,D_1=R_1,D_2=R_2
+-nologo
+-end
+-input=DefaultBuild\RX621_MCR_Camera.abs
+-output=DefaultBuild\RX621_MCR_Camera.mot
+-form=stype
+-exit
 
 
 --- SHA1 hash value of output files ---
-C:\WorkSpace\RX621_MCR_Camera\DefaultBuild\RX621_MCR_Camera.abs: 8e7048f3bb1af21673a899f560341848d6024ea9
-C:\WorkSpace\RX621_MCR_Camera\DefaultBuild\RX621_MCR_Camera.mot: 7de91f4d4b44219ed6d048602bf9304f41385a78
+C:\WorkSpace\RX621_MCR_Camera\DefaultBuild\RX621_MCR_Camera.abs: 1bd7f6548053491e621a79f1b80420640bfa4f12
+C:\WorkSpace\RX621_MCR_Camera\DefaultBuild\RX621_MCR_Camera.mot: 69e385cdddaeeaa08352fd944af2df20ee44a2dd
 
 
 --- システム情報 ---
@@ -35,11 +64,11 @@ C:\WorkSpace\RX621_MCR_Camera\DefaultBuild\RX621_MCR_Camera.mot: 7de91f4d4b44219
  C:\Program Files (x86)\Renesas Electronics\CS+\CC
 *メモリ使用量
  *プライベート・ワーキング・セット
-  247 MB
+  264 MB
  *GDIオブジェクト数
-  2039
+  2065
  *USERオブジェクト数
-  923
+  951
  *開いているファイル
   3 editors, 3 files, 25 KB
 
