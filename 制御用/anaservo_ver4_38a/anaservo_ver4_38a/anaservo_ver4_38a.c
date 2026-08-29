@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			125	  	/* ハンドル最大位置 115           */
 
-#define 	MAXTIME 			1200 //1100	  				/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
+#define 	MAXTIME 			1150 //1100	  				/* 最大走行時間 (0.01秒)  1200 = 12s     1250     */
 //#define 	START_WAIT 			 100 //motor+0.5 bat+0.5	// スタート時の走行待ち時間 (1.00秒)  100 = 1s        */
 
 /*======================================*/
@@ -220,7 +220,7 @@ int		    i_TOPSPEED_B=		50;		//直線 コース記憶用
 
 /////////////////////////////////////////////////////////////////////////////////////// 0:禁止 1と-1は同じ
 //前半
-int			i_SPEED_DOWN	=		5;//5		//角度によりi_TOPSPEEDを減速 カーブ前半 8 6
+int			i_SPEED_DOWN	=		6;//5		//角度によりi_TOPSPEEDを減速 カーブ前半 8 6
 int			i_MOTOR_out_R	=	 	-2;//1		//外側モーター用パラメーター 1	-2
 int			i_MOTOR_in_F	=		3;//4		//内側モーター用パラメーター 	2 	1
 int			i_MOTOR_in_R	=		-3;//-2		//内側モーター用パラメーター -2	-3
@@ -259,8 +259,8 @@ int			i_saka_max	  =		  1;	//認識可能な坂の数
 #define		KASA_Encoder4  	3000	//坂上終わり  
 #define		KASA_Encoder5  	4400	//下り終わり 通常にもどる 
 
-#define		KASA_Encoder4_2  3800	//坂上終わり(最後の坂道)
-#define		KASA_Encoder5_2  4600	//下り終わり 通常にもどる(最後の坂道) 
+#define		KASA_Encoder4_2  3000	//坂上終わり(最後の坂道)
+#define		KASA_Encoder5_2  4400	//下り終わり 通常にもどる(最後の坂道) 
 
 
 //斜面(上り)
@@ -1284,8 +1284,8 @@ void main( void )
 						if(or < MOTOR_out_CH_R_Boost_min) or = MOTOR_out_CH_R_Boost_min;
 					}else{
 						if(f < 0) f = 0;
-						if(r < -10) r = -10;
-						if(or < 0) or = 0;
+						if(r < 0) r = 0;//-10
+						if(or < 10) or = 10; //0
 					}
 					 
 					if(f > i_MOTOR_out_base) f = i_MOTOR_out_base;
@@ -1419,8 +1419,8 @@ void main( void )
 						if(or < MOTOR_out_CH_R_Boost_min) or = MOTOR_out_CH_R_Boost_min;
 					}else{
 						if(f < 0) f = 0;
-						if(r < -10) r = -10;
-						if(or < 0) or = 0;	
+						if(r < 0) r = 0;//-10
+						if(or < 10) or = 10;	//0
 					}
 					
 					if(f > i_MOTOR_out_base) f = i_MOTOR_out_base;
