@@ -126,8 +126,8 @@ void main(void)
 		
 #ifdef PRINT
 	//USB_init();  //USB CDCÇÃèâä˙âª
-	initSCI1(SPEED_9600);
-	//initSCI1(SPEED_38400);
+	//initSCI1(SPEED_9600);
+	initSCI1(SPEED_38400);
 #endif //PRINT
 	
 	/* Data Initialization */
