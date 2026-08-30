@@ -213,7 +213,7 @@ int			i_KASOKU = 15;
 
 #define		MOTOR_OUT_BASE_N		100		//カーブ後半用　外側モーター用パラメーター 
 
-#define		MAX_TOPSPEED	55	//ブースト時でもこの速度以上は出ないように制限する JMCR指定モータ相当の最大速度と同等に設定する
+#define		MAX_TOPSPEED	58	//ブースト時でもこの速度以上は出ないように制限する JMCR指定モータ相当の最大速度と同等に設定する
 
 int		    i_TOPSPEED	=		50;		//直線 
 int		    i_TOPSPEED_B=		50;		//直線 コース記憶用
@@ -413,7 +413,8 @@ void main( void )
     /* マイコン機能の初期化 */
     init();                             /* 初期化                       */
     initBeepS();                        /* ブザー関連処理               */
-	init_uart0_printf( SPEED_9600 );    /* UART0とprintf関連の初期化    */
+	//init_uart0_printf( SPEED_9600 );    /* UART0とprintf関連の初期化    */
+	init_uart0_printf( SPEED_38400 );    /* UART0とprintf関連の初期化    */
 	setMicroSDLedPort( &p6, &pd6, 0 );  /* microSD モニタLED設定        */
    
 	asm(" fset I ");                    /* 全体の割り込み許可           */
