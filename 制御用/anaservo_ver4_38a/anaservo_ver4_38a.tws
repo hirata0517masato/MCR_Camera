@@ -8,8 +8,14 @@
 [BREAKPOINTS]
 [OPEN_WORKSPACE_FILES]
 "C:\WorkSpace\anaservo_ver4_38a\anaservo_ver4_38a\anaservo_ver4_38a.c" 
+"C:\WorkSpace\anaservo_ver4_38a\anaservo_ver4_38a\microsd_lib.c" 
+"C:\WorkSpace\anaservo_ver4_38a\anaservo_ver4_38a\printf_lib.c" 
+"C:\WorkSpace\common_r8c38a\sfr_r838a.h" 
 [WORKSPACE_FILE_STATES]
 "C:\WorkSpace\anaservo_ver4_38a\anaservo_ver4_38a\anaservo_ver4_38a.c" -8 -31 1278 637 1 0 
+"C:\WorkSpace\anaservo_ver4_38a\anaservo_ver4_38a\microsd_lib.c" 26 26 1080 416 0 1 
+"C:\WorkSpace\anaservo_ver4_38a\anaservo_ver4_38a\printf_lib.c" 78 78 1080 416 0 3 
+"C:\WorkSpace\common_r8c38a\sfr_r838a.h" 52 52 1080 416 0 2 
 [LOADED_PROJECTS]
 "anaservo_ver4_38a" 
 [END]

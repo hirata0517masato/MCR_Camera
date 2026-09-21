@@ -37,7 +37,7 @@
 
 #define 	SERVO_MAX 			125	  	/* ƒnƒ“ƒhƒ‹Å‘åˆÊ’u 115           */
 
-#define 	MAXTIME 			1150 //1100	  				/* Å‘å‘–sŠÔ (0.01•b)  1200 = 12s     1250     */
+#define 	MAXTIME 			1400 //1100	  				/* Å‘å‘–sŠÔ (0.01•b)  1200 = 12s     1250     */
 //#define 	START_WAIT 			 100 //motor+0.5 bat+0.5	// ƒXƒ^[ƒg‚Ì‘–s‘Ò‚¿ŠÔ (1.00•b)  100 = 1s        */
 
 /*======================================*/
@@ -149,6 +149,7 @@ int             i_Encoder5  = 0;               /*  5ms–ˆ‚ÌÅV’l               *
 unsigned int    ui_EncoderBuff  = 0;           /* ŒvZ—p@Š„‚è‚İ“à‚Åg—p     */
 long			l_startPoint = 0;			/* ‹——£Œv‘ª—pƒXƒ^[ƒg’n“_ */
 long			l_startPoint_saka = 0;		/* ‹——£Œv‘ª—pƒXƒ^[ƒg’n“_ âH */
+long			l_startPoint_saka_ue_fin = 0;/* ‹——£Œv‘ª—pƒXƒ^[ƒg’n“_ âH */
 long			l_startPoint_curve = 0;		/* ‹——£Œv‘ª—pƒXƒ^[ƒg’n“_ ƒJ[ƒuI—¹ˆÊ’u*/
 long            l_straight_EncoderTotal = 0;   /* ’¼üÏZ’l•Û‘¶—p                 */
 
@@ -203,8 +204,8 @@ unsigned char   uc_types_dipsw;            /* ƒfƒBƒbƒvƒXƒCƒbƒ`’l•Û‘¶       */
 
 **************************************************************************************************/
 //ƒIƒtƒZƒbƒg
-int  		i_Center_offset_MAX = 5;		/*ƒJ[ƒuƒJƒƒ‰ƒZƒ“ƒ^[‚ğˆÚ“®Šñ‚¹‚é Å¬’l 0 	*/
-int  		i_Center_offset_Angle = -5;	/*‚±‚Ì’l‚É‚Â‚«‚P‚h‚m‘¤‚ÉŠñ‚¹‚é	³FIN@•‰FOUT		*/
+int  		i_Center_offset_MAX = 0;		/*ƒJ[ƒuƒJƒƒ‰ƒZƒ“ƒ^[‚ğˆÚ“®Šñ‚¹‚é Å¬’l 0 	*/
+int  		i_Center_offset_Angle = -100;	/*‚±‚Ì’l‚É‚Â‚«‚P‚h‚m‘¤‚ÉŠñ‚¹‚é	³FIN@•‰FOUT		*/
 
 int			i_KASOKU = 15;
 
@@ -232,7 +233,7 @@ int			i_MOTOR_in_F_N=		7;//8		//“à‘¤ƒ‚[ƒ^[—pƒpƒ‰ƒ[ƒ^[@Œã”¼	6	6
 int			i_MOTOR_in_R_N=		4;//6		//“à‘¤ƒ‚[ƒ^[—pƒpƒ‰ƒ[ƒ^[@Œã”¼	3	3
 
 
-#define		date_f_brake		400	//Ä¶‘–s ’Êí‘–s‚Æ“¯—l‚Ì‘¬“x§ŒÀ‚ğ‚·‚é‹——£ 400
+#define		date_f_brake		500	//Ä¶‘–s ’Êí‘–s‚Æ“¯—l‚Ì‘¬“x§ŒÀ‚ğ‚·‚é‹——£ 400
 #define		date_f_brake2		60	//Ä¶‘–s@c‚è‹——£/date_f_brake2 ‚¾‚¯‘¬“xãŒÀ‚ğã‚°‚é ”’l‚ğ‘å‚«‚­‚µ‚½•û‚ª’x‚­‚È‚é(0‚É‚Í‚µ‚È‚¢‚±‚Æj
 
 #define		Cu_FREE_time  		15		//ƒJ[ƒuI—¹‚ÌŒã—ÖƒtƒŠ[‚ÌŠÔ(msecj
@@ -259,8 +260,8 @@ int			i_saka_max	  =		  1;	//”F¯‰Â”\‚Èâ‚Ì”
 #define		KASA_Encoder4  	3000	//âãI‚í‚è  
 #define		KASA_Encoder5  	4400	//‰º‚èI‚í‚è ’Êí‚É‚à‚Ç‚é 
 
-#define		KASA_Encoder4_2  3000	//âãI‚í‚è(ÅŒã‚Ìâ“¹)
-#define		KASA_Encoder5_2  4400	//‰º‚èI‚í‚è ’Êí‚É‚à‚Ç‚é(ÅŒã‚Ìâ“¹) 
+#define		KASA_Encoder4_2  3500	//âãI‚í‚è(ÅŒã‚Ìâ“¹)
+#define		KASA_Encoder5_2  4800	//‰º‚èI‚í‚è ’Êí‚É‚à‚Ç‚é(ÅŒã‚Ìâ“¹) 
 
 
 //Î–Ê(ã‚è)
@@ -338,9 +339,9 @@ int			i_C_short_len =		540;	//‚±‚Ì‹——£–¢–‚ÍƒVƒ‡[ƒgAˆÈã‚Íƒƒ“ƒO ¦Ä¶‘–s—p‚
 #define		C_TOPSPEED_SHORT_NG	4		//’Êí‚Ì‚İ (i_Encoder10 < C_TOPSPEED - C_TOPSPEED_SHORT_NG )‚Ì‚Æ‚«@‹——£‚ÍƒVƒ‡[ƒg‚Å‚à‘¬“x‚ª’x‚¢‚Æ‚«‚Íƒƒ“ƒO
 
 
-char		c_c_cut  	 	 =	  1;	//Ä¶‘–s‚Å‚ ‚Á‚Ä‚à 0= Ä¶‚µ‚È‚¢ 1= Ä¶‚·‚é
+char		c_c_cut  	 	 =	  0;	//Ä¶‘–s‚Å‚ ‚Á‚Ä‚à 0= Ä¶‚µ‚È‚¢ 1= Ä¶‚·‚é
 
-int			i_date_f_brake_c	=	600;	//Ä¶‘–s‚ÌƒuƒŒ[ƒLg—p‰Â”\‹——£(mm) ƒNƒ‰ƒ“ƒN—p 600
+int			i_date_f_brake_c	=	550;	//Ä¶‘–s‚ÌƒuƒŒ[ƒLg—p‰Â”\‹——£(mm) ƒNƒ‰ƒ“ƒN—p 600
 int			i_date_f_shortcat_c =	230;	//Ä¶‘–s‚ÌƒVƒ‡[ƒgƒJƒbƒg‹——£(mm) ƒNƒ‰ƒ“ƒN—p 210
 
 int 		i_C_TOPSPEED4 = 		48;		//Ä¶‘–s‚ÌƒuƒŒ[ƒL‘O
@@ -376,7 +377,7 @@ char		c_h_cut 			 =	  1;	//Ä¶‘–s‚Å‚ ‚Á‚Ä‚à 0= Ä¶‚µ‚È‚¢ 1= Ä¶‚·‚é
 #define			BRAKE_MAX_R			-90	//ƒuƒŒ[ƒL‚ÌÅ‘åƒpƒ[ ƒŠƒA—p
 
 
-int				i_kp = -18;//- 8  3 -16 -19 -23  -13
+int				i_kp = -22;//- 8  3 -16 -19 -23  -13
 int				i_kd = -105;//-80 20 -130 -190	-110
 int 			i_ki = 0;//-2
 
@@ -407,7 +408,7 @@ void main( void )
 	int             i, j,old_i;
     unsigned int    u;
     char            c;
-	int x,f,r,or,jj = 0;
+	int x,f,r,rr,or,jj = 0;
 	int     ret;
 	
     /* ƒ}ƒCƒRƒ“‹@”\‚Ì‰Šú‰» */
@@ -791,6 +792,7 @@ void main( void )
 			l_EncoderTotal = 0;  
 			l_startPoint = 0;
 			l_startPoint_saka = 0;
+			l_startPoint_saka_ue_fin = 0;
 			
 			c_saka_cnt = 0;//â“¹‚Ì‰ñ”
 			
@@ -969,7 +971,7 @@ void main( void )
 		//if(-50 < i && i < 50){
 		if(-20 < i && i < 20){
 			if(c_mode == 0){//â’†‚Å‚È‚¯‚ê‚Î
-				if(l_EncoderTotal > 200 && (l_startPoint_saka == 0 || (l_EncoderTotal-l_startPoint_saka) >= 500) && (l_startPoint == 0 || (l_EncoderTotal-l_startPoint ) >= 150) && (l_startPoint_curve == 0 || (l_EncoderTotal-l_startPoint_curve) >= 0)){//ƒQ[ƒg‚É”½‰‚µ‚È‚¢‚æ‚¤‚É && âI—¹‚©‚ç­‚µ‚ÌŠÔ‚Í–³‹ && ƒNƒ‰ƒ“ƒNAƒn[ƒtI—¹Œã­‚µ–³‹ && ƒJ[ƒu’¼Œã‚Í–³‹
+				if(l_EncoderTotal > 200 && (l_startPoint_saka == 0 || (((l_EncoderTotal-l_startPoint_saka) >= 500) && ((l_EncoderTotal-l_startPoint_saka_ue_fin) >= 2000)) ) && (l_startPoint == 0 || (l_EncoderTotal-l_startPoint ) >= 150) && (l_startPoint_curve == 0 || (l_EncoderTotal-l_startPoint_curve) >= 0)){//ƒQ[ƒg‚É”½‰‚µ‚È‚¢‚æ‚¤‚É && âI—¹‚©‚ç­‚µ‚ÌŠÔ‚Í–³‹ && ƒNƒ‰ƒ“ƒNAƒn[ƒtI—¹Œã­‚µ–³‹ && ƒJ[ƒu’¼Œã‚Í–³‹
 				
 					if(i_date_f_mode == 0){
 						if( check_crossline() ) {       // ƒNƒƒXƒ‰ƒCƒ“ƒ`ƒFƒbƒN         
@@ -1104,6 +1106,8 @@ void main( void )
 				i_MOTOR_out_R = MOTOR_out4_R;
 				i_MOTOR_in_F = MOTOR_in4_F;
 				i_MOTOR_in_R = MOTOR_in4_R;
+				
+				l_startPoint_saka_ue_fin = l_EncoderTotal;
 			
 			}else if((l_EncoderTotal-l_startPoint_saka) >= KASA_Encoder2){//‘¬“x‚ğ‚³‚ç‚É’x‚­ âãƒWƒƒƒ“ƒv–h~
 				i_TOPSPEED = TOPSPEED3;
@@ -1230,26 +1234,31 @@ void main( void )
 				
 					r = x;
 					f = x;
+					rr = x;
 				}else if(ul_cnt_curve_time_1ms <= Cu_BRAKE_N && c_mode != 1){//ƒuƒŒ[ƒL‘O”¼ && âƒ‚[ƒh‚Å‚È‚¯‚ê‚Î
 				
 					x = ((i_TOPSPEED -(i / i_SPEED_DOWN))-i_Encoder10)*5;	
-					r = ((i_TOPSPEED -(i / i_SPEED_DOWN))-i_Encoder10)*40;
 					f = ((i_TOPSPEED -(i / i_SPEED_DOWN))-i_Encoder10)*20;
+					r = ((i_TOPSPEED -(i / i_SPEED_DOWN))-i_Encoder10)*40;
+					rr = ((i_TOPSPEED -(i / i_SPEED_DOWN))-i_Encoder10)*40;
 				
 					if(x < -10) x = -10;
-					if(r < -80) r = -80;
 					if(f < -35) f = -35;
+					if(r < -80) r = -80;
+					if(rr < -80) rr = -80;
 				}else{
 					x = ((i_TOPSPEED -(i / i_SPEED_DOWN))-i_Encoder10)*2;	
-					r = ((i_TOPSPEED -(i / i_SPEED_DOWN))-i_Encoder10)*5;
-					f = ((i_TOPSPEED -(i / i_SPEED_DOWN))-i_Encoder10)*2;
+					f = ((i_TOPSPEED -(i / i_SPEED_DOWN))-i_Encoder10)*5;
+					r = ((i_TOPSPEED -(i / i_SPEED_DOWN))-i_Encoder10)*10;
+					rr = ((i_TOPSPEED -(i / i_SPEED_DOWN))-i_Encoder10)*20;
 				
 					if(x < -10) x = -10;
+					if(f < -20) f = -20;
 					if(r < -20) r = -20;
-					if(f < -20) f = -20;	
+					if(rr < -40) rr = -40;	
 				}
 				motor_f( x, f );
-            	motor_r( r, r );			
+            	motor_r( r, rr );			
 			
 			}else if(i_Encoder10 >= (i_TOPSPEED -(i / i_SPEED_DOWN_N)) && (l_EncoderTotal-l_startPoint ) >= 200 ) {// ƒGƒ“ƒR[ƒ_‚É‚æ‚èƒXƒs[ƒh§Œä  ƒJ[ƒuŒã”¼
 			
@@ -1285,8 +1294,16 @@ void main( void )
 						if(or < MOTOR_out_CH_R_Boost_min) or = MOTOR_out_CH_R_Boost_min;
 					}else{
 						if(f < 0) f = 0;
-						if(r < 0) r = 0;//-10
-						if(or < 10) or = 10; //0
+						
+						if(4 < (i_Center + i_Center_offset)){//ŠO‚É‚æ‚è‚·‚¬
+							 f /= 2;
+							
+							if(r < -30) r = -30;//-10
+							if(or < -5) or = -5; //0
+						}else{
+							if(r < -10) r = -10;//-10
+							if(or < 0) or = 0; //0
+						}
 					}
 					 
 					if(f > i_MOTOR_out_base) f = i_MOTOR_out_base;
@@ -1366,27 +1383,32 @@ void main( void )
 	
 					r = x;
 					f = x;
+					rr = x;
 				}else if(ul_cnt_curve_time_1ms <= Cu_BRAKE_N && c_mode != 1){//ƒuƒŒ[ƒL‘O”¼ && âƒ‚[ƒh‚Å‚È‚¯‚ê‚Î
 					x = ((i_TOPSPEED -(-i / i_SPEED_DOWN))-i_Encoder10)*5;
-					r = ((i_TOPSPEED -(-i / i_SPEED_DOWN))-i_Encoder10)*40;
 					f = ((i_TOPSPEED -(-i / i_SPEED_DOWN))-i_Encoder10)*20;
+					r = ((i_TOPSPEED -(-i / i_SPEED_DOWN))-i_Encoder10)*40;
+					rr = ((i_TOPSPEED -(-i / i_SPEED_DOWN))-i_Encoder10)*40;
 							
 		
 					if(x < -10) x = -10;
-					if(r < -80) r = -80;
 					if(f < -35) f = -35;
+					if(r < -80) r = -80;
+					if(rr < -80) rr = -80;
 				}else{
 					x = ((i_TOPSPEED -(-i / i_SPEED_DOWN))-i_Encoder10)*2;
-					r = ((i_TOPSPEED -(-i / i_SPEED_DOWN))-i_Encoder10)*5;
-					f = ((i_TOPSPEED -(-i / i_SPEED_DOWN))-i_Encoder10)*2;
+					f = ((i_TOPSPEED -(-i / i_SPEED_DOWN))-i_Encoder10)*5;
+					r = ((i_TOPSPEED -(-i / i_SPEED_DOWN))-i_Encoder10)*10;
+					rr = ((i_TOPSPEED -(-i / i_SPEED_DOWN))-i_Encoder10)*20;
 							
 
 					if(x < -10) x = -10;
-					if(r < -20) r = -20;
 					if(f < -20) f = -20;
+					if(r < -20) r = -20;
+					if(rr < -40) rr = -40;
 				}	
 				motor_f( f, x );
-            	motor_r( r, r );
+            	motor_r( rr, r );
 				
 			}else if(i_Encoder10 >= (i_TOPSPEED -(-i / i_SPEED_DOWN_N)) && (l_EncoderTotal-l_startPoint ) >= 200) {  // ƒGƒ“ƒR[ƒ_‚É‚æ‚èƒXƒs[ƒh§Œä ƒJ[ƒuŒã”¼
 			
@@ -1420,8 +1442,18 @@ void main( void )
 						if(or < MOTOR_out_CH_R_Boost_min) or = MOTOR_out_CH_R_Boost_min;
 					}else{
 						if(f < 0) f = 0;
-						if(r < 0) r = 0;//-10
-						if(or < 10) or = 10;	//0
+					
+						
+						
+						if((i_Center + i_Center_offset) < -4 ){//ŠO‚É‚æ‚è‚·‚¬
+							f /= 2;
+							if(r < -30) r = -30;//-10
+							if(or < -5) or = -5;	//0
+							
+						}else{
+							if(r < -10) r = -10;//-10
+							if(or < 0) or = 0;	//0
+						}
 					}
 					
 					if(f > i_MOTOR_out_base) f = i_MOTOR_out_base;
@@ -1634,7 +1666,7 @@ void main( void )
 						c_c_short_mode = 0;
 					}
 				}else if(c_c_cut == 0 && i_date_f_mode != 0){//ƒR[ƒX‹L‰¯‚Å‚àƒNƒ‰ƒ“ƒN‚Í’Êí
-				
+					/*
 					if( (i_C_short_len > l_EncoderTotal - l_EncoderTotal_ch - (i_date_f_buff_ch_int[i_date_f_num_ch] - i_date_f_brake_c) ) || ( i_Encoder10 > i_C_TOPSPEED + C_TOPSPEED_SHORT)){ // ‹——£‚ª’Z‚¢ || İ’è‘¬“x‚Ü‚ÅŒ¸‘¬‚Å‚«‚Ä‚¢‚È‚¢(‹——£‚ª’Z‚¢‚ÆŒ¸‘¬‚ª‚Å‚«‚Ä‚¢‚È‚¢‰Â”\«‚ª‚ ‚é)
 						c_c_short_mode = 1;	
 						
@@ -1644,7 +1676,9 @@ void main( void )
 						
 					}else{
 						c_c_short_mode = 0;
-					}
+					}*/
+					
+					c_c_short_mode = 1;	//‚·‚×‚Ä‹——£‚ª 500mm ‚Æ‚µ‚Ä’²®‚·‚é
 					
 				}else{//’Êí
 					if( (i_C_short_len > l_EncoderTotal - l_EncoderTotal_ch ) || ( i_Encoder10 > i_C_TOPSPEED + C_TOPSPEED_SHORT)){ // ‹——£‚ª’Z‚¢ || İ’è‘¬“x‚Ü‚ÅŒ¸‘¬‚Å‚«‚Ä‚¢‚È‚¢(‹——£‚ª’Z‚¢‚ÆŒ¸‘¬‚ª‚Å‚«‚Ä‚¢‚È‚¢‰Â”\«‚ª‚ ‚é)
@@ -1707,6 +1741,7 @@ void main( void )
 					}
 				}else if(c_c_cut == 0 && i_date_f_mode != 0){//ƒR[ƒX‹L‰¯‚Å‚àƒNƒ‰ƒ“ƒN‚Í’Êí
 				
+					/*
 					if( (i_C_short_len > l_EncoderTotal - l_EncoderTotal_ch - (i_date_f_buff_ch_int[i_date_f_num_ch] - i_date_f_brake_c) ) || ( i_Encoder10 > i_C_TOPSPEED + C_TOPSPEED_SHORT)){ // ‹——£‚ª’Z‚¢ || İ’è‘¬“x‚Ü‚ÅŒ¸‘¬‚Å‚«‚Ä‚¢‚È‚¢(‹——£‚ª’Z‚¢‚ÆŒ¸‘¬‚ª‚Å‚«‚Ä‚¢‚È‚¢‰Â”\«‚ª‚ ‚é)
 						c_c_short_mode = 1;	
 						
@@ -1716,7 +1751,9 @@ void main( void )
 						
 					}else{
 						c_c_short_mode = 0;
-					}
+					}*/
+					
+					c_c_short_mode = 1;	//‚·‚×‚Ä‹——£‚ª 500mm ‚Æ‚µ‚Ä’²®‚·‚é
 					
 				}else{//’Êí
 					if( (i_C_short_len > l_EncoderTotal - l_EncoderTotal_ch ) || ( i_Encoder10 > i_C_TOPSPEED + C_TOPSPEED_SHORT)){ // ‹——£‚ª’Z‚¢ || İ’è‘¬“x‚Ü‚ÅŒ¸‘¬‚Å‚«‚Ä‚¢‚È‚¢(‹——£‚ª’Z‚¢‚ÆŒ¸‘¬‚ª‚Å‚«‚Ä‚¢‚È‚¢‰Â”\«‚ª‚ ‚é)
@@ -3343,7 +3380,7 @@ int date_f_make(int i_pattern, int i_angle, int i_encoder, int i_rmode){
 	static long sl_Encoder_Total = 0;
 	static long sl_Encoder_Saka = 20000;
 	static int	si_saka_flag = 0;
-	static int si_Encoder_min = 800;
+	static int si_Encoder_min = 900;
 	
 	sl_Encoder += i_encoder;
 	sl_Encoder_Total += i_encoder;
@@ -3813,14 +3850,14 @@ void intTRB( void )
 				if(c_mode == 0){
 					//if(i_date_f_buff_int[i_date_f_num] - date_f_brake < l_straight_EncoderTotal)si_flag = 1;//‹L˜^‚µ‚½’¼ü‚ğ‘–‚Á‚½
 					
-					if(l_straight_EncoderTotal > 300){
-						if(i_date_f_buff_int[i_date_f_num] - 300 < l_straight_EncoderTotal)si_flag = 1;//‹L˜^‚µ‚½’¼ü‚ğ‘–‚Á‚½
+					if(l_straight_EncoderTotal > 500){
+						if(i_date_f_buff_int[i_date_f_num] - 500 < l_straight_EncoderTotal)si_flag = 1;//‹L˜^‚µ‚½’¼ü‚ğ‘–‚Á‚½
 					}
 				}else{
 					//if(i_date_f_buff_int[i_date_f_num] - date_f_brake - 500 < l_straight_EncoderTotal)si_flag = 1;//‹L˜^‚µ‚½’¼ü‚ğ‘–‚Á‚½
 					
-					if(l_straight_EncoderTotal > 300){
-						if(i_date_f_buff_int[i_date_f_num] - 300 - 600 < l_straight_EncoderTotal)si_flag = 1;//‹L˜^‚µ‚½’¼ü‚ğ‘–‚Á‚½
+					if(l_straight_EncoderTotal > 500){
+						if(i_date_f_buff_int[i_date_f_num] - 500 - 600 < l_straight_EncoderTotal)si_flag = 1;//‹L˜^‚µ‚½’¼ü‚ğ‘–‚Á‚½
 					}
 				}
 				si_flag20 = 0;
