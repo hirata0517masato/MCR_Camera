@@ -214,7 +214,7 @@ int			i_KASOKU = 15;
 
 #define		MOTOR_OUT_BASE_N		100		//カーブ後半用　外側モーター用パラメーター 
 
-#define		MAX_TOPSPEED	58	//ブースト時でもこの速度以上は出ないように制限する JMCR指定モータ相当の最大速度と同等に設定する
+#define		MAX_TOPSPEED	60	//ブースト時でもこの速度以上は出ないように制限する JMCR指定モータ相当の最大速度と同等に設定する
 
 int		    i_TOPSPEED	=		50;		//直線 
 int		    i_TOPSPEED_B=		50;		//直線 コース記憶用
@@ -229,8 +229,8 @@ int			i_MOTOR_in_R	=		-3;//-2		//内側モーター用パラメーター -2	-3
 //後半
 int			i_SPEED_DOWN_N=		8;//7		//角度によりi_TOPSPEEDを減速  カーブ後半 11 10
 int			i_MOTOR_out_R_N=	4;//5		//外側モーター用パラメーター 後半	5	5
-int			i_MOTOR_in_F_N=		7;//8		//内側モーター用パラメーター　後半	6	6
-int			i_MOTOR_in_R_N=		4;//6		//内側モーター用パラメーター　後半	3	3
+int			i_MOTOR_in_F_N=		8;//8		//内側モーター用パラメーター　後半	6	6
+int			i_MOTOR_in_R_N=		3;//6		//内側モーター用パラメーター　後半	3	3
 
 
 #define		date_f_brake		500	//再生走行時 通常走行と同様の速度制限をする距離 400
@@ -255,13 +255,13 @@ int			i_S_flag = 2;				//坂道　遇数回を　1 = 無視しない  2 = 無視する
 int			i_saka_max	  =		  1;	//認識可能な坂の数
 #define 	KASA_Encoder1  	100	//坂開始	50
 #define 	KASA_Encoder2  	600	//上り途中 終わり 300
-#define 	KASA_Encoder3  	1400	//上り終わり 
+#define 	KASA_Encoder3  	1600	//上り終わり 
 
 #define		KASA_Encoder4  	3000	//坂上終わり  
 #define		KASA_Encoder5  	4400	//下り終わり 通常にもどる 
 
 #define		KASA_Encoder4_2  3500	//坂上終わり(最後の坂道)
-#define		KASA_Encoder5_2  4800	//下り終わり 通常にもどる(最後の坂道) 
+#define		KASA_Encoder5_2  5100	//下り終わり 通常にもどる(最後の坂道) 
 
 
 //斜面(上り)
