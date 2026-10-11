@@ -1,46 +1,18 @@
 品質記録情報
-2026年9月21日 11:52:56
+2026年10月11日 10:37:28
 
 ------ ビルド開始(RX621_MCR_Camera, DefaultBuild) ------
-C:\Program Files (x86)\Renesas Electronics\CS+\CC\CC-RX\V3.05.00\Bin\rlink.exe -subcommand=DefaultBuild\RX621_MCR_Camera.clnk
-W0561017:Paid license of CC-RX V3 is not found, and the evaluation period has expired. Please consider purchasing the product.
-W0561017:Paid license of CC-RX V3 is not found, and the evaluation period has expired. Please consider purchasing the product.
-Renesas Optimizing Linker Completed
------- ビルド終了(エラー:0個, 警告:2個)(RX621_MCR_Camera, DefaultBuild) ------
-
---- CommandFile 1 ---
-DefaultBuild\RX621_MCR_Camera.clnk :
--library=DefaultBuild\RX621_MCR_Camera.lib
--input=DefaultBuild\dbsct.obj
--input=DefaultBuild\intprg.obj
--input=DefaultBuild\resetprg.obj
--input=DefaultBuild\sbrk.obj
--input=DefaultBuild\vecttbl.obj
--input=DefaultBuild\RX621_MCR_Camera.obj
--input=DefaultBuild\wait.obj
--input=DefaultBuild\printf_lib.obj
--noprelink
--output=DefaultBuild\RX621_MCR_Camera.abs
--list=DefaultBuild\RX621_MCR_Camera.map
--nooptimize
--start=B_1,R_1,B_2,R_2,B,R,SU,SI/04,PResetPRG/0FFF80000,C_1,C_2,C,C$DSEC,C$BSEC,C$INIT,C$VTBL,C$VECT,D_1,D_2,D,P,PIntPRG,W_1,W_2,W,L/0FFF80100,FIXEDVECT/0FFFFFFD0
--rom=D=R,D_1=R_1,D_2=R_2
--nologo
--end
--input=DefaultBuild\RX621_MCR_Camera.abs
--output=DefaultBuild\RX621_MCR_Camera.mot
--form=stype
--exit
+------ ビルド終了(エラー:0個, 警告:0個)(RX621_MCR_Camera, DefaultBuild) ------
 
 
 --- SHA1 hash value of output files ---
-C:\WorkSpace\RX621_MCR_Camera\DefaultBuild\RX621_MCR_Camera.abs: ebc23bfa4f21311291682b4afea6a775ca92ef75
-C:\WorkSpace\RX621_MCR_Camera\DefaultBuild\RX621_MCR_Camera.mot: bca6024e989550aca781a69ee95a2841492cc6e7
+C:\WorkSpace\RX621_MCR_Camera\DefaultBuild\RX621_MCR_Camera.abs: 3d225e7c6db66b95fa13f91d76c1a15e50c3a081
+C:\WorkSpace\RX621_MCR_Camera\DefaultBuild\RX621_MCR_Camera.mot: 09661fb0ec49408ec12cd24d4942873ccb414563
 
 
 --- システム情報 ---
 *OS バージョン
- Microsoft Windows 11 Pro (-, 10.0.26200, WOW64)
+ Microsoft Windows 11 Pro (-, 10.0.26300, WOW64)
 *言語
  日本語 (日本)
 *.NET Framework バージョン
@@ -63,11 +35,11 @@ C:\WorkSpace\RX621_MCR_Camera\DefaultBuild\RX621_MCR_Camera.mot: bca6024e989550a
  C:\Program Files (x86)\Renesas Electronics\CS+\CC
 *メモリ使用量
  *プライベート・ワーキング・セット
-  269 MB
+  253 MB
  *GDIオブジェクト数
-  2042
+  2045
  *USERオブジェクト数
-  923
+  921
  *開いているファイル
   3 editors, 3 files, 25 KB
 

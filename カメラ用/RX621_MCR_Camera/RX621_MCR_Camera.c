@@ -67,7 +67,7 @@ int printf_flag = 0;
 #define 	LineStopSaka  	77
 
 #define 	LineStartNonR 	35		/* ƒJƒƒ‰‚ÅŒ©‚é”ÍˆÍ(‰E–³‹) */
-#define 	LineStopNonR  	50
+#define 	LineStopNonR  	58
 
 #define 	LineStartNonL 	70		/* ƒJƒƒ‰‚ÅŒ©‚é”ÍˆÍ(¶–³‹) */
 #define 	LineStopNonL  	92
